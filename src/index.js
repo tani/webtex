@@ -1,3 +1,3 @@
-export * from './latex-parser';
-export { Generator } from './generator';
-export { HtmlGenerator } from './html-generator';
+module.exports.parse = require('./latex-parser.js').parse;
+module.exports.Generator = require('./generator.js').Generator;
+module.exports.HtmlGenerator = require('./html-generator.js').HtmlGenerator;

@@ -1,10 +1,10 @@
 {
   "name": "latex.js",
   "description": "JavaScript LaTeX to HTML5 translator",
-  "version": "0.11.1",
+  "version": "2.0.0",
   "author": {
-    "name": "Michael Brade",
-    "email": "brade@kde.org"
+    "name": "Fernando Garcias Borges",
+    "email": "fgborges@protonmail.com"
   },
   "keywords": [
     "pegjs",
@@ -12,30 +12,10 @@
     "parser",
     "html5"
   ],
-  "bin": {
-    "latex.js": "./bin/latex.js"
-  },
   "main": "dist/index.js",
-  "browser": "dist/latex.min.js",
-  "files": [
-    "dist/index.js",
-    "dist/index.js.map",
-    "dist/latex-parser.js",
-    "dist/latex.ltx.js",
-    "dist/symbols.js",
-    "dist/generator.js",
-    "dist/html-generator.js",
-    "dist/documentclasses/",
-    "dist/packages/",
-    "dist/css/",
-    "dist/fonts/",
-    "dist/js/",
-    "dist/latex.js",
-    "dist/latex.component.js"
-  ],
   "scripts": {
     "clean": "rimraf dist bin test/coverage;",
-    "build": "rimraf dist/**/*.js.map;mkdirp dist/documentclasses;mkdirp dist/packages;mkdirp dist/css;mkdirp dist/js;mkdirp dist/fonts;rsync -a src/css/ dist/css/;rsync -a src/fonts/ dist/fonts/;rsync -a node_modules/katex/dist/fonts/*.woff dist/fonts/;rsync -a src/js/ dist/js/;cp src/latex.component.js dist/;lsc -c -m embedded -o dist src/plugin-pegjs.ls src/symbols.ls src/generator.ls src/html-generator.ls &lsc -c -m embedded -p src/latex.ltx.ls > dist/latex.ltx.js &lsc -c -m embedded -p src/types.ls > dist/types.js &lsc -c -m embedded -o dist/documentclasses src/documentclasses/ &lsc -c -m embedded -o dist/packages src/packages/;wait;pegjs -o dist/latex-parser.js --plugin ./dist/plugin-pegjs src/latex-parser.pegjs;webpack --config-name latex.js",
+    "build": "rimraf dist/**/*.js.map;mkdirp dist/documentclasses;mkdirp dist/packages;mkdirp dist/css;mkdirp dist/js;mkdirp dist/fonts;rsync -a src/css/ dist/css/;rsync -a src/fonts/ dist/fonts/;rsync -a node_modules/katex/dist/fonts/*.woff dist/fonts/;rsync -a src/js/ dist/js/;cp src/latex.component.js dist/;cp src/index.js dist/;lsc -c -m embedded -o dist src/plugin-pegjs.ls src/symbols.ls src/generator.ls src/html-generator.ls &lsc -c -m embedded -p src/latex.ltx.ls > dist/latex.ltx.js &lsc -c -m embedded -p src/types.ls > dist/types.js &lsc -c -m embedded -o dist/documentclasses src/documentclasses/ &lsc -c -m embedded -o dist/packages src/packages/;wait;pegjs -o dist/latex-parser.js --plugin ./dist/plugin-pegjs src/latex-parser.pegjs;rollup -c",
     "test": "mocha test/*.ls;",
     "iron": "iron-node node_modules/.bin/_mocha test/*.ls;",
     "testc": "nyc ./node_modules/.bin/mocha -i -g screenshot --reporter mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml test/*.ls &&mocha -g screenshot --reporter mocha-junit-reporter --reporter-options mochaFile=./test/screenshots/test-results.xml test/*.ls;",
@@ -56,17 +36,9 @@
     "js-beautify": "1.9.x"
   },
   "devDependencies": {
-    "@babel/cli": "7.4.x",
-    "@babel/core": "7.4.x",
-    "@babel/node": "7.2.x",
-    "@babel/plugin-syntax-object-rest-spread": "7.2.x",
-    "@babel/preset-env": "7.4.x",
-    "@babel/register": "7.4.x",
-    "babel-loader": "8.0.x",
     "chai": "4.x",
     "chai-as-promised": "7.x",
     "codecov": "3.x",
-    "copy-webpack-plugin": "5.x",
     "decache": "4.5.x",
     "livescript": "https://github.com/michael-brade/LiveScript",
     "mkdirp": "0.5.x",
@@ -82,12 +54,7 @@
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-node-resolve": "^5.0.2",
     "slugify": "1.3.x",
-    "source-map-loader": "0.2.x",
-    "tmp": "0.x",
-    "uglify-js": "3.5.x",
-    "webpack": "4.x",
-    "webpack-cli": "3.x",
-    "webpack-closure-compiler": "2.x"
+    "tmp": "0.x"
   },
   "repository": {
     "type": "git",
