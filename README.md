@@ -8,6 +8,17 @@ The generated HTML is exactly what is meant to be output, down to the last
 space. The CSS makes it look like LaTeX output&mdash;except where impossible in principle,
 see limitations.
 
+## History
+
+This project was launched as [LaTeX.js](https://github.com/michael-brade/LaTeX.js).
+
+We forked from the project because we were going to add/remove the following features.
+
+- [x] Use rollup instead of webpack
+- [x] ES6 Modules support
+- [ ] WebWorker Support
+- [ ] Export typed file for TypeScript
+- [ ] Speed Up for rendering
 
 ## Installation
 
