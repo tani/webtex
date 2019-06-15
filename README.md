@@ -1,28 +1,12 @@
-<div align="center">
-
-  [![NPM version](https://img.shields.io/npm/v/latex.js.svg?style=plastic)](https://www.npmjs.org/package/latex.js)
-  [![NPM downloads](https://img.shields.io/npm/dm/latex.js.svg?style=plastic)](https://www.npmjs.org/package/latex.js)
-  [![CircleCI](https://img.shields.io/circleci/project/github/michael-brade/LaTeX.js.svg?style=plastic)](https://circleci.com/gh/michael-brade/LaTeX.js)
-  [![codecov](https://codecov.io/gh/michael-brade/LaTeX.js/branch/master/graph/badge.svg)](https://codecov.io/gh/michael-brade/LaTeX.js)
-  [![Maintainability](https://api.codeclimate.com/v1/badges/f2ab8b70a87a9da55189/maintainability)](https://codeclimate.com/github/michael-brade/LaTeX.js/maintainability)
-  [![Greenkeeper badge](https://badges.greenkeeper.io/michael-brade/LaTeX.js.svg)](https://greenkeeper.io/)
-  [![License](https://img.shields.io/github/license/michael-brade/LaTeX.js.svg?style=plastic)](https://github.com/michael-brade/LaTeX.js/blob/master/LICENSE)
-
-</div>
-
-
 # LaTeX to HTML5 translator using a PEG.js parser
 
 This is a LaTeX to HTML5 translator written in JavaScript using PEG.js.
-`latex.js` for LaTeX is similar in spirit to `marked` for Markdown.
+`latex2e-js` for LaTeX is similar in spirit to `marked` for Markdown.
 
-LaTeX.js tries to be absolutely and uncompromisingly exact and compatible with LaTeX.
+latex2e-js tries to be absolutely and uncompromisingly exact and compatible with LaTeX.
 The generated HTML is exactly what is meant to be output, down to the last
 space. The CSS makes it look like LaTeX output&mdash;except where impossible in principle,
 see limitations.
-
-You can play with it here:
-[http://latex.js.org/playground.html](http://latex.js.org/playground.html)
 
 
 ## Installation
@@ -30,59 +14,13 @@ You can play with it here:
 For CLI usage install it globally:
 
 ```
-npm install -g latex.js
+npm install -g fgborges/latex2e-js
 ```
-
-For library usage add it to your project:
-
-```
-npm install --save-prod latex.js
-```
-
 
 
 ## Usage
 
-LaTeX.js has a command line interface (CLI), it can be embedded in a website using the provided webcomponent, or it can be
-used to directly obtain and possibly modify the generated HTML/DOM by accessing the low-level classes. Each of those
-use-cases is explained in the following subsections.
-
-LaTeX.js can parse full LaTeX documents as well as documents without a preamble and only the text that comes between
-`\begin{document}` and `\end{document}` in a full LaTeX document. In that latter case, the default documentclass is
-used, which is `article` unless specified otherwise.
-
-
-### CLI
-
-The CLI has the following options:
-
-```
-Usage: latex.js [options] [files...]
-
-JavaScript LaTeX to HTML5 translator
-
-Options:
-
-  -V, --version          output the version number
-  -o, --output <file>    specify output file, otherwise STDOUT will be used
-  -a, --assets [dir]     copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)
-  -u, --url <base URL>   set the base URL to use for the assets (default: use relative URLs)
-  -b, --body             don't include HTML boilerplate and CSS, only output the contents of body
-  -e, --entities         encode HTML entities in the output instead of using UTF-8 characters
-  -p, --pretty           beautify the html (this may add/remove spaces unintentionally)
-  -c, --class <class>    set a default documentclass for documents without a preamble (default: article)
-  -m, --macros <file>    load a JavaScript file with additional custom macros
-  -s, --style <url>      specify an additional style sheet to use (can be repeated)
-  -n, --no-hyphenation   don't insert soft hyphens (disables automatic hyphenation in the browser)
-  -l, --language <lang>  set hyphenation language (default: en)
-  -h, --help             output usage information
-
-If no input files are given, STDIN is read.
-```
-
-### WebComponent
-
-LaTeX.js can be used as a web component:
+latex2e-js can be used as a web component:
 
 ```html
 <!DOCTYPE html>
@@ -95,7 +33,7 @@ LaTeX.js can be used as a web component:
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script type="module">
-  import latexjs from "https://cdn.jsdelivr.net/npm/latex.js/dist/latex.component.js"
+  import latexjs from "https://cdn.jsdelivr.net/gh/fgbores/latex2e-js@develop/dist/latex.component.js"
   customElements.define('latex-js', latexjs)
   </script>
 
@@ -108,13 +46,13 @@ LaTeX.js can be used as a web component:
     }
   </style>
 
-  <title>LaTeX.js Web Component Test</title>
+  <title>latex2e-js Web Component Test</title>
 </head>
 
 <body>
   <h1>Compiling LaTeX</h1>
 
-  <latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js@0.11.1/dist/">
+  <latex-js baseURL="https://cdn.jsdelivr.net/gh/fgboregs/latex2e-js@develop/dist/">
     \documentclass{article}
 
     \begin{document}
@@ -137,9 +75,9 @@ This, however, requires a browser with support for the shadow DOM.
 Then you need to decide how to embed the `<latex-js>` element and style it accordingly with CSS; most importantly, set
 the `display:` property. It is `inline` by default.
 
-The `<latex-js>` element supports a few attributes to configure LaTeX.js:
+The `<latex-js>` element supports a few attributes to configure latex2e-js:
 
-- `baseURL`: if you want the LaTeX.js component to use a different set of stylesheets than the ones delivered along
+- `baseURL`: if you want the latex2e-js component to use a different set of stylesheets than the ones delivered along
   with the `latex.component.js`, then you need to set the base using this attribute.
 
 - `hyphenate`: enable or disable hyphenation (default: enabled)
@@ -149,7 +87,7 @@ The `<latex-js>` element supports a few attributes to configure LaTeX.js:
 
 This is the low-level use-case which gives the greatest control over the translation process.
 
-LaTeX.js is divided into a parser and a generator, so that in theory you could switch the generator to create e.g. plain
+latex2e-js is divided into a parser and a generator, so that in theory you could switch the generator to create e.g. plain
 text instead of HTML. Currently, only a HTML generator exists.
 
 Import the parser and generator, then parse and translate to HTML:
@@ -187,25 +125,21 @@ the jsDelivr CDN:
 
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <!-- <script src="node_modules/latex.js/dist/latex.min.js"></script> -->
-  <script src="https://cdn.jsdelivr.net/npm/latex.js@0.11.1/dist/latex.min.js"></script>
-
-  <title>LaTeX.js API Test</title>
+  <title>latex2e-js API Test</title>
 </head>
 
 <body>
   <h1>Compiling LaTeX</h1>
 
   <script>
-    // or ES Modules
-    // import latexjs from "https://cdn.jsdelivr.net/npm/latex.js@0.11.1/dist/latex.esm.js"
+    import latex2ejs from "https://cdn.jsdelivr.net/gh/fgborges/latex2e-js@develop/dist/latex.esm.js"
     var text = "Hi, this is a line of text."
 
-    var generator = new latexjs.HtmlGenerator({ hyphenate: false })
+    var generator = new latex2ejs.HtmlGenerator({ hyphenate: false })
 
-    generator = latexjs.parse(text, { generator: generator })
+    generator = latex2ejs.parse(text, { generator: generator })
 
-    document.body.appendChild(generator.stylesAndScripts("https://cdn.jsdelivr.net/npm/latex.js@0.11.1/dist/"))
+    document.body.appendChild(generator.stylesAndScripts("https://cdn.jsdelivr.net/gh/fgborges/latex2e-js@develop/dist/"))
     document.body.appendChild(generator.domFragment())
   </script>
 </body>
@@ -223,34 +157,19 @@ To build it and run the tests, clone this repository and execute:
 
 ```
 npm install
-npm run build   # or devbuild
+npm run build
 npm test
 ```
 
 To verify the screenshots (the CSS tests), ImageMagick needs to be installed. Screenshots are taken
 with Chromium using `puppeteer`.
 
-
-
-
-## Playground
-
-To build the playground, execute:
-
-```
-npm run docs
-```
-
-
-
 ## Directory Structure
 
 General structure:
 
-- `src`: all the LaTeX.js sources
-- `bin`: the compiled CLI
+- `src`: all the latex2e-js sources
 - `dist`: the compiled and minified source
-- `docs`: the webpage and (compiled) playground
 - `test`: unit tests and test driver
 
 
@@ -286,7 +205,7 @@ TeX's primitives and basic functionality, so to speak.
 
 ## Definition of Custom Macros
 
-To define your own LaTeX macros in JavaScript and extend LaTeX.js, you have to create a class that contains these macros
+To define your own LaTeX macros in JavaScript and extend latex2e-js, you have to create a class that contains these macros
 and pass it to the `HtmlGenerator` constructor in the `options` object as `CustomMacros` property. For instance:
 
 ```js
@@ -450,17 +369,17 @@ The title of the document.
 ## Limitations
 
 - I haven't created an intermediate AST yet, so TeX's conditional expressions are impossible
-- deprecated macros, or macros that are not supposed to be used in LaTeX, won't even exist in LaTeX.js.
+- deprecated macros, or macros that are not supposed to be used in LaTeX, won't even exist in latex2e-js.
   Examples include: `eqnarray`, the old LaTeX 2.09 font macros `\it`, `\sl`, etc. Also missing are most of the plainTeX macros.
   See also [`l2tabuen.pdf`](ftp://ftp.dante.de/tex-archive/info/l2tabu/english/l2tabuen.pdf).
-- incorrect but legal markup in LaTeX won't produce the same result in LaTeX.js - like when using `\raggedleft` in the
-  middle of a paragraph; but the LaTeX.js result should be intuitively correct.
+- incorrect but legal markup in LaTeX won't produce the same result in latex2e-js - like when using `\raggedleft` in the
+  middle of a paragraph; but the latex2e-js result should be intuitively correct.
 - because of the limitations when parsing TeX as a context-free grammar (see [below](#parsing-tex)), native LaTeX packages
   cannot be parsed and loaded. Instead, the macros those packages (and documentclasses) provide have to be implemented in
   JavaScript.
 
 
-## Limitations of LaTeX.js due to HTML and CSS
+## Limitations of latex2e-js due to HTML and CSS
 
 The following features in LaTeX just cannot be translated to HTML, not even when using JavaScript:
 
@@ -545,7 +464,7 @@ because the space after \a is skipped in the input processor. Later stages of pr
 ```
 However, LaTeX documents themselves usually don't rely on or need this feature--that is, until I'm convinced otherwise.
 
-This also means that you cannot use `\vs^^+ip` to have LaTeX.js interpret it as `\vskip`. Again, this is a feature
+This also means that you cannot use `\vs^^+ip` to have latex2e-js interpret it as `\vskip`. Again, this is a feature
 that most people will probably never need.
 
 
@@ -559,7 +478,7 @@ If you need a LaTeX to HTML translator that also understands TeX to some extent,
 * ~~[HEVEA](http://hevea.inria.fr/) (OCaml)~~
 * ~~[plasTeX](https://github.com/tiarno/plastex) (Python)~~
 
-Update: sadly, those last two are nowhere near the quality of LaTeX.js.
+Update: sadly, those last two are nowhere near the quality of latex2e-js.
 
 There is no such alternative in JavaScript yet, though, which is why I started this project. I want to use it in my
 `derby-entities-lib` project.
@@ -567,16 +486,8 @@ There is no such alternative in JavaScript yet, though, which is why I started t
 
 ## License
 
-[![License](https://img.shields.io/github/license/michael-brade/LaTeX.js.svg?style=plastic)](https://github.com/michael-brade/LaTeX.js/blob/master/LICENSE)
+This project is originally LaTeX.js. latex2e-js is forked from original project.
 
 Copyright (c) 2015-2018 Michael Brade
 
-
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "String"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[constructor]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/constructor "Class"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+Copyright (c) 2019 Fernando Garcias Borges All Rights Reserved.
