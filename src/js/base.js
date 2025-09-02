@@ -1,8 +1,8 @@
-function getVariable(el, propertyName) {
+getVariable(el, propertyName) {
     return String(getComputedStyle(el).getPropertyValue('--' + propertyName)).trim();
 };
 
-function processTheElements() {
+processTheElements() {
     var thes = document.querySelectorAll('.the');
     for (var i = 0; i < thes.length; i++) {
         var v = getVariable(thes[i], thes[i].getAttribute('display-var'));
@@ -13,8 +13,7 @@ function processTheElements() {
     }
 }
 
-
-function _vertical(el, tb) {
+_vertical(el, tb) {
     var doc, docEl, rect, win;
 
     // return zero for disconnected and hidden (display: none) elements, IE <= 11 only
@@ -32,28 +31,26 @@ function _vertical(el, tb) {
     return rect[tb] + win.pageYOffset - docEl.clientTop;
 }
 
-
-function offsetTop(el) {
+offsetTop(el) {
     return _vertical(el, "top");
 }
 
-function offsetBottom(el) {
+offsetBottom(el) {
     return _vertical(el, "bottom");
 }
 
-function offsetBaseline(el) {
+offsetBaseline(el) {
     var mpbaseline = el.querySelector('.mpbaseline');
     return offsetBottom(mpbaseline);
 }
 
-function heightAboveBaseline(el) {
+heightAboveBaseline(el) {
     var baseline = offsetBaseline(el);
     var top = offsetTop(el);
     return baseline - top;
 }
 
-
-function positionMarginpars() {
+positionMarginpars() {
     var mpars = document.querySelectorAll('.marginpar > div');
     var prevBottom = 0;
 
@@ -77,15 +74,13 @@ function positionMarginpars() {
     });
 }
 
-
-
 // don't call resize event handlers too often
 var optimizedResize = (function() {
     var callbacks = [],
         running = false;
 
     // fired on resize event
-    function resize() {
+    resize() {
         if (!running) {
             running = true;
 
@@ -98,13 +93,13 @@ var optimizedResize = (function() {
     }
 
     // run the actual callbacks
-    function runCallbacks() {
+    runCallbacks() {
         callbacks.forEach(function(callback) { callback(); });
         running = false;
     }
 
     // adds callback to loop
-    function addCallback(callback) {
+    addCallback(callback) {
         if (callback) {
             callbacks.push(callback);
         }
@@ -121,10 +116,9 @@ var optimizedResize = (function() {
     }
 }());
 
-
 // setup event listeners
 
-function completed() {
+completed() {
     document.removeEventListener("DOMContentLoaded", completed);
 	window.removeEventListener("load", positionMarginpars);
 

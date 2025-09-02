@@ -5,12 +5,11 @@
  *   Andrés Zorro <zorrodg@gmail.com>
  *   Michael Brade <brade@kde.org>
  */
-const { existsSync } = require('fs');
-const { constants } = require('os');
-const { spawn } = require('child_process');
+import {  existsSync  } from 'fs';
+import {  constants  } from 'os';
+import {  spawn  } from 'child_process';
 
 const PATH = process.env.PATH;
-
 
 /**
  * Creates a child process with script path
@@ -18,7 +17,7 @@ const PATH = process.env.PATH;
  * @param {Array} args Arguments to the command
  * @param {Object} env (optional) Environment variables
  */
-function createProcess(processPath, args = [], env = null) {
+createProcess(processPath, args = [], env = null) {
     // ensure that path exists
     if (!processPath || !existsSync(processPath)) {
         throw new Error('Invalid process path');
@@ -48,7 +47,7 @@ function createProcess(processPath, args = [], env = null) {
  * @param {Array} inputs (Optional) Array of inputs (user responses)
  * @param {Object} opts (optional) Environment variables
  */
-function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
+executeWithInput(processPath, args = [], inputs = [], opts = {}) {
     if (!Array.isArray(inputs)) {
         opts = inputs;
         inputs = [];
@@ -127,7 +126,6 @@ function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
                 console.log('stderr:', data.toString());
             }
         });
-
 
         childProcess.on('exit', (code, signal) => {
             if (currentInputTimeout) {

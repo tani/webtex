@@ -1,6 +1,5 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-import livescript from "./lib/rollup-plugin-livescript.js";
 import pegjs from "./lib/rollup-plugin-pegjs.mjs";
 import terser from "@rollup/plugin-terser";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -12,9 +11,8 @@ export default [{
     input: "src/index.mjs",
     plugins: [
         // resolve before pegjs so that the filter in pegjs has less left to do
-        resolve({extensions: [".js", ".ls"], preferBuiltins: true}),
+        resolve({extensions: [".js", ".mjs"], preferBuiltins: true}),
         pegjs({plugins: [ignoreInfiniteLoop], target: "commonjs", exportVar: "parser", format: "bare", trace: false}),
-        livescript(),
         commonjs({ ignoreDynamicRequires: true }),
         visualizer({
             filename: 'dist/latex.stats.html',

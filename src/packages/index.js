@@ -11,7 +11,6 @@ import { Stix } from './stix'
 import { Textcomp } from './textcomp'
 import { Textgreek } from './textgreek'
 
-
 export default {
     color: Color,
     xcolor: XColor,
