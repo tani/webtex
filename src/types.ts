@@ -11,7 +11,7 @@ makeLengthClass = function(generator){
     unitsSp = new Map([["sp", 1], ["pt", 65536], ["bp", 65536 * 72.27 / 72], ["pc", 65536 * 12], ["dd", 65536 * 1238 / 1157], ["cc", 65536 * 1238 / 1157 * 12], ["in", 65536 * 72.27], ["px", 65536 * 72.27 / 96], ["mm", 65536 * 7227 / 2540], ["cm", 65536 * 7227 / 254]]);
     constructor.zero = new constructor(0, "sp");
     function constructor(value, unit){
-      if (!typeof value === "number") {
+      if (typeof value !== "number") {
         g.error("Length CTOR: value needs to be a number!");
       }
       this._value = value;

@@ -67,7 +67,7 @@ export$ = Base = (function(){
         return this$.g.setLength('paperwidth', tmp);
       default:
         value = parseFloat(k);
-        if (value !== NaN && k.endsWith("pt") && String(value) === k.substring(0, k.length - 2)) {
+        if (!isNaN(value) && k.endsWith("pt") && String(value) === k.substring(0, k.length - 2)) {
           return this$.g.setLength('@@size', new this$.g.Length(value, "pt"));
         }
       }

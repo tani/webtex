@@ -1,12 +1,21 @@
 import { Base } from './base';
+
+interface ReportConstructor {
+  (generator: any, options: any): void;
+  css: string;
+  args: any;
+  superclass?: any;
+  prototype: any;
+}
+
 var export$;
 export { export$ as Report }
-var Report;
+var Report: ReportConstructor;
 export$ = Report = (function(superclass){
   var args, x$, prototype = extend$((import$(Report, superclass).displayName = 'Report', Report), superclass).prototype, constructor = Report;
   Report.css = "css/book.css";
   function Report(generator, options){
-    Report.superclass.apply(this, arguments);
+    (Report as any).superclass.apply(this, arguments);
     this.g.newCounter('chapter');
     this.g.addToReset('section', 'chapter');
     this.g.setCounter('secnumdepth', 2);

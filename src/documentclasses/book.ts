@@ -1,12 +1,21 @@
 import { Report } from './report';
+
+interface BookConstructor {
+  (generator: any, options: any): void;
+  css: string;
+  args: any;
+  superclass?: any;
+  prototype: any;
+}
+
 var export$;
 export { export$ as Book }
-var Book;
+var Book: BookConstructor;
 export$ = Book = (function(superclass){
   var args, x$, y$, prototype = extend$((import$(Book, superclass).displayName = 'Book', Book), superclass).prototype, constructor = Book;
   Book.css = "css/book.css";
   function Book(generator, options){
-    Book.superclass.apply(this, arguments);
+    (Book as any).superclass.apply(this, arguments);
     this['@mainmatter'] = true;
   }
   args = Book.args = Report.args;

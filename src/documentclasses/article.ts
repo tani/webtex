@@ -1,12 +1,21 @@
 import { Base } from './base';
+
+interface ArticleConstructor {
+  (generator: any, options: any): void;
+  css: string;
+  args: any;
+  superclass?: any;
+  prototype: any;
+}
+
 var export$;
 export { export$ as Article }
-var Article;
+var Article: ArticleConstructor;
 export$ = Article = (function(superclass){
   var args, prototype = extend$((import$(Article, superclass).displayName = 'Article', Article), superclass).prototype, constructor = Article;
   Article.css = "css/article.css";
   function Article(generator, options){
-    Article.superclass.apply(this, arguments);
+    (Article as any).superclass.apply(this, arguments);
     this.g.setCounter('secnumdepth', 3);
     this.g.setCounter('tocdepth', 3);
   }

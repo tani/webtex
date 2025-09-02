@@ -59,14 +59,14 @@ function positionMarginpars() {
 
         var baselineref = offsetBottom(mpref);
         var heightAB = heightAboveBaseline(mpar);
-        var height = mpar.offsetHeight;
+        var height = (mpar as HTMLElement).offsetHeight;
 
         // round to 1 digit
         var top = Math.round((baselineref - heightAB - prevBottom) * 10) / 10;
 
         // only mutate if it actually changed
-        if (mpar.style.marginTop != Math.max(0, top) + "px") {
-            mpar.style.marginTop = Math.max(0, top) + "px";
+        if ((mpar as HTMLElement).style.marginTop != Math.max(0, top) + "px") {
+            (mpar as HTMLElement).style.marginTop = Math.max(0, top) + "px";
         }
 
         // if marginTop would have been negative, the element is now further down by that offset => add it to prevBottom

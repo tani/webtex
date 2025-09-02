@@ -1,13 +1,13 @@
 'use strict';
-var path, fs, spawn, EOL;
+var path, fs, spawnProcess, EOL;
 path = require('path');
 fs = require('fs').promises;
-spawn = require('child_process').spawn;
+spawnProcess = require('child_process').spawn;
 EOL = require('os').EOL;
 describe('LaTeX.js API test', function(){
   test('node legacy module API', function(){
     var node;
-    node = spawn('node', [path.join(__dirname, 'api/node.js')], {
+    node = spawnProcess('node', [path.join(__dirname, 'api/node.js')], {
       env: {
         PATH: process.env.PATH
       }
@@ -37,7 +37,7 @@ describe('LaTeX.js API test', function(){
   });
   test('node ES6 module API', function(){
     var node;
-    node = spawn('node', [path.join(__dirname, 'api/node.mjs')], {
+    node = spawnProcess('node', [path.join(__dirname, 'api/node.mjs')], {
       env: {
         PATH: process.env.PATH
       }

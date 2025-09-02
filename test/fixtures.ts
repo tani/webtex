@@ -1,5 +1,5 @@
 'use strict';
-var createHTMLWindow, path, fs, he, slugify, spawn, ref$, parse, HtmlGenerator, decache, htmlBeautify, loadFixture, registerWindow, subdirs;
+var createHTMLWindow, path, fs, he, slugify, spawnChild, ref$, parse, HtmlGenerator, decache, htmlBeautify, loadFixture, registerWindow, subdirs;
 createHTMLWindow = require('svgdom').createHTMLWindow;
 global.window = createHTMLWindow();
 global.document = window.document;
@@ -7,7 +7,7 @@ path = require('path');
 fs = require('fs');
 he = require('he');
 slugify = require('slugify');
-spawn = require('child_process').spawn;
+spawnChild = require('child_process').spawn;
 ref$ = require('../dist/latex'), parse = ref$.parse, HtmlGenerator = ref$.HtmlGenerator;
 decache = require('decache');
 htmlBeautify = require('js-beautify').html;
@@ -120,7 +120,7 @@ function runFixture(fixture, name){
 }
 function latexScreenshot(source, filename){
   var process, stdout, stderr;
-  process = spawn(path.join(__dirname, 'latex2png.sh'), [filename + ".latex.png"]);
+  process = spawnChild(path.join(__dirname, 'latex2png.sh'), [filename + ".latex.png"]);
   stdout = "";
   stderr = "";
   process.stdout.on('data', function(data){

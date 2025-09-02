@@ -22,30 +22,41 @@ before(async function(){
       deviceScaleFactor: 2
     }
   }));
-  global.firefox = (await puppeteer.launch({
-    product: 'firefox',
-    executablePath: '/opt/firefox/firefox',
-    headless: true,
-    devtools: false,
-    dumpio: false,
-    defaultViewport: {
-      width: 1000,
-      height: 0,
-      deviceScaleFactor: 2
-    }
-  }));
+  try {
+    global.firefox = (await puppeteer.launch({
+      product: 'firefox',
+      executablePath: '/opt/firefox/firefox',
+      headless: true,
+      devtools: false,
+      dumpio: false,
+      defaultViewport: {
+        width: 1000,
+        height: 0,
+        deviceScaleFactor: 2
+      }
+    }));
+  } catch (error) {
+    console.warn('Firefox not available, skipping Firefox tests');
+    global.firefox = null;
+  }
   cPage = (await chrome.pages())[0];
-  fPage = (await firefox.pages())[0];
+  if (firefox) {
+    fPage = (await firefox.pages())[0];
+  } else {
+    fPage = null;
+  }
   cPage.on('console', function(msg){
     if (msg._type === 'error') {
       return console.error("Error in chrome: ", msg._text);
     }
   });
-  fPage.on('console', function(msg){
-    if (msg._type === 'error') {
-      return console.error("Error in firefox: ", msg._text);
-    }
-  });
+  if (fPage) {
+    fPage.on('console', function(msg){
+      if (msg._type === 'error') {
+        return console.error("Error in firefox: ", msg._text);
+      }
+    });
+  }
   server = http.createServer(async function(request, response){
     if (request.url === "/") {
       response.writeHead(200, {
@@ -76,7 +87,9 @@ before(async function(){
 });
 after(async function(){
   (await chrome.close());
-  (await firefox.close());
+  if (firefox) {
+    (await firefox.close());
+  }
   server.close();
 });
 function compareScreenshots(filename){
@@ -110,22 +123,25 @@ global.takeScreenshot = async function(html, filename){
   (await cPage.addStyleTag({
     content: ".body { border: .4px solid; height: max-content; }"
   }));
-  (await fPage.goto('http://localhost:' + server.address().port));
-  (await fPage.addStyleTag({
-    content: ".body { border: .4px solid; height: max-content; }"
-  }));
   cfile = filename + ".ch";
-  ffile = filename + ".ff";
   (await cPage.screenshot({
     omitBackground: true,
     fullPage: false,
     captureBeyondViewport: false,
     path: cfile + '.new.png'
   }));
-  (await fPage.screenshot({
-    path: ffile + '.new.png'
-  }));
   compareScreenshots(cfile);
-  compareScreenshots(ffile);
+  
+  if (fPage) {
+    (await fPage.goto('http://localhost:' + server.address().port));
+    (await fPage.addStyleTag({
+      content: ".body { border: .4px solid; height: max-content; }"
+    }));
+    ffile = filename + ".ff";
+    (await fPage.screenshot({
+      path: ffile + '.new.png'
+    }));
+    compareScreenshots(ffile);
+  }
   testHtmlPage = "";
 };

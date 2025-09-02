@@ -7,7 +7,7 @@
  */
 const { existsSync } = require('fs');
 const { constants } = require('os');
-const { spawn } = require('child_process');
+const { spawn: spawnCmd } = require('child_process');
 
 const PATH = process.env.PATH;
 
@@ -26,7 +26,7 @@ function createProcess(processPath, args = [], env = null) {
     args = [processPath].concat(args);
 
     // this works for node-based CLIs and has to be adjusted for other processes
-    return spawn('node', args, {
+    return spawnCmd('node', args, {
         env: Object.assign(
             {
                 NODE_ENV: 'test',
@@ -53,7 +53,7 @@ function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
         inputs = [];
     }
 
-    const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
+    const { env = null, timeout = 100, maxTimeout = 10000 } = opts as any;
     const childProcess = createProcess(processPath, args, env);
     childProcess.stdin.setEncoding('utf-8');
 
@@ -158,7 +158,7 @@ function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
 
     // Appending the process to the promise, in order to add additional parameters or behavior
     // (such as IPC communication)
-    promise.attachedProcess = childProcess;
+    (promise as any).attachedProcess = childProcess;
 
     return promise;
 }
