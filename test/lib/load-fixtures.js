@@ -1,5 +1,4 @@
 var load;
-export { load }
 'use strict';
 var fs, p, parse;
 fs = require('fs');
@@ -55,3 +54,5 @@ load = function(path, separator){
     fixtures: []
   };
 };
+
+module.exports = { load };

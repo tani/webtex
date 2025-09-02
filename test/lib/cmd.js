@@ -5,9 +5,9 @@
  *   Andrés Zorro <zorrodg@gmail.com>
  *   Michael Brade <brade@kde.org>
  */
-import {  existsSync  } from 'fs';
-import {  constants  } from 'os';
-import {  spawn  } from 'child_process';
+const { existsSync } = require('fs');
+const { constants } = require('os');
+const { spawn } = require('child_process');
 
 const PATH = process.env.PATH;
 
@@ -17,7 +17,7 @@ const PATH = process.env.PATH;
  * @param {Array} args Arguments to the command
  * @param {Object} env (optional) Environment variables
  */
-createProcess(processPath, args = [], env = null) {
+function createProcess(processPath, args = [], env = null) {
     // ensure that path exists
     if (!processPath || !existsSync(processPath)) {
         throw new Error('Invalid process path');
@@ -47,7 +47,7 @@ createProcess(processPath, args = [], env = null) {
  * @param {Array} inputs (Optional) Array of inputs (user responses)
  * @param {Object} opts (optional) Environment variables
  */
-executeWithInput(processPath, args = [], inputs = [], opts = {}) {
+function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
     if (!Array.isArray(inputs)) {
         opts = inputs;
         inputs = [];

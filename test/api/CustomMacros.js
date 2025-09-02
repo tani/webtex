@@ -1,6 +1,4 @@
 var export$,CustomMacros;
-export { export$ as CustomMacros }
-export { CustomMacros as default }
 var CustomMacros;
 export$ = CustomMacros = (function(){
   CustomMacros.displayName = 'CustomMacros';
@@ -15,3 +13,6 @@ export$ = CustomMacros = (function(){
   };
   return CustomMacros;
 }());
+
+module.exports = CustomMacros;
+module.exports.default = CustomMacros;

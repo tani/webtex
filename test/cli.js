@@ -40,7 +40,7 @@ describe('LaTeX.js CLI test', function(){
   test('include custom macros', function(){
     var tmpfile, macroCode;
     tmpfile = tmp.fileSync();
-    macroCode = require('livescript').compile(fs.readFileSync('test/api/CustomMacros.ls', 'utf8'));
+    macroCode = fs.readFileSync('test/api/CustomMacros.js', 'utf8');
     fs.writeSync(tmpfile.fd, macroCode);
     return expect(latexjs.execute(['-b', '-m', tmpfile.name], ["A \\myMacro[custom] macro."])).to.eventually.be.fulfilled.and.to.satisfy(function(res){
       return res.stdout === '<div class="body"><p>A -cus­tom- macro.</p></div>' + EOL;

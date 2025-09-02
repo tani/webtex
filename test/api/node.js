@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 // #region code
-import {  parse, HtmlGenerator  } from 'latex.js';
-import {  createHTMLWindow  } from 'svgdom';
+const { parse, HtmlGenerator } = require('latex.js');
+const { createHTMLWindow } = require('svgdom');
 
 global.window = createHTMLWindow()
 global.document = window.document

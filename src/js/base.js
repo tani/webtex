@@ -1,8 +1,8 @@
-getVariable(el, propertyName) {
+function getVariable(el, propertyName) {
     return String(getComputedStyle(el).getPropertyValue('--' + propertyName)).trim();
 };
 
-processTheElements() {
+function processTheElements() {
     var thes = document.querySelectorAll('.the');
     for (var i = 0; i < thes.length; i++) {
         var v = getVariable(thes[i], thes[i].getAttribute('display-var'));
@@ -13,7 +13,7 @@ processTheElements() {
     }
 }
 
-_vertical(el, tb) {
+function _vertical(el, tb) {
     var doc, docEl, rect, win;
 
     // return zero for disconnected and hidden (display: none) elements, IE <= 11 only
@@ -31,26 +31,26 @@ _vertical(el, tb) {
     return rect[tb] + win.pageYOffset - docEl.clientTop;
 }
 
-offsetTop(el) {
+function offsetTop(el) {
     return _vertical(el, "top");
 }
 
-offsetBottom(el) {
+function offsetBottom(el) {
     return _vertical(el, "bottom");
 }
 
-offsetBaseline(el) {
+function offsetBaseline(el) {
     var mpbaseline = el.querySelector('.mpbaseline');
     return offsetBottom(mpbaseline);
 }
 
-heightAboveBaseline(el) {
+function heightAboveBaseline(el) {
     var baseline = offsetBaseline(el);
     var top = offsetTop(el);
     return baseline - top;
 }
 
-positionMarginpars() {
+function positionMarginpars() {
     var mpars = document.querySelectorAll('.marginpar > div');
     var prevBottom = 0;
 
@@ -80,7 +80,7 @@ var optimizedResize = (function() {
         running = false;
 
     // fired on resize event
-    resize() {
+    function resize() {
         if (!running) {
             running = true;
 
@@ -93,13 +93,13 @@ var optimizedResize = (function() {
     }
 
     // run the actual callbacks
-    runCallbacks() {
+    function runCallbacks() {
         callbacks.forEach(function(callback) { callback(); });
         running = false;
     }
 
     // adds callback to loop
-    addCallback(callback) {
+    function addCallback(callback) {
         if (callback) {
             callbacks.push(callback);
         }
@@ -118,7 +118,7 @@ var optimizedResize = (function() {
 
 // setup event listeners
 
-completed() {
+function completed() {
     document.removeEventListener("DOMContentLoaded", completed);
 	window.removeEventListener("load", positionMarginpars);
 

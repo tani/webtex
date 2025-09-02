@@ -1,5 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
 import pegjs from "./lib/rollup-plugin-pegjs.mjs";
 import terser from "@rollup/plugin-terser";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -8,10 +9,16 @@ import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 const prod = process.env.NODE_ENV === "production"
 
 export default [{
-    input: "src/index.mjs",
+    input: "src/index.ts",
     plugins: [
+        // TypeScript compilation first
+        typescript({
+            tsconfig: "./tsconfig.build.json",
+            declaration: true,
+            declarationDir: "dist/types"
+        }),
         // resolve before pegjs so that the filter in pegjs has less left to do
-        resolve({extensions: [".js", ".mjs"], preferBuiltins: true}),
+        resolve({extensions: [".ts", ".js", ".mjs"], preferBuiltins: true}),
         pegjs({plugins: [ignoreInfiniteLoop], target: "commonjs", exportVar: "parser", format: "bare", trace: false}),
         commonjs({ ignoreDynamicRequires: true }),
         visualizer({
