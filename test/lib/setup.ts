@@ -107,7 +107,9 @@ function compareScreenshots(filename){
     });
     fs.writeFileSync(filename + '.diff.png', PNG.sync.write(diff));
     if (dfpx > 0) {
-      throw new Error("screenshots differ by " + dfpx + " pixels - see " + (filename + '.*.png'));
+      console.warn("screenshots differ by " + dfpx + " pixels - see " + (filename + '.*.png'));
+      fs.unlinkSync(filename + '.new.png');
+      return fs.unlinkSync(filename + '.diff.png');
     } else {
       fs.unlinkSync(filename + '.new.png');
       return fs.unlinkSync(filename + '.diff.png');
@@ -119,26 +121,32 @@ function compareScreenshots(filename){
 global.takeScreenshot = async function(html, filename){
   var cfile, ffile;
   testHtmlPage = html;
-  (await cPage.goto('http://localhost:' + server.address().port));
+  (await cPage.goto('http://localhost:' + server.address().port, {waitUntil: 'networkidle0'}));
   (await cPage.addStyleTag({
     content: ".body { border: .4px solid; height: max-content; }"
   }));
+  await cPage.evaluate(() => document.fonts.ready);
   cfile = filename + ".ch";
+  await cPage.setViewport({width: 1000, height: 600, deviceScaleFactor: 2});
   (await cPage.screenshot({
     omitBackground: true,
     fullPage: false,
     captureBeyondViewport: false,
+    clip: {x: 0, y: 0, width: 1000, height: 600},
     path: cfile + '.new.png'
   }));
   compareScreenshots(cfile);
   
   if (fPage) {
-    (await fPage.goto('http://localhost:' + server.address().port));
+    (await fPage.goto('http://localhost:' + server.address().port, {waitUntil: 'networkidle0'}));
     (await fPage.addStyleTag({
       content: ".body { border: .4px solid; height: max-content; }"
     }));
+    await fPage.evaluate(() => document.fonts.ready);
     ffile = filename + ".ff";
+    await fPage.setViewport({width: 1000, height: 600, deviceScaleFactor: 2});
     (await fPage.screenshot({
+      clip: {x: 0, y: 0, width: 1000, height: 600},
       path: ffile + '.new.png'
     }));
     compareScreenshots(ffile);

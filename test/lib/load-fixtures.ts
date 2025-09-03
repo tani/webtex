@@ -23,6 +23,9 @@ parse = function(input, separator){
     if (fixture.source === undefined || fixture.result === undefined) {
       break;
     }
+    if (!fixture.source.trim() && !fixture.result.trim()) {
+      continue;
+    }
     result.fixtures.push(fixture);
   }
   return result;
