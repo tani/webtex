@@ -4,14 +4,14 @@
 const { parse, HtmlGenerator } = require('latex.js');
 const { createHTMLWindow } = require('svgdom');
 
-global.window = createHTMLWindow()
-global.document = window.document
+global.window = createHTMLWindow();
+global.document = window.document;
 
-let latex = "Hi, this is a line of text."
+const latex = "Hi, this is a line of text.";
 
-let generator = new HtmlGenerator({ hyphenate: false })
+const generator = new HtmlGenerator({ hyphenate: false });
 
-let doc = parse(latex, { generator: generator }).htmlDocument()
+const doc = parse(latex, { generator }).htmlDocument();
 
-console.log(doc.documentElement.outerHTML)
+console.log(doc.documentElement.outerHTML);
 // #endregion code
