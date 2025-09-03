@@ -1,4 +1,3 @@
 import { Graphicx } from './graphicx';
-var Graphics;
-export { Graphics }
-Graphics = Graphicx;
+
+export const Graphics = Graphicx;

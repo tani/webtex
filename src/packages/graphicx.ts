@@ -1,27 +1,34 @@
-var export$;
-export { export$ as Graphicx }
-'use strict';
-var Graphicx;
-export$ = Graphicx = (function(){
-  Graphicx.displayName = 'Graphicx';
-  var args, prototype = Graphicx.prototype, constructor = Graphicx;
-  args = Graphicx.args = {};
-  function Graphicx(generator, options){}
-  args['rotatebox'] = ['H', 'kv?', 'n', 'hg'];
-  Graphicx.prototype['rotatebox'] = function(kvl, angle, text){};
-  args['scalebox'] = ['H', 'n', 'n?', 'g'];
-  Graphicx.prototype['scalebox'] = function(hsc, vsc, text){};
-  args['reflectbox'] = ['H', 'g'];
-  Graphicx.prototype['reflectbox'] = function(text){
-    return this['scalebox'](-1, 1, text);
-  };
-  args['resizebox'] = ['H', 's', 'l', 'l', 'g'];
-  Graphicx.prototype['resizebox'] = function(s, hl, vl, text){};
-  args['graphicspath'] = ['HV', 'gl'];
-  Graphicx.prototype['graphicspath'] = function(paths){};
-  args['includegraphics'] = ['H', 's', 'kv?', 'kv?', 'k'];
-  Graphicx.prototype['includegraphics'] = function(s, kvl, kvl2, file){
+export class Graphicx {
+  static displayName = 'Graphicx';
+  static args: Record<string, any> = {};
+
+  g: any;
+
+  constructor(generator: any, options?: any[]) {
+    this.g = generator;
+  }
+
+  rotatebox(kvl: any, angle: any, text: any): void {}
+
+  scalebox(hsc: number, vsc: number, text: any): void {}
+
+  reflectbox(text: any): any {
+    return this.scalebox(-1, 1, text);
+  }
+
+  resizebox(s: any, hl: any, vl: any, text: any): void {}
+
+  graphicspath(paths: any[]): void {}
+
+  includegraphics(s: any, kvl: any, kvl2: any, file: string): any[] {
     return [this.g.createImage(kvl.get("width"), kvl.get("height"), file)];
-  };
-  return Graphicx;
-}());
+  }
+}
+
+// Set up args for the methods
+Graphicx.args['rotatebox'] = ['H', 'kv?', 'n', 'hg'];
+Graphicx.args['scalebox'] = ['H', 'n', 'n?', 'g'];
+Graphicx.args['reflectbox'] = ['H', 'g'];
+Graphicx.args['resizebox'] = ['H', 's', 'l', 'l', 'g'];
+Graphicx.args['graphicspath'] = ['HV', 'gl'];
+Graphicx.args['includegraphics'] = ['H', 's', 'kv?', 'kv?', 'k'];

@@ -1,23 +1,27 @@
-var export$;
-export { export$ as Hyperref }
-'use strict';
-var Hyperref;
-export$ = Hyperref = (function(){
-  Hyperref.displayName = 'Hyperref';
-  var args, prototype = Hyperref.prototype, constructor = Hyperref;
-  args = Hyperref.args = {};
-  function Hyperref(generator, options){}
-  args['href'] = ['H', 'o?', 'u', 'g'];
-  Hyperref.prototype['href'] = function(opts, url, txt){
+export class Hyperref {
+  static displayName = 'Hyperref';
+  static args: Record<string, any> = {};
+
+  g: any;
+
+  constructor(generator: any, options?: any[]) {
+    this.g = generator;
+  }
+
+  href(opts: any, url: string, txt: any): any[] {
     return [this.g.create(this.g.link(url), txt)];
-  };
-  args['url'] = ['H', 'u'];
-  Hyperref.prototype['url'] = function(url){
+  }
+
+  url(url: string): any[] {
     return [this.g.create(this.g.link(url), this.g.createText(url))];
-  };
-  args['nolinkurl'] = ['H', 'u'];
-  Hyperref.prototype['nolinkurl'] = function(url){
+  }
+
+  nolinkurl(url: string): any[] {
     return [this.g.create(this.g.link(), this.g.createText(url))];
-  };
-  return Hyperref;
-}());
+  }
+}
+
+// Set up args for the methods
+Hyperref.args['href'] = ['H', 'o?', 'u', 'g'];
+Hyperref.args['url'] = ['H', 'u'];
+Hyperref.args['nolinkurl'] = ['H', 'u'];
