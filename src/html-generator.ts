@@ -136,7 +136,20 @@ export$ = HtmlGenerator = (function(superclass){
   HtmlGenerator.prototype.pictureCanvas = function(){
     return create(this.inline, "picture-canvas");
   };
-  HtmlGenerator.prototype.SVG = SVG;
+  HtmlGenerator.prototype.SVG = function() {
+    // Create isolated SVG instance to prevent DOM serialization race conditions
+    const svgInstance = SVG();
+    // Add namespace attributes immediately to prevent corruption
+    if (svgInstance.node) {
+      svgInstance.attr({
+        'xmlns': 'http://www.w3.org/2000/svg',
+        'version': '1.1',
+        'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+        'xmlns:svgjs': 'http://svgjs.dev/svgjs'
+      });
+    }
+    return svgInstance;
+  };
   HtmlGenerator.prototype.KaTeX = katex;
   HtmlGenerator.prototype._dom = null;
   function HtmlGenerator(options){

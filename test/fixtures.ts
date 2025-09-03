@@ -87,6 +87,12 @@ function runFixture(fixture, name){
     }
     htmlIs = he.decode(htmlIs.replace(/\r\n|\n|\r/g, ""));
     htmlShould = he.decode(htmlShould.replace(/\r\n|\n|\r/g, ""));
+    
+    // Normalize SVG marker and clipPath IDs for consistent testing
+    htmlIs = htmlIs.replace(/SvgjsMarker\d+/g, 'SvgjsMarkerNORM');
+    htmlShould = htmlShould.replace(/SvgjsMarker\d+/g, 'SvgjsMarkerNORM');
+    htmlIs = htmlIs.replace(/SvgjsClipPath\d+/g, 'SvgjsClipPathNORM');
+    htmlShould = htmlShould.replace(/SvgjsClipPath\d+/g, 'SvgjsClipPathNORM');
     if (htmlIs !== htmlShould) {
       filename = path.join(__dirname, 'html', slugify(name + ' ' + fixture.header, {
         remove: /[*+~()'"!:@,{}\\]/g
