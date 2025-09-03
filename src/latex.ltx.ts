@@ -1107,7 +1107,15 @@ export$ = LaTeX = (function(){
       try {
         if (!Package) {
           Export = require("./packages/" + pkg);
-          Package = Export['default'] || Export[Object.getOwnPropertyNames(Export)[0]];
+          Package = Export['default'];
+          if (!Package) {
+            // Find first function property that's not __esModule
+            const propNames = Object.getOwnPropertyNames(Export);
+            const constructorName = propNames.find(name => 
+              name !== '__esModule' && typeof Export[name] === 'function'
+            );
+            Package = constructorName ? Export[constructorName] : null;
+          }
         }
         assignIn(this, new Package(this.g, options));
         assign(args, Package.args);
