@@ -94,9 +94,9 @@ export$ = XColor = (function(){
   args['color'] = ["HV", [['c-ml?', 'c-spl'], ['c']]];
   XColor.prototype['color'] = function(){
     if (arguments.length === 1) {
-      console.log("got color expression");
+      // Handle color expression
     } else {
-      console.log("got model/color spec");
+      // Handle model/color spec
     }
   };
   args['textcolor'] = ["HV", [['c-ml?', 'c-spl'], ['c']], "g"];

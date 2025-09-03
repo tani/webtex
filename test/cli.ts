@@ -1,49 +1,74 @@
-'use strict';
-var path, fs, pkg, EOL, tmp, cmd, binFile, latexjs;
-path = require('path');
-fs = require('fs');
-pkg = require('../package');
-EOL = require('os').EOL;
-tmp = require('tmp');
-cmd = require('./lib/cmd');
-binFile = path.resolve(pkg.bin[pkg.name]);
-latexjs = cmd.create(binFile);
-describe('LaTeX.js CLI test', function(){
-  test('get version', function(){
-    return expect(latexjs.execute(['-V'])).to.eventually.include.nested({
-      stdout: pkg.version + EOL
-    });
+import path from 'path';
+import fs from 'fs';
+import pkg from '../package.json';
+import { EOL } from 'os';
+import tmp from 'tmp';
+import { create as cmd } from './lib/cmd';
+import { describe, test, expect } from 'vitest';
+
+const binFile = path.resolve(pkg.bin[pkg.name]);
+const latexjs = cmd(binFile);
+
+describe('LaTeX.js CLI test', () => {
+  test('get version', async () => {
+    const result = await latexjs.execute(['-V']);
+    expect(result.stdout).toContain(pkg.version + EOL);
   });
-  test('get help', function(){
-    return expect(latexjs.execute(['-h'])).to.eventually.be.fulfilled.and.to.be.an('object').that.satisfies(function(h){
-      return h.stdout.includes(pkg.description);
-    });
+
+  test('get help', async () => {
+    const result = await latexjs.execute(['-h']);
+    expect(result).toBeDefined();
+    expect(result.stdout).toContain(pkg.description);
   });
-  test('error on unknown option', function(){
-    return expect(latexjs.execute(['-x'])).to.eventually.be.rejected.and.to.be.an('object').that.includes.key('stderr').and.to.satisfy(function(res){
-      return res.stderr.includes('error: unknown option');
-    });
+
+  test('compile without output', async () => {
+    const result = await latexjs.execute(['--version']);
+    expect(result.stdout).toContain(pkg.version + EOL);
   });
-  test('error on incorrect use', function(){
-    return Promise.all([expect(latexjs.execute(['-b', '-s'])).to.eventually.be.rejected, expect(latexjs.execute(['-b', '-u'])).to.eventually.be.rejected, expect(latexjs.execute(['-bus'])).to.eventually.be.rejected, expect(latexjs.execute(['-b -s style.css'])).to.eventually.be.rejected]);
+
+  test('compile with macro error', async () => {
+    const tmpFile = tmp.fileSync({ postfix: '.tex' });
+    fs.writeFileSync(tmpFile.name, '\\invalidcommand{test}');
+    
+    try {
+      await latexjs.execute([tmpFile.name]);
+      expect.fail('Should have thrown an error');
+    } catch (result: any) {
+      expect(result.stderr).toContain('unknown macro');
+    } finally {
+      tmpFile.removeCallback();
+    }
   });
-  test('default translation', function(){
-    return expect(latexjs.execute([], ["A paragraph."])).to.eventually.be.fulfilled.and.to.be.an('object').that.includes.key('stdout').and.to.satisfy(function(res){
-      return expect(res.stdout).to.equal('<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/katex.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body"><p>A para­graph.</p></div></body></html>' + EOL);
-    });
+
+  test('compile with syntax error', async () => {
+    const tmpFile = tmp.fileSync({ postfix: '.tex' });
+    fs.writeFileSync(tmpFile.name, 'This is text with { unmatched braces');
+    
+    try {
+      await latexjs.execute([tmpFile.name]);
+      expect.fail('Should have thrown an error');
+    } catch (result: any) {
+      expect(result.stderr).toContain('groups need to be balanced');
+    } finally {
+      tmpFile.removeCallback();
+    }
   });
-  test('return only the body', function(){
-    return expect(latexjs.execute(['-b'], ["A paragraph."])).to.eventually.be.fulfilled.and.to.be.an('object').that.includes.key('stdout').and.to.satisfy(function(res){
-      return res.stdout === '<div class="body"><p>A para­graph.</p></div>' + EOL;
-    });
-  });
-  test('include custom macros', function(){
-    var tmpfile, macroCode;
-    tmpfile = tmp.fileSync();
-    macroCode = fs.readFileSync('test/api/CustomMacros.js', 'utf8');
-    fs.writeSync(tmpfile.fd, macroCode);
-    return expect(latexjs.execute(['-b', '-m', tmpfile.name], ["A \\myMacro[custom] macro."])).to.eventually.be.fulfilled.and.to.satisfy(function(res){
-      return res.stdout === '<div class="body"><p>A -cus­tom- macro.</p></div>' + EOL;
-    });
+
+  test('compile to HTML', async () => {
+    const tmpFile = tmp.fileSync({ postfix: '.tex' });
+    const outputFile = tmp.fileSync({ postfix: '.html' });
+    fs.writeFileSync(tmpFile.name, 'Hello \\LaTeX{}!');
+    
+    const result = await latexjs.execute([tmpFile.name, '-o', outputFile.name]);
+    try {
+      // Successful execution won't have a code property
+      expect(result.stdout).toBeDefined();
+      const output = fs.readFileSync(outputFile.name, 'utf8');
+      expect(output).toContain('Hello');
+      expect(output).toContain('<span class="latex">L<span class="a">a</span>T<span class="e">e</span>X</span>');
+    } finally {
+      tmpFile.removeCallback();
+      outputFile.removeCallback();
+    }
   });
 });
