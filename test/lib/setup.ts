@@ -5,7 +5,7 @@ chai = require('chai');
 http = require('http');
 serveHandler = require('serve-handler');
 puppeteer = require('puppeteer');
-pixelmatch = require('pixelmatch');
+pixelmatch = require('pixelmatch').default;
 PNG = require('pngjs').PNG;
 chai.use(require('chai-as-promised'));
 global.expect = chai.expect;

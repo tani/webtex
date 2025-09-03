@@ -38,9 +38,11 @@
     "clean": "rimraf dist bin test/coverage test/test-results.xml",
     "prebuild": "npm run clean && mkdirp dist/css dist/js dist/fonts dist/documentclasses dist/packages bin && touch dist/documentclasses/.keep dist/packages/.keep",
     "build:assets": "cp -r src/css/* dist/css/ && cp -r src/fonts/* dist/fonts/ && cp -r src/js/* dist/js/ && cp node_modules/katex/dist/fonts/*.woff2 dist/fonts/",
+    "build:packages": "tsc src/packages/*.ts --outDir dist/packages --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && npm run build:packages:placeholders",
+    "build:packages:placeholders": "echo 'module.exports = {};' > dist/packages/geometry.js && echo 'module.exports = {};' > dist/packages/layout.js && echo 'module.exports = {};' > dist/packages/showframe.js && echo 'module.exports = {};' > dist/packages/luatextra.js && echo 'module.exports = {};' > dist/packages/lua-visual-debug.js",
     "build:cli": "tsc src/cli.ts --outDir bin --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && mv bin/cli.js bin/latex.js && chmod +x bin/latex.js",
     "build:lib": "rollup -c",
-    "build": "npm run prebuild && npm run build:assets && npm run build:cli && npm run build:lib",
+    "build": "npm run prebuild && npm run build:assets && npm run build:packages && npm run build:cli && npm run build:lib",
     "test": "mocha --node-option import=tsx test/*.ts",
     "test:coverage": "nyc --include=bin --include=src --include=dist -e ls --reporter=html --reporter=text --reporter=lcovonly --report-dir=test/coverage npx mocha -i -g screenshot --reporter mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml test/*.ts && npx mocha -g screenshot --reporter mocha-junit-reporter --reporter-options mochaFile=./test/screenshots/test-results.xml test/*.ts"
   },

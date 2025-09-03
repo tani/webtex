@@ -4,9 +4,10 @@ export { export$ as XColor }
 var XColor;
 export$ = XColor = (function(){
   XColor.displayName = 'XColor';
-  var args, colors, prototype = XColor.prototype, constructor = XColor;
+  var args, colors, symbols, prototype = XColor.prototype, constructor = XColor;
   args = XColor.args = {};
   colors = XColor.colors = new Map([["red", {}], ["green", {}], ["blue", {}], ["cyan", {}], ["magenta", {}], ["yellow", {}], ["black", {}], ["gray", {}], ["white", {}], ["darkgray", {}], ["lightgray", {}], ["brown", {}], ["lime", {}], ["olive", {}], ["orange", {}], ["pink", {}], ["purple", {}], ["teal", {}], ["violet", {}]]);
+  symbols = XColor.symbols = new Map([]);
   function XColor(generator, options){
     var i$, ref$, len$, opt;
     this.g = generator;
@@ -101,8 +102,14 @@ export$ = XColor = (function(){
   args['textcolor'] = ["HV", [['c-ml?', 'c-spl'], ['c']], "g"];
   XColor.prototype['textcolor'] = function(){
     if (arguments.length === 2) {
-      return;
+      // Return the text content without color styling for now
+      return [arguments[1]];
     }
+    // For 3 arguments (model, color, text)
+    if (arguments.length === 3) {
+      return [arguments[2]];
+    }
+    return [];
   };
   args['colorbox'] = ['H', 'i?', 'c', 'g'];
   XColor.prototype['colorbox'] = function(model, color, text){};
