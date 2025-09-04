@@ -8,6 +8,19 @@ import { createHTMLWindow } from "svgdom";
 import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/latex";
 
+interface FixtureRunnerOptions {
+	/**
+	 * Also generate snapshots alongside traditional fixture assertions
+	 * Useful for gradual migration to snapshot testing
+	 */
+	generateSnapshots?: boolean;
+	
+	/**
+	 * Snapshot name suffix when generating snapshots
+	 */
+	snapshotSuffix?: string;
+}
+
 // Set up DOM for Node.js environment
 const window = createHTMLWindow();
 (global as any).window = window;
@@ -20,7 +33,8 @@ function resetSvgIds() {
 	return registerWindow(window as any, document as any);
 }
 
-export function runFixture(fixture: any, name: string) {
+export function runFixture(fixture: any, name: string, options: FixtureRunnerOptions = {}) {
+	const { generateSnapshots = false, snapshotSuffix = "" } = options;
 	let _test: any = test;
 
 	if (fixture.header?.charAt(0) === "!") {
@@ -83,7 +97,16 @@ export function runFixture(fixture: any, name: string) {
 			} catch (_e) {}
 			fs.writeFileSync(filename, htmlIs);
 		}
+		// Traditional fixture assertion
 		expect(htmlIs).toBe(htmlShould);
+		
+		// Optional snapshot generation for gradual migration
+		if (generateSnapshots) {
+			const testName = `${fixture.header || `fixture number ${fixture.id}`}${snapshotSuffix}`;
+			expect(htmlIs).toMatchSnapshot(
+				`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`
+			);
+		}
 	});
 	// Screenshot tests are now handled separately in test/visual/screenshots.spec.ts
 }

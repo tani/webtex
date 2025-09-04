@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -17,6 +18,7 @@ export default defineConfig({
 			"test/screenshots/**",
 			"test/integration/**",
 			"test/html/**",
+			"test/**/__snapshots__/**",
 		],
 		setupFiles: ["test/lib/setup.ts"],
 		// Test categorization via tags
@@ -25,6 +27,13 @@ export default defineConfig({
 			threads: {
 				singleThread: false,
 			},
+		},
+		// Snapshot configuration
+		resolveSnapshotPath: (testPath: string, snapExtension: string) => {
+			// Place snapshots in __snapshots__ folders next to test files
+			const dir = path.dirname(testPath);
+			const filename = path.basename(testPath).replace(/\.(test|spec)\.(js|ts)$/, '');
+			return path.join(dir, '__snapshots__', `${filename}${snapExtension}`);
 		},
 		coverage: {
 			provider: "v8",
