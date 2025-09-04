@@ -35,6 +35,7 @@ export class Base {
 		paragraph: ["V", "s", "X", "o?", "g"],
 		subparagraph: ["V", "s", "X", "o?", "g"],
 		maketitle: ["V"],
+		quotation: ["V"],
 	};
 
 	protected g: Generator;
@@ -277,6 +278,12 @@ export class Base {
 	}
 
 	// Methods that might be inherited and called by other document classes
-	quotation: () => any[];
-	endquotation: () => void;
+	quotation(): any[] {
+		(this.g as any).startlist();
+		return [(this.g as any).create((this.g as any).quotation)];
+	}
+	
+	endquotation(): void {
+		(this.g as any).endlist();
+	}
 }
