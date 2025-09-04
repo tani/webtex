@@ -1,63 +1,74 @@
 import { Base } from './base';
 
-interface ArticleConstructor {
-  (generator: any, options: any): void;
-  css: string;
-  args: any;
-  superclass?: any;
-  prototype: any;
+interface Generator {
+  setCounter(name: string, value: number): void;
+  macro(name: string): any;
+  create(element: any, content: any, className?: string): any;
+  list: any;
+  _toc: any;
+  setFontSize(size: string): void;
+  enterGroup(): void;
+  exitGroup(): void;
+  setFontWeight(weight: string): void;
+  Alph(value: number): string;
+  counter(name: string): number;
 }
 
-var export$;
-export { export$ as Article }
-var Article: ArticleConstructor;
-export$ = Article = (function(superclass){
-  var args, prototype = extend$((import$(Article, superclass).displayName = 'Article', Article), superclass).prototype, constructor = Article;
-  Article.css = "css/article.css";
-  function Article(generator, options){
-    (Article as any).superclass.apply(this, arguments);
+export class Article extends Base {
+  static displayName = 'Article';
+  static css = "css/article.css";
+  static args = {
+    ...Base.args,
+    'tableofcontents': ['V'],
+    'abstract': ['V'],
+    'appendix': ['V']
+  };
+
+  protected g: Generator;
+
+  constructor(generator: Generator, options?: any) {
+    super(generator, options);
+    this.g = generator;
     this.g.setCounter('secnumdepth', 3);
     this.g.setCounter('tocdepth', 3);
   }
-  args = Article.args = Base.args;
-  Article.prototype['refname'] = function(){
+
+  refname(): string[] {
     return ["References"];
-  };
-  args['tableofcontents'] = ['V'];
-  Article.prototype['tableofcontents'] = function(){
+  }
+
+  tableofcontents(): any[] {
     return this.section(true, undefined, this.g.macro('contentsname')).concat([this.g._toc]);
-  };
-  args['abstract'] = ['V'];
-  Article.prototype['abstract'] = function(){
-    var head;
+  }
+
+  abstract(): any[] {
     this.g.setFontSize("small");
     this.g.enterGroup();
     this.g.setFontWeight("bf");
-    head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
+    const head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
     this.g.exitGroup();
     return [head].concat(this.quotation());
-  };
-  Article.prototype['endabstract'] = function(){
+  }
+
+  endabstract(): void {
     this.endquotation();
-  };
-  args['appendix'] = ['V'];
-  Article.prototype['appendix'] = function(){
+  }
+
+  appendix(): void {
     this.g.setCounter('section', 0);
     this.g.setCounter('subsection', 0);
-    this['thesection'] = function(){
+    this.thesection = () => {
       return [this.g.Alph(this.g.counter('section'))];
     };
-  };
-  return Article;
-}(Base));
-function extend$(sub, sup){
-  function fun(){} fun.prototype = (sub.superclass = sup).prototype;
-  (sub.prototype = new fun).constructor = sub;
-  if (typeof sup.extended == 'function') sup.extended(sub);
-  return sub;
-}
-function import$(obj, src){
-  var own = {}.hasOwnProperty;
-  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
-  return obj;
+  }
+
+  // Method that will be dynamically overridden in appendix()
+  thesection(): string[] {
+    return super.thesection ? super.thesection() : [];
+  }
+
+  // Methods inherited from Base that need to be available
+  section: (starred?: boolean, toc?: any, title?: any) => any[];
+  quotation: () => any[];
+  endquotation: () => void;
 }
