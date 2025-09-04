@@ -1,11 +1,5 @@
 import { exec } from "node:child_process";
-import {
-	cpSync,
-	existsSync,
-	mkdirSync,
-	readFileSync,
-	writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { promisify } from "node:util";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
@@ -17,7 +11,17 @@ import pegjs from "./lib/rollup-plugin-pegjs.mjs";
 
 const execAsync = promisify(exec);
 
-// Custom plugin to copy static assets
+// Constants
+const PLACEHOLDER_PACKAGES = ["geometry", "layout", "showframe", "luatextra", "lua-visual-debug"];
+const STATIC_ASSETS = [
+	{ src: "src/css", dest: "dist/css", name: "CSS" },
+	{ src: "src/fonts", dest: "dist/fonts", name: "font" },
+	{ src: "src/js", dest: "dist/js", name: "JS" },
+];
+
+/**
+ * Plugin to copy static assets during build
+ */
 function assetCopyPlugin() {
 	return {
 		name: "asset-copy",
@@ -26,39 +30,25 @@ function assetCopyPlugin() {
 		},
 		writeBundle() {
 			console.log("Copying static assets...");
-			// Copy static assets
-			if (existsSync("src/css")) {
-				cpSync("src/css", "dist/css", { recursive: true });
-				console.log("Copied CSS assets");
-			}
-			if (existsSync("src/fonts")) {
-				cpSync("src/fonts", "dist/fonts", { recursive: true });
-				console.log("Copied font assets");
-			}
-			if (existsSync("src/js")) {
-				cpSync("src/js", "dist/js", { recursive: true });
-				console.log("Copied JS assets");
+			
+			// Copy standard assets
+			for (const asset of STATIC_ASSETS) {
+				if (existsSync(asset.src)) {
+					cpSync(asset.src, asset.dest, { recursive: true });
+					console.log(`Copied ${asset.name} assets`);
+				}
 			}
 
 			// Copy KaTeX fonts
-			try {
-				const katexFonts = "node_modules/katex/dist/fonts";
-				if (existsSync(katexFonts)) {
-					mkdirSync("dist/fonts", { recursive: true });
-					cpSync(katexFonts, "dist/fonts", {
-						recursive: true,
-						filter: (src) => src.endsWith(".woff2"),
-					});
-					console.log("Copied KaTeX fonts");
-				}
-			} catch (e) {
-				console.warn("Could not copy KaTeX fonts:", e.message);
-			}
+			copyKatexFonts();
 		},
+		
 	};
 }
 
-// Custom plugin to compile TypeScript modules
+/**
+ * Plugin to compile TypeScript modules and CLI
+ */
 function typescriptModulesPlugin() {
 	return {
 		name: "typescript-modules",
@@ -66,58 +56,76 @@ function typescriptModulesPlugin() {
 			console.log("Building TypeScript modules...");
 
 			try {
-				// Build packages
-				await execAsync(
-					"tsc src/packages/*.ts --outDir dist/packages --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck",
-				);
-
-				// Build package placeholders
-				const template = readFileSync(
-					"lib/package-placeholder-template.js",
-					"utf8",
-				);
-				const placeholderPackages = [
-					"geometry",
-					"layout",
-					"showframe",
-					"luatextra",
-					"lua-visual-debug",
-				];
-
-				mkdirSync("dist/packages", { recursive: true });
-				for (const pkg of placeholderPackages) {
-					const className =
-						pkg.charAt(0).toUpperCase() +
-						pkg.slice(1).replace(/-(.)/g, (_m, c) => c.toUpperCase());
-					writeFileSync(
-						`dist/packages/${pkg}.js`,
-						template.replace(/PACKAGE_NAME/g, className),
-					);
-				}
-				writeFileSync("dist/packages/.keep", "");
-
-				// Build documentclasses
-				await execAsync(
-					"tsc src/documentclasses/*.ts --outDir dist/documentclasses --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck",
-				);
-				writeFileSync("dist/documentclasses/.keep", "");
-
+				await Promise.all([
+					buildPackages(),
+					buildDocumentClasses(),
+				]);
+				
+				await buildPackagePlaceholders();
 				console.log("TypeScript modules built successfully!");
 			} catch (error) {
 				console.error("Error building TypeScript modules:", error);
 				throw error;
 			}
 		},
+
+	};
+}
+
+function copyKatexFonts() {
+	try {
+		const katexFonts = "node_modules/katex/dist/fonts";
+		if (existsSync(katexFonts)) {
+			mkdirSync("dist/fonts", { recursive: true });
+			cpSync(katexFonts, "dist/fonts", {
+				recursive: true,
+				filter: (src) => src.endsWith(".woff2"),
+			});
+			console.log("Copied KaTeX fonts");
+		}
+	} catch (e) {
+		console.warn("Could not copy KaTeX fonts:", (e as Error).message);
+	}
+}
+
+async function buildPackages() {
+	await execAsync(`tsc src/packages/*.ts --outDir dist/packages`);
+	writeFileSync("dist/packages/.keep", "");
+}
+
+async function buildDocumentClasses() {
+	await execAsync(`tsc src/documentclasses/*.ts --outDir dist/documentclasses`);
+	writeFileSync("dist/documentclasses/.keep", "");
+}
+
+async function buildPackagePlaceholders() {
+			const template = readFileSync("lib/package-placeholder-template.js", "utf8");
+			mkdirSync("dist/packages", { recursive: true });
+			
+	for (const pkg of PLACEHOLDER_PACKAGES) {
+		const className = pkg.charAt(0).toUpperCase() + 
+			pkg.slice(1).replace(/-(.)/g, (_m, c) => c.toUpperCase());
+		writeFileSync(
+			`dist/packages/${pkg}.js`,
+			template.replace(/PACKAGE_NAME/g, className),
+		);
+	}
+}
+
+/**
+ * Plugin to compile CLI
+ */
+function cliPlugin() {
+	return {
+		name: "cli-build",
 		async closeBundle() {
 			console.log("Building CLI...");
 
 			try {
-				// Build CLI as ESM (after main library is built)
 				await execAsync(
-					"tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node",
+					`tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node`
 				);
 
-				// Rename and make executable
 				cpSync("bin/cli.js", "bin/latex.js");
 				await execAsync("chmod +x bin/latex.js");
 
@@ -131,13 +139,13 @@ function typescriptModulesPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
-	const prod = mode === "production" || process.env.NODE_ENV === "production";
+	const isProd = mode === "production" || process.env.NODE_ENV === "production";
 
 	return {
 		build: {
 			outDir: "dist",
-			sourcemap: prod,
-			minify: prod ? "terser" : false,
+			sourcemap: isProd,
+			minify: isProd ? "terser" : false,
 			lib: {
 				entry: "src/index.ts",
 				name: "LaTeX",
@@ -145,8 +153,10 @@ export default defineConfig(({ mode }) => {
 			},
 			rollupOptions: {
 				plugins: [
-					// Ensure resolution before PEG.js so its filter sees resolved paths
-					resolve({ extensions: [".ts", ".js", ".mjs"], preferBuiltins: true }),
+					resolve({ 
+						extensions: [".ts", ".js", ".mjs"], 
+						preferBuiltins: true 
+					}),
 					pegjs({
 						plugins: [ignoreInfiniteLoop],
 						target: "es",
@@ -155,7 +165,10 @@ export default defineConfig(({ mode }) => {
 						trace: false,
 					}),
 					commonjs({ ignoreDynamicRequires: true }),
-					visualizer({ filename: "dist/latex.stats.html", sourcemap: prod }),
+					visualizer({ 
+						filename: "dist/latex.stats.html", 
+						sourcemap: isProd 
+					}),
 				],
 				output: {
 					format: "es",
@@ -166,6 +179,7 @@ export default defineConfig(({ mode }) => {
 		plugins: [
 			assetCopyPlugin(),
 			typescriptModulesPlugin(),
+			cliPlugin(),
 			dts({
 				tsconfigPath: "./tsconfig.json",
 				include: ["src"],
