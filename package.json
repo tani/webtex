@@ -21,7 +21,7 @@
 		"import": "./dist/latex.mjs",
 		"require": "./dist/latex.js"
 	},
-	"browser": "./dist/latex.js",
+	"browser": "./dist/latex.mjs",
 	"files": [
 		"bin/latex.js",
 		"dist/latex.js",

@@ -16,8 +16,6 @@ export default defineConfig(({ mode }) => {
       minify: prod ? "terser" : false,
       lib: {
         entry: "src/index.ts",
-        // UMD global name
-        name: "latexjs",
       },
       rollupOptions: {
         // Keep bundling deps similar to current Rollup setup (no externals)
@@ -40,20 +38,8 @@ export default defineConfig(({ mode }) => {
             entryFileNames: "latex.mjs",
           },
           {
-            format: "umd",
-            name: "latexjs",
+            format: "cjs",
             entryFileNames: "latex.js",
-            plugins: [
-              {
-                name: "import-meta-to-umd",
-                resolveImportMeta(property: string) {
-                  if (property === "url") {
-                    return "document.currentScript && document.currentScript.src";
-                  }
-                  return null as any;
-                },
-              },
-            ],
           },
         ],
       },
