@@ -47,7 +47,7 @@ function createProcess(processPath, args = [], env = null) {
  * @param {Array} inputs (Optional) Array of inputs (user responses)
  * @param {Object} opts (optional) Environment variables
  */
-function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
+function executeWithInput(processPath: string, args: string[] = [], inputs: string[] = [], opts: any = {}): Promise<ExecuteResult> {
     if (!Array.isArray(inputs)) {
         opts = inputs;
         inputs = [];
@@ -94,7 +94,7 @@ function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
         }, timeout);
     };
 
-    const promise = new Promise((resolve, reject) => {
+    const promise = new Promise<ExecuteResult>((resolve, reject) => {
 
         let stdout = ""
         let stderr = ""
@@ -163,17 +163,22 @@ function executeWithInput(processPath, args = [], inputs = [], opts = {}) {
     return promise;
 }
 
-module.exports = {
-    createProcess,
-    create: processPath => {
-        const fn = (...args) => executeWithInput(processPath, ...args);
+export { createProcess };
 
-        return {
-            execute: fn
-        };
-    },
-    DOWN: '\x1B\x5B\x42',
-    UP: '\x1B\x5B\x41',
-    ENTER: '\x0D',
-    SPACE: '\x20'
-};
+interface ExecuteResult {
+    stdout: string;
+    stderr: string;
+}
+
+export function create(processPath: string) {
+    const fn = (...args: any[]): Promise<ExecuteResult> => executeWithInput(processPath, ...args);
+
+    return {
+        execute: fn
+    };
+}
+
+export const DOWN = '\x1B\x5B\x42';
+export const UP = '\x1B\x5B\x41';
+export const ENTER = '\x0D';
+export const SPACE = '\x20';

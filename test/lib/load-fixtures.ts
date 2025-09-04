@@ -1,13 +1,11 @@
-var load;
-'use strict';
-var fs, p, parse;
-fs = require('fs');
-p = require('path');
-parse = function(input, separator){
+import fs from 'fs';
+import p from 'path';
+
+const parse = function(input: string, separator: string) {
   var lines, result, fid, i$, to$, line, fixture;
-  separator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
-  separator = RegExp('(?:^|\\r\\n|\\n|\\r)(?:' + separator + '(?:$|\\r\\n|\\n|\\r)(?!' + separator + ')|' + separator + '(?=$|\\r\\n|\\n|\\r))');
-  lines = input.split(separator);
+  const escapedSeparator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+  const separatorRegex = RegExp('(?:^|\\r\\n|\\n|\\r)(?:' + escapedSeparator + '(?:$|\\r\\n|\\n|\\r)(?!' + escapedSeparator + ')|' + escapedSeparator + '(?=$|\\r\\n|\\n|\\r))');
+  lines = input.split(separatorRegex);
   result = {
     fixtures: []
   };
@@ -43,9 +41,8 @@ parse = function(input, separator){
             ]
         }
 */
-load = function(path, separator){
+export const load = function(path: string, separator: string = '.') {
   var stat, input, result;
-  separator == null && (separator = '.');
   stat = fs.statSync(path);
   if (stat.isFile()) {
     input = fs.readFileSync(path, 'utf8');
@@ -58,4 +55,3 @@ load = function(path, separator){
   };
 };
 
-module.exports = { load };

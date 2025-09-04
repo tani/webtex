@@ -54,7 +54,7 @@ describe('LaTeX.js fixtures', () => {
 });
 
 function runFixture(fixture: any, name: string) {
-  let _test = test;
+  let _test: any = test;
   let screenshot = false;
   
   if (fixture.header?.charAt(0) === "!") {
@@ -129,7 +129,7 @@ function runFixture(fixture: any, name: string) {
 }
 function latexScreenshot(source, filename){
   var process, stdout, stderr;
-  process = spawnChild(path.join(__dirname, 'latex2png.sh'), [filename + ".latex.png"]);
+  process = spawn(path.join(__dirname, 'latex2png.sh'), [filename + ".latex.png"]);
   stdout = "";
   stderr = "";
   process.stdout.on('data', function(data){

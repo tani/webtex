@@ -3,9 +3,6 @@ import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
 
-declare global {
-  function takeScreenshot(html: string, filename: string): Promise<void>;
-}
 
 (globalThis as any).takeScreenshot = async function(html: string, filename: string) {
   // Add .png extension if not present
