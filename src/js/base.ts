@@ -1,86 +1,95 @@
-function getVariable(el, propertyName) {
+const getVariable = (el: Element, propertyName: string): string => {
     return String(getComputedStyle(el).getPropertyValue('--' + propertyName)).trim();
 };
 
-function processTheElements() {
-    var thes = document.querySelectorAll('.the');
-    for (var i = 0; i < thes.length; i++) {
-        var v = getVariable(thes[i], thes[i].getAttribute('display-var'));
-        // only mutate if it actually changed
-        if (thes[i].textContent != v) {
-            thes[i].textContent = v;
+const processTheElements = (): void => {
+    const thes = document.querySelectorAll('.the');
+    thes.forEach((theElement) => {
+        const displayVar = theElement.getAttribute('display-var');
+        if (displayVar) {
+            const v = getVariable(theElement, displayVar);
+            // only mutate if it actually changed
+            if (theElement.textContent !== v) {
+                theElement.textContent = v;
+            }
         }
-    }
-}
+    });
+};
 
-function _vertical(el, tb) {
-    var doc, docEl, rect, win;
-
+const _vertical = (el: Element, tb: 'top' | 'bottom'): number => {
     // return zero for disconnected and hidden (display: none) elements, IE <= 11 only
     // running getBoundingClientRect() on a disconnected node in IE throws an error
-    if ( !el.getClientRects().length ) {
+    if (!el.getClientRects().length) {
         return 0;
     }
 
-    rect = el.getBoundingClientRect();
+    const rect = el.getBoundingClientRect();
+    const doc = el.ownerDocument;
+    const docEl = doc.documentElement;
+    const win = doc.defaultView;
 
-    doc = el.ownerDocument;
-    docEl = doc.documentElement;
-    win = doc.defaultView;
+    if (!win) {
+        return 0;
+    }
 
     return rect[tb] + win.pageYOffset - docEl.clientTop;
-}
+};
 
-function offsetTop(el) {
+const offsetTop = (el: Element): number => {
     return _vertical(el, "top");
-}
+};
 
-function offsetBottom(el) {
+const offsetBottom = (el: Element): number => {
     return _vertical(el, "bottom");
-}
+};
 
-function offsetBaseline(el) {
-    var mpbaseline = el.querySelector('.mpbaseline');
-    return offsetBottom(mpbaseline);
-}
+const offsetBaseline = (el: Element): number => {
+    const mpbaseline = el.querySelector('.mpbaseline');
+    return mpbaseline ? offsetBottom(mpbaseline) : 0;
+};
 
-function heightAboveBaseline(el) {
-    var baseline = offsetBaseline(el);
-    var top = offsetTop(el);
+const heightAboveBaseline = (el: Element): number => {
+    const baseline = offsetBaseline(el);
+    const top = offsetTop(el);
     return baseline - top;
-}
+};
 
-function positionMarginpars() {
-    var mpars = document.querySelectorAll('.marginpar > div');
-    var prevBottom = 0;
+const positionMarginpars = (): void => {
+    const mpars = document.querySelectorAll('.marginpar > div') as NodeListOf<HTMLElement>;
+    let prevBottom = 0;
 
-    mpars.forEach(function(mpar) {
-        var mpref = document.querySelector('.body #marginref-' + mpar.id);
+    mpars.forEach((mpar) => {
+        const mpref = document.querySelector('.body #marginref-' + mpar.id) as Element;
+        
+        if (!mpref) {
+            return;
+        }
 
-        var baselineref = offsetBottom(mpref);
-        var heightAB = heightAboveBaseline(mpar);
-        var height = (mpar as HTMLElement).offsetHeight;
+        const baselineref = offsetBottom(mpref);
+        const heightAB = heightAboveBaseline(mpar);
+        const height = mpar.offsetHeight;
 
         // round to 1 digit
-        var top = Math.round((baselineref - heightAB - prevBottom) * 10) / 10;
+        const top = Math.round((baselineref - heightAB - prevBottom) * 10) / 10;
+        const marginTopValue = Math.max(0, top) + "px";
 
         // only mutate if it actually changed
-        if ((mpar as HTMLElement).style.marginTop != Math.max(0, top) + "px") {
-            (mpar as HTMLElement).style.marginTop = Math.max(0, top) + "px";
+        if (mpar.style.marginTop !== marginTopValue) {
+            mpar.style.marginTop = marginTopValue;
         }
 
         // if marginTop would have been negative, the element is now further down by that offset => add it to prevBottom
         prevBottom = baselineref - heightAB + height - Math.min(0, top);
     });
-}
+};
 
 // don't call resize event handlers too often
-var optimizedResize = (function() {
-    var callbacks = [],
-        running = false;
+const optimizedResize = (() => {
+    const callbacks: Array<() => void> = [];
+    let running = false;
 
     // fired on resize event
-    function resize() {
+    const resize = (): void => {
         if (!running) {
             running = true;
 
@@ -90,51 +99,56 @@ var optimizedResize = (function() {
                 setTimeout(runCallbacks, 66);
             }
         }
-    }
+    };
 
     // run the actual callbacks
-    function runCallbacks() {
-        callbacks.forEach(function(callback) { callback(); });
+    const runCallbacks = (): void => {
+        callbacks.forEach((callback) => callback());
         running = false;
-    }
+    };
 
     // adds callback to loop
-    function addCallback(callback) {
+    const addCallback = (callback: () => void): void => {
         if (callback) {
             callbacks.push(callback);
         }
-    }
+    };
 
     return {
         // public method to add additional callback
-        add: function(callback) {
+        add: (callback: () => void): void => {
             if (!callbacks.length) {
                 window.addEventListener('resize', resize);
             }
             addCallback(callback);
         }
-    }
-}());
+    };
+})();
 
 // setup event listeners
 
-function completed() {
+const completed = (): void => {
     document.removeEventListener("DOMContentLoaded", completed);
-	window.removeEventListener("load", positionMarginpars);
+    window.removeEventListener("load", completed);
 
-    var observer = new MutationObserver(function() {
+    const observer = new MutationObserver(() => {
         processTheElements();
         positionMarginpars();
     });
 
-    observer.observe(document, { attributes: true, childList: true, characterData: true, subtree: true });
+    observer.observe(document, { 
+        attributes: true, 
+        childList: true, 
+        characterData: true, 
+        subtree: true 
+    });
 
     // add resize event listener
     optimizedResize.add(positionMarginpars);
 
     processTheElements();
     positionMarginpars();
-}
+};
 
 document.addEventListener("DOMContentLoaded", completed);
 window.addEventListener("load", completed);
