@@ -32,68 +32,68 @@ const command = {
 	usage: "[options] [files...]",
 	args: {
 		output: {
-			type: "string" as const,
+			type: "string",
 			short: "o",
 			description: "specify output file, otherwise STDOUT will be used",
 		},
 		assets: {
-			type: "string" as const,
+			type: "string",
 			short: "a",
 			optional: true,
 			description:
 				"copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)",
 		},
 		url: {
-			type: "string" as const,
+			type: "string",
 			short: "u",
 			description:
 				"set the base URL to use for the assets (default: use relative URLs)",
 		},
 		body: {
-			type: "boolean" as const,
+			type: "boolean",
 			short: "b",
 			description:
 				"don't include HTML boilerplate and CSS, only output the contents of body",
 		},
 		entities: {
-			type: "boolean" as const,
+			type: "boolean",
 			short: "e",
 			description:
 				"encode HTML entities in the output instead of using UTF-8 characters",
 		},
 		pretty: {
-			type: "boolean" as const,
+			type: "boolean",
 			short: "p",
 			description:
 				"beautify the html (this may add/remove spaces unintentionally)",
 		},
 		class: {
-			type: "string" as const,
+			type: "string",
 			short: "c",
 			default: "article",
 			description:
 				"set a default documentclass for documents without a preamble",
 		},
 		macros: {
-			type: "string" as const,
+			type: "string",
 			short: "m",
 			description: "load a JavaScript file with additional custom macros",
 		},
 		stylesheet: {
-			type: "string" as const,
+			type: "string",
 			short: "s",
 			description:
 				"specify additional style sheets to use (comma-separated for multiple)",
 		},
 		hyphenation: {
-			type: "boolean" as const,
+			type: "boolean",
 			short: "n",
 			default: true,
 			description:
 				"insert soft hyphens (enables automatic hyphenation in the browser)",
 		},
 		language: {
-			type: "string" as const,
+			type: "string",
 			short: "l",
 			default: "en",
 			description: "set hyphenation language",
@@ -102,10 +102,10 @@ const command = {
 	run: main,
 };
 
-async function main(ctx: any) {
+async function main(ctx) {
 	const options = ctx.values;
 	const files = ctx.positionals;
-	let CustomMacros: any;
+	let CustomMacros;
 	if (options.macros) {
 		const macros = path.resolve(process.cwd(), options.macros);
 		const macroModule = await import(macros);
@@ -118,7 +118,7 @@ async function main(ctx: any) {
 		process.exit(1);
 	}
 
-	const getLanguagePatterns = (language: string) => {
+	const getLanguagePatterns = (language) => {
 		switch (language) {
 			case "en":
 				return en;
@@ -136,15 +136,15 @@ async function main(ctx: any) {
 		documentClass: options.class,
 		CustomMacros: CustomMacros,
 		styles: options.stylesheet
-			? options.stylesheet.split(",").map((s: string) => s.trim())
+			? options.stylesheet.split(",").map((s) => s.trim())
 			: [],
 	};
 
 	const readFile = util.promisify(fsReadFile);
 	const input = files.length
-		? Promise.all(files.map((file: string) => readFile(file, "utf8")))
-		: new Promise<string>((resolve) => {
-				stdin((str: string) => {
+		? Promise.all(files.map((file) => readFile(file, "utf8")))
+		: new Promise((resolve) => {
+				stdin((str) => {
 					resolve(str);
 				});
 			});
@@ -161,7 +161,7 @@ async function main(ctx: any) {
 				generator: new HtmlGenerator(htmlOptions),
 			});
 
-			let html: string;
+			let html;
 			if (options.body) {
 				const div = document.createElement("div");
 				div.appendChild(generator.domFragment().cloneNode(true));

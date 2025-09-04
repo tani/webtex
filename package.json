@@ -33,7 +33,7 @@
 		"dist/documentclasses/"
 	],
 	"scripts": {
-		"clean": "rimraf dist bin test/coverage test/test-results.xml",
+		"clean": "rimraf dist test/coverage test/test-results.xml",
 		"build": "npm run clean && vite build",
 		"pretest": "npm run build",
 		"test": "vitest run",

@@ -37,9 +37,6 @@ const STATIC_ASSETS = [
 function assetCopyPlugin() {
 	return {
 		name: "asset-copy",
-		configResolved() {
-			mkdirSync("bin", { recursive: true });
-		},
 		writeBundle() {
 			console.log("Copying static assets...");
 
@@ -120,32 +117,6 @@ async function buildPackagePlaceholders() {
 	}
 }
 
-/**
- * Plugin to compile CLI
- */
-function cliPlugin() {
-	return {
-		name: "cli-build",
-		async closeBundle() {
-			console.log("Building CLI...");
-
-			try {
-				await execAsync(
-					`tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node`,
-				);
-
-				cpSync("bin/cli.js", "bin/latex.js");
-				await execAsync("chmod +x bin/latex.js");
-
-				console.log("CLI built successfully!");
-			} catch (error) {
-				console.error("Error building CLI:", error);
-				throw error;
-			}
-		},
-	};
-}
-
 export default defineConfig(({ mode }) => {
 	const isProd = mode === "production" || process.env.NODE_ENV === "production";
 
@@ -155,7 +126,7 @@ export default defineConfig(({ mode }) => {
 			sourcemap: isProd,
 			minify: isProd ? "terser" : false,
 			lib: {
-				entry: "src/index.ts",
+				entry: ["src/index.ts"],
 				name: "LaTeX",
 				formats: ["es"],
 			},
@@ -187,7 +158,6 @@ export default defineConfig(({ mode }) => {
 		plugins: [
 			assetCopyPlugin(),
 			typescriptModulesPlugin(),
-			cliPlugin(),
 			dts({
 				tsconfigPath: "./tsconfig.json",
 				include: ["src"],
