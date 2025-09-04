@@ -52,7 +52,7 @@
 		"gunshi": "^0.26.3",
 		"hyphenation.de": "*",
 		"hyphenation.en-us": "*",
-		"js-beautify": "^1.15.4",
+		"prettier": "^3.6.2",
 		"stdin": "*",
 		"svgdom": "^0.1.8"
 	},

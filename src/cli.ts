@@ -5,8 +5,7 @@ import path from "node:path";
 import fsExtra from "fs-extra";
 import stdin from "stdin";
 import { cli } from "gunshi";
-import beautify from "js-beautify";
-const { html: beautifyHtml } = beautify;
+import prettier from "prettier";
 import { he, parse as latexParse, HtmlGenerator } from "../dist/latex.js";
 import en from "hyphenation.en-us";
 import de from "hyphenation.de";
@@ -159,12 +158,19 @@ async function main(ctx: any) {
 			}
 
 			if (options.pretty) {
-				html = beautifyHtml(html, {
-					end_with_newline: true,
-					wrap_line_length: 120,
-					wrap_attributes: "auto",
-					unformatted: ["span"],
-				});
+				// Fix void element closing tags before formatting
+				html = html.replace(/<(meta|link|br)([^>]*)><\/\1>/g, '<$1$2>');
+				
+				try {
+					html = await prettier.format(html, {
+						parser: "html",
+						printWidth: 120,
+						htmlWhitespaceSensitivity: "ignore",
+						singleAttributePerLine: false,
+					});
+				} catch (error) {
+					console.warn("Warning: Could not format HTML with prettier, using unformatted output");
+				}
 			}
 
 			if (options.output) {
