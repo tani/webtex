@@ -1,45 +1,42 @@
-export class Echo {
-  static displayName = 'Echo';
-  static args: Record<string, any> = {};
-
-  g: any;
-
-  constructor(generator: any, options?: any[]) {
-    this.g = generator;
-  }
-
-  gobbleO(): any[] {
+var export$;
+export { export$ as Echo }
+'use strict';
+var Echo;
+export$ = Echo = (function(){
+  Echo.displayName = 'Echo';
+  var args, prototype = Echo.prototype, constructor = Echo;
+  args = Echo.args = {};
+  function Echo(generator, options){}
+  args.gobbleO = ['H', 'o?'];
+  Echo.prototype['gobbleO'] = function(){
     return [];
-  }
-
-  echoO(o?: any): any[] {
+  };
+  args.echoO = ['H', 'o?'];
+  Echo.prototype['echoO'] = function(o){
     return ["-", o, "-"];
-  }
-
-  echoOGO(o1?: any, g?: any, o2?: any): any[] {
-    const result: any[] = [];
+  };
+  args.echoOGO = ['H', 'o?', 'g', 'o?'];
+  Echo.prototype['echoOGO'] = function(o1, g, o2){
+    var x$;
+    x$ = [];
     if (o1) {
-      result.push("-", o1, "-");
+      x$.push("-", o1, "-");
     }
-    result.push("+", g, "+");
+    x$.push("+", g, "+");
     if (o2) {
-      result.push("-", o2, "-");
+      x$.push("-", o2, "-");
     }
-    return result;
-  }
-
-  echoGOG(g1: any, o?: any, g2?: any): any[] {
-    const result: any[] = ["+", g1, "+"];
+    return x$;
+  };
+  args.echoGOG = ['H', 'g', 'o?', 'g'];
+  Echo.prototype['echoGOG'] = function(g1, o, g2){
+    var x$;
+    x$ = ["+", g1, "+"];
     if (o) {
-      result.push("-", o, "-");
+      x$.push("-", o, "-");
     }
-    result.push("+", g2, "+");
-    return result;
-  }
-}
-
-// Set up args for the methods
-Echo.args.gobbleO = ['H', 'o?'];
-Echo.args.echoO = ['H', 'o?'];
-Echo.args.echoOGO = ['H', 'o?', 'g', 'o?'];
-Echo.args.echoGOG = ['H', 'g', 'o?', 'g'];
+    x$.push("+", g2, "+");
+    return x$;
+  };
+  return Echo;
+}());

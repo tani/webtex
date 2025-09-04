@@ -1,87 +1,42 @@
 import { LaTeX } from './latex.ltx';
 import { diacritics, symbols } from './symbols';
 import { makeLengthClass } from './types';
-
-const Macros = LaTeX;
-
-// Modern Array extension with proper typing
-declare global {
-  interface Array<T> {
-    top: T;
-  }
-}
-
+var export$;
+export { export$ as Generator }
+var Macros, Generator, slice$ = [].slice, arrayFrom$ = Array.from || function(x){return slice$.call(x);};
+Macros = LaTeX;
 Object.defineProperty(Array.prototype, 'top', {
   enumerable: false,
   configurable: true,
-  get<T>(this: T[]): T {
+  get: function(){
     return this[this.length - 1];
   },
-  set<T>(this: T[], v: T): void {
+  set: function(v){
     this[this.length - 1] = v;
   }
 });
-// Type definitions
-interface GeneratorOptions {
-  documentClass?: any;
-  precision?: number;
-  CustomMacros?: any;
-}
-
-interface StackFrame {
-  attrs: {
-    fontFamily?: string;
-    fontWeight?: string;
-    fontShape?: string;
-    fontSize?: string;
-    textDecoration?: string;
-  };
-  align: any;
-  currentlabel: {
-    id: string;
-    label: any;
-  };
-  lengths: Map<string, any>;
-}
-
-export class Generator {
-  static displayName = 'Generator';
-  
-  documentClass: any = null;
-  documentTitle: string | null = null;
-  _options: GeneratorOptions;
-  _macros: Record<string, Function> = {};
-  _stack: StackFrame[] = [];
-  _groups: number[] = [];
-  _continue: boolean | number = false;
-  _labels: Map<string, any> = new Map();
-  _refs: Map<string, any[]> = new Map();
-  _counters: Map<string, number> = new Map();
-  _resets: Map<string, string[]> = new Map();
-  _marginpars: any[] = [];
-  Length: any = null;
-  _uid: number = 1;
-  _curArgs: any[] = [];
-  
-  constructor(options: GeneratorOptions = {}) {
-    this._options = options;
-    this._macros = {};
-    this._stack = [];
-    this._groups = [];
-    this._labels = new Map();
-    this._refs = new Map();
-    this._counters = new Map();
-    this._resets = new Map();
-    this._marginpars = [];
-    this.reset();
-  }
-
-  reset() {
+export$ = Generator = (function(){
+  Generator.displayName = 'Generator';
+  var error, _roman, prototype = Generator.prototype, constructor = Generator;
+  Generator.prototype.documentClass = null;
+  Generator.prototype.documentTitle = null;
+  Generator.prototype._options = null;
+  Generator.prototype._macros = null;
+  Generator.prototype._stack = null;
+  Generator.prototype._groups = null;
+  Generator.prototype._continue = false;
+  Generator.prototype._labels = null;
+  Generator.prototype._refs = null;
+  Generator.prototype._counters = null;
+  Generator.prototype._resets = null;
+  Generator.prototype._marginpars = null;
+  Generator.prototype.Length = null;
+  Generator.prototype.reset = function(){
     this.Length = makeLengthClass(this);
     this.documentClass = this._options.documentClass;
     this.documentTitle = "untitled";
     this._uid = 1;
-    Object.keys(this._macros).forEach(key => delete this._macros[key]);
+    this._macros = {};
     this._curArgs = [];
     this._stack = [{
       attrs: {},
@@ -104,87 +59,77 @@ export class Generator {
     this.newCounter('enumiii');
     this.newCounter('enumiv');
     this._macros = new Macros(this, this._options.CustomMacros);
-  }
-
-  nextId() {
+  };
+  Generator.prototype.nextId = function(){
     return this._uid++;
-  }
-
-  round(num: number) {
-    const factor = Math.pow(10, this._options.precision);
+  };
+  Generator.prototype.round = function(num){
+    var factor;
+    factor = Math.pow(10, this._options.precision);
     return Math.round(num * factor) / factor;
-  }
-
-  error(e: string) {
+  };
+  error = function(e){
+    console.error(e);
+    throw new Error(e);
+  };
+  Generator.prototype.error = function(e){
     error(e);
-  }
-
-  setErrorFn(e: (msg: string) => never) {
+  };
+  Generator.prototype.setErrorFn = function(e){
     error = e;
-  }
-
-  location(): any {
+  };
+  Generator.prototype.location = function(){
     error("location function not set!");
-    return { end: { offset: 0 } }; // This should be overridden by actual implementation
-  }
-
-  setTitle(title: any) {
+  };
+  Generator.prototype.setTitle = function(title){
     return this.documentTitle = title.textContent;
-  }
-
-  hasSymbol(name: string) {
+  };
+  Generator.prototype.hasSymbol = function(name){
     return Macros.symbols.has(name);
-  }
-
-  symbol(name: string) {
+  };
+  Generator.prototype.symbol = function(name){
     if (!this.hasSymbol(name)) {
       this.error("no such symbol: " + name);
     }
     return Macros.symbols.get(name);
-  }
-
-  hasMacro(name: string) {
+  };
+  Generator.prototype.hasMacro = function(name){
     return typeof this._macros[name] === "function" && !deepEq$(name, "constructor", '===') && (this._macros.hasOwnProperty(name) || Macros.prototype.hasOwnProperty(name));
-  }
-
-  isHmode(marco: string) {
-    const ref$ = LaTeX.args[marco];
-    return (ref$ != null ? ref$[0] : undefined) === 'H' || !LaTeX.args[marco];
-  }
-
-  isVmode(marco: string) {
-    const ref$ = LaTeX.args[marco];
-    return (ref$ != null ? ref$[0] : undefined) === 'V';
-  }
-
-  isHVmode(marco: string) {
-    const ref$ = LaTeX.args[marco];
-    return (ref$ != null ? ref$[0] : undefined) === 'HV';
-  }
-
-  isPreamble(marco: string) {
-    const ref$ = LaTeX.args[marco];
-    return (ref$ != null ? ref$[0] : undefined) === 'P';
-  }
-  macro(name: string, args: any[]) {
+  };
+  Generator.prototype.isHmode = function(marco){
+    var ref$;
+    return ((ref$ = Macros.args[marco]) != null ? ref$[0] : void 8) === 'H' || !Macros.args[marco];
+  };
+  Generator.prototype.isVmode = function(marco){
+    var ref$;
+    return ((ref$ = Macros.args[marco]) != null ? ref$[0] : void 8) === 'V';
+  };
+  Generator.prototype.isHVmode = function(marco){
+    var ref$;
+    return ((ref$ = Macros.args[marco]) != null ? ref$[0] : void 8) === 'HV';
+  };
+  Generator.prototype.isPreamble = function(marco){
+    var ref$;
+    return ((ref$ = Macros.args[marco]) != null ? ref$[0] : void 8) === 'P';
+  };
+  Generator.prototype.macro = function(name, args){
+    var ref$, this$ = this;
     if (symbols.has(name)) {
       return [this.createText(symbols.get(name))];
     }
-    const result = this._macros[name].apply(this._macros, args);
-    return result != null ? result.filter((x: any) => {
+    return (ref$ = this._macros[name].apply(this._macros, args)) != null ? ref$.filter(function(x){
       return x != undefined;
-    }).map((x: any) => {
+    }).map(function(x){
       if (typeof x === 'string' || x instanceof String) {
-        return this.createText(String(x));
+        return this$.createText(x);
       } else {
-        return this.addAttributes(x);
+        return this$.addAttributes(x);
       }
-    }) : undefined;
-  }
-
-  beginArgs(macro: string) {
-    const that = LaTeX.args[macro];
-    this._curArgs.push(that
+    }) : void 8;
+  };
+  Generator.prototype.beginArgs = function(macro){
+    var that;
+    this._curArgs.push((that = Macros.args[macro])
       ? {
         name: macro,
         args: that.slice(1),
@@ -194,73 +139,69 @@ export class Generator {
         args: [],
         parsed: []
       });
-  }
-
-  selectArgsBranch(nextChar: string) {
-    const optArgs = ['o?', 'i?', 'k?', 'kv?', 'n?', 'l?', 'c-ml?', 'cl?'];
+  };
+  Generator.prototype.selectArgsBranch = function(nextChar){
+    var optArgs, branches, i$, len$, b, ref$;
+    optArgs = ['o?', 'i?', 'k?', 'kv?', 'n?', 'l?', 'c-ml?', 'cl?'];
     if (Array.isArray(this._curArgs.top.args[0])) {
-      const branches = this._curArgs.top.args[0];
-      for (let i = 0, len = branches.length; i < len; ++i) {
-        const b = branches[i];
+      branches = this._curArgs.top.args[0];
+      for (i$ = 0, len$ = branches.length; i$ < len$; ++i$) {
+        b = branches[i$];
         if ((nextChar === '[' && in$(b[0], optArgs)) || (nextChar === '{' && !in$(b[0], optArgs))) {
           this._curArgs.top.args.shift();
-          this._curArgs.top.args.unshift(...b);
+          (ref$ = this._curArgs.top.args).unshift.apply(ref$, b);
           return true;
         }
       }
     }
-  }
-  nextArg(arg: string) {
+  };
+  Generator.prototype.nextArg = function(arg){
     if (this._curArgs.top.args[0] === arg) {
       this._curArgs.top.args.shift();
       return true;
     }
-  }
-
-  argError(m: string) {
+  };
+  Generator.prototype.argError = function(m){
     return error("macro \\" + this._curArgs.top.name + ": " + m);
-  }
-
-  addParsedArg(a: any) {
+  };
+  Generator.prototype.addParsedArg = function(a){
     this._curArgs.top.parsed.push(a);
-  }
-
-  parsedArgs() {
+  };
+  Generator.prototype.parsedArgs = function(){
     return this._curArgs.top.parsed;
-  }
-
-  preExecMacro() {
+  };
+  Generator.prototype.preExecMacro = function(){
     this.macro(this._curArgs.top.name, this.parsedArgs());
-  }
-
-  endArgs() {
-    const x = this._curArgs.pop();
-    x.args.length === 0 || error("grammar error: arguments for " + x.name + " have not been parsed: " + x.args);
-    return x.parsed;
-  }
-  begin(env_id: string) {
+  };
+  Generator.prototype.endArgs = function(){
+    var x$;
+    x$ = this._curArgs.pop();
+    x$.args.length === 0 || error("grammar error: arguments for " + x$.name + " have not been parsed: " + x$.args);
+    return x$.parsed;
+  };
+  Generator.prototype.begin = function(env_id){
     if (!this.hasMacro(env_id)) {
       error("unknown environment: " + env_id);
     }
     this.startBalanced();
     this.enterGroup();
     this.beginArgs(env_id);
-  }
-
-  end(id: string, end_id: string) {
-    let end;
+  };
+  Generator.prototype.end = function(id, end_id){
+    var end;
     if (id !== end_id) {
       error("environment '" + id + "' is missing its end, found '" + end_id + "' instead");
     }
     if (this.hasMacro("end" + id)) {
-      end = this.macro("end" + id, []);
+      end = this.macro("end" + id);
     }
     this.exitGroup();
     this.isBalanced() || error(id + ": groups need to be balanced in environments!");
     this.endBalanced();
     return end;
-  }
-  enterGroup(copyAttrs: boolean = false) {
+  };
+  Generator.prototype.enterGroup = function(copyAttrs){
+    copyAttrs == null && (copyAttrs = false);
     this._stack.push({
       attrs: copyAttrs
         ? Object.assign({}, this._stack.top.attrs)
@@ -270,51 +211,42 @@ export class Generator {
       lengths: new Map(this._stack.top.lengths)
     });
     ++this._groups.top;
-  }
-
-  exitGroup() {
+  };
+  Generator.prototype.exitGroup = function(){
     --this._groups.top >= 0 || error("there is no group to end here");
     this._stack.pop();
-  }
-
-  startBalanced() {
+  };
+  Generator.prototype.startBalanced = function(){
     this._groups.push(0);
-  }
-
-  endBalanced() {
+  };
+  Generator.prototype.endBalanced = function(){
     this._groups.pop();
     return this._groups.length;
-  }
-
-  isBalanced() {
+  };
+  Generator.prototype.isBalanced = function(){
     return this._groups.top === 0;
-  }
-  continue() {
+  };
+  Generator.prototype['continue'] = function(){
     this._continue = this.location().end.offset;
-  }
-
-  break() {
-    if (typeof this._continue === 'number' && this.location().end.offset > this._continue) {
+  };
+  Generator.prototype['break'] = function(){
+    if (this.location().end.offset > this._continue) {
       this._continue = false;
     }
-  }
-
-  setAlignment(align: any) {
+  };
+  Generator.prototype.setAlignment = function(align){
     this._stack.top.align = align;
-  }
-
-  alignment() {
+  };
+  Generator.prototype.alignment = function(){
     return this._stack.top.align;
-  }
-  setFontFamily(family: string) {
+  };
+  Generator.prototype.setFontFamily = function(family){
     this._stack.top.attrs.fontFamily = family;
-  }
-
-  setFontWeight(weight: string) {
+  };
+  Generator.prototype.setFontWeight = function(weight){
     this._stack.top.attrs.fontWeight = weight;
-  }
-
-  setFontShape(shape: string) {
+  };
+  Generator.prototype.setFontShape = function(shape){
     if (shape === "em") {
       if (this._activeAttributeValue("fontShape") === "it") {
         shape = "up";
@@ -323,31 +255,29 @@ export class Generator {
       }
     }
     this._stack.top.attrs.fontShape = shape;
-  }
-
-  setFontSize(size: string) {
+  };
+  Generator.prototype.setFontSize = function(size){
     this._stack.top.attrs.fontSize = size;
-  }
-
-  setTextDecoration(decoration: string) {
+  };
+  Generator.prototype.setTextDecoration = function(decoration){
     this._stack.top.attrs.textDecoration = decoration;
-  }
-  _inlineAttributes() {
-    const cur = this._stack.top.attrs;
+  };
+  Generator.prototype._inlineAttributes = function(){
+    var cur;
+    cur = this._stack.top.attrs;
     return [cur.fontFamily, cur.fontWeight, cur.fontShape, cur.fontSize, cur.textDecoration].join(' ').replace(/\s+/g, ' ').trim();
-  }
-
-  _activeAttributeValue(attr: string) {
-    for (let i = this._stack.length - 1; i >= 0; --i) {
-      const level = i;
-      const that = this._stack[level].attrs[attr];
-      if (that) {
+  };
+  Generator.prototype._activeAttributeValue = function(attr){
+    var i$, level, that;
+    for (i$ = this._stack.length - 1; i$ >= 0; --i$) {
+      level = i$;
+      if (that = this._stack[level].attrs[attr]) {
         return that;
       }
     }
-  }
-  startsection(sec: string, level: number, star: boolean, toc: any, ttl: any) {
-    let chaphead, el;
+  };
+  Generator.prototype.startsection = function(sec, level, star, toc, ttl){
+    var chaphead, el, ref$;
     if (toc == ttl && ttl == undefined) {
       if (!star && this.counter("secnumdepth") >= level) {
         this.stepCounter(sec);
@@ -357,63 +287,58 @@ export class Generator {
     }
     if (!star && this.counter("secnumdepth") >= level) {
       if (sec === 'chapter') {
-        chaphead = this.create(this.block, (this.macro('chaptername', []) || []).concat(this.createText(this.symbol('space')), (this.macro('the' + sec, []) || [])));
+        chaphead = this.create(this.block, this.macro('chaptername').concat(this.createText(this.symbol('space')), this.macro('the' + sec)));
         el = this.create(this[sec], [chaphead, ttl]);
       } else {
-        el = this.create(this[sec], (this.macro('the' + sec, []) || []).concat(this.createText(this.symbol('quad')), ttl));
+        el = this.create(this[sec], this.macro('the' + sec).concat(this.createText(this.symbol('quad')), ttl));
       }
-      const ref$ = this._stack.top.currentlabel.id;
-      if (ref$ != null) {
+      if ((ref$ = this._stack.top.currentlabel.id) != null) {
         el.id = ref$;
       }
     } else {
       el = this.create(this[sec], ttl);
     }
     return el;
-  }
-  startlist() {
+  };
+  Generator.prototype.startlist = function(){
     this.stepCounter('@listdepth');
     if (this.counter('@listdepth') > 6) {
       error("too deeply nested");
     }
     return true;
-  }
-
-  endlist() {
+  };
+  Generator.prototype.endlist = function(){
     this.setCounter('@listdepth', this.counter('@listdepth') - 1);
-    this.continue();
-  }
-  newLength(l: string) {
+    this['continue']();
+  };
+  Generator.prototype.newLength = function(l){
     if (this.hasLength(l)) {
       error("length " + l + " already defined!");
     }
     this._stack.top.lengths.set(l, this.Length.zero);
-  }
-
-  hasLength(l: string) {
+  };
+  Generator.prototype.hasLength = function(l){
     return this._stack.top.lengths.has(l);
-  }
-
-  setLength(id: string, length: any) {
+  };
+  Generator.prototype.setLength = function(id, length){
     if (!this.hasLength(id)) {
       error("no such length: " + id);
     }
     this._stack.top.lengths.set(id, length);
-  }
-
-  length(l: string) {
+  };
+  Generator.prototype.length = function(l){
     if (!this.hasLength(l)) {
       error("no such length: " + l);
     }
     return this._stack.top.lengths.get(l);
-  }
-
-  theLength(id: string) {
-    const l = this.create(this.inline, undefined, "the");
+  };
+  Generator.prototype.theLength = function(id){
+    var l;
+    l = this.create(this.inline, undefined, "the");
     l.setAttribute("display-var", id);
     return l;
-  }
-  newCounter(c: string, parent?: string) {
+  };
+  Generator.prototype.newCounter = function(c, parent){
     if (this.hasCounter(c)) {
       error("counter " + c + " already defined!");
     }
@@ -425,49 +350,44 @@ export class Generator {
     if (this.hasMacro('the' + c)) {
       error("macro \\the" + c + " already defined!");
     }
-    this._macros['the' + c] = () => {
-      return [this.arabic(this.counter(c))];
+    this._macros['the' + c] = function(){
+      return [this.g.arabic(this.g.counter(c))];
     };
-  }
-
-  hasCounter(c: string) {
+  };
+  Generator.prototype.hasCounter = function(c){
     return this._counters.has(c);
-  }
-
-  setCounter(c: string, v: number) {
+  };
+  Generator.prototype.setCounter = function(c, v){
     if (!this.hasCounter(c)) {
       error("no such counter: " + c);
     }
     this._counters.set(c, v);
-  }
-
-  stepCounter(c: string) {
+  };
+  Generator.prototype.stepCounter = function(c){
     this.setCounter(c, this.counter(c) + 1);
     this.clearCounter(c);
-  }
-
-  counter(c: string) {
+  };
+  Generator.prototype.counter = function(c){
     if (!this.hasCounter(c)) {
       error("no such counter: " + c);
     }
     return this._counters.get(c);
-  }
-  refCounter(c: string, id?: string) {
-    let el;
+  };
+  Generator.prototype.refCounter = function(c, id){
+    var el;
     if (!id) {
       id = c + "-" + this.nextId();
       el = this.create(this.anchor(id));
     }
     this._stack.top.currentlabel = {
       id: id,
-      label: this.createFragment(Array.from(this.hasMacro('p@' + c)
-        ? this.macro('p@' + c, [])
-        : []).concat(Array.from(this.macro('the' + c, []) || [])))
+      label: this.createFragment(arrayFrom$(this.hasMacro('p@' + c)
+        ? this.macro('p@' + c)
+        : []).concat(arrayFrom$(this.macro('the' + c))))
     };
     return el;
-  }
-
-  addToReset(c: string, parent: string) {
+  };
+  Generator.prototype.addToReset = function(c, parent){
     if (!this.hasCounter(parent)) {
       error("no such counter: " + parent);
     }
@@ -475,51 +395,47 @@ export class Generator {
       error("no such counter: " + c);
     }
     this._resets.get(parent).push(c);
-  }
-
-  clearCounter(c: string) {
-    const ref$ = this._resets.get(c);
-    for (let i = 0, len = ref$.length; i < len; ++i) {
-      const r = ref$[i];
+  };
+  Generator.prototype.clearCounter = function(c){
+    var i$, ref$, len$, r;
+    for (i$ = 0, len$ = (ref$ = this._resets.get(c)).length; i$ < len$; ++i$) {
+      r = ref$[i$];
       this.clearCounter(r);
       this.setCounter(r, 0);
     }
-  }
-  alph(num: number) {
+  };
+  Generator.prototype.alph = function(num){
     return String.fromCharCode(96 + num);
-  }
-
-  Alph(num: number) {
+  };
+  Generator.prototype.Alph = function(num){
     return String.fromCharCode(64 + num);
-  }
-
-  arabic(num: number) {
+  };
+  Generator.prototype.arabic = function(num){
     return String(num);
-  }
-
-  roman(num: number) {
-    const lookup: Array<[string, number]> = [['m', 1000], ['cm', 900], ['d', 500], ['cd', 400], ['c', 100], ['xc', 90], ['l', 50], ['xl', 40], ['x', 10], ['ix', 9], ['v', 5], ['iv', 4], ['i', 1]];
-    return this._roman(num, lookup);
-  }
-
-  Roman(num: number) {
-    const lookup: Array<[string, number]> = [['M', 1000], ['CM', 900], ['D', 500], ['CD', 400], ['C', 100], ['XC', 90], ['L', 50], ['XL', 40], ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]];
-    return this._roman(num, lookup);
-  }
-
-  private _roman(num: number, lookup: Array<[string, number]>) {
-    let roman = "";
-    for (let i = 0, len = lookup.length; i < len; ++i) {
-      const item = lookup[i];
-      while (num >= item[1]) {
-        roman += item[0];
-        num -= item[1];
+  };
+  Generator.prototype.roman = function(num){
+    var lookup;
+    lookup = [['m', 1000], ['cm', 900], ['d', 500], ['cd', 400], ['c', 100], ['xc', 90], ['l', 50], ['xl', 40], ['x', 10], ['ix', 9], ['v', 5], ['iv', 4], ['i', 1]];
+    return _roman(num, lookup);
+  };
+  Generator.prototype.Roman = function(num){
+    var lookup;
+    lookup = [['M', 1000], ['CM', 900], ['D', 500], ['CD', 400], ['C', 100], ['XC', 90], ['L', 50], ['XL', 40], ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]];
+    return _roman(num, lookup);
+  };
+  _roman = function(num, lookup){
+    var roman, i$, len$, i;
+    roman = "";
+    for (i$ = 0, len$ = lookup.length; i$ < len$; ++i$) {
+      i = lookup[i$];
+      while (num >= i[1]) {
+        roman += i[0];
+        num -= i[1];
       }
     }
     return roman;
-  }
-
-  fnsymbol(num: number) {
+  };
+  Generator.prototype.fnsymbol = function(num){
     switch (num) {
     case 1:
       return this.symbol('textasteriskcentered');
@@ -542,8 +458,9 @@ export class Generator {
     default:
       return error("fnsymbol value must be between 1 and 9");
     }
-  }
-  setLabel(label: string) {
+  };
+  Generator.prototype.setLabel = function(label){
+    var i$, ref$, len$, r;
     if (this._labels.has(label)) {
       error("label " + label + " already defined!");
     }
@@ -552,110 +469,61 @@ export class Generator {
     }
     this._labels.set(label, this._stack.top.currentlabel);
     if (this._refs.has(label)) {
-      const ref$ = this._refs.get(label);
-      for (let i = 0, len = ref$.length; i < len; ++i) {
-        const r = ref$[i];
+      for (i$ = 0, len$ = (ref$ = this._refs.get(label)).length; i$ < len$; ++i$) {
+        r = ref$[i$];
         while (r.firstChild) {
           r.removeChild(r.firstChild);
         }
         r.appendChild(this._stack.top.currentlabel.label.cloneNode(true));
         r.setAttribute("href", "#" + this._stack.top.currentlabel.id);
       }
-      this._refs.delete(label);
+      this._refs['delete'](label);
     }
-  }
-  ref(label: string) {
-    const that = this._labels.get(label);
-    if (that) {
+  };
+  Generator.prototype.ref = function(label){
+    var that, el;
+    if (that = this._labels.get(label)) {
       return this.create(this.link("#" + that.id), that.label.cloneNode(true));
     }
-    const el = this.create(this.link("#"), this.createText("??"));
+    el = this.create(this.link("#"), this.createText("??"));
     if (!this._refs.has(label)) {
       this._refs.set(label, [el]);
     } else {
       this._refs.get(label).push(el);
     }
     return el;
-  }
-
-  logUndefinedRefs() {
+  };
+  Generator.prototype.logUndefinedRefs = function(){
+    var keys, ref;
     if (this._refs.size === 0) {
       return;
     }
-    const keys = this._refs.keys();
-    let ref;
+    keys = this._refs.keys();
     while (!(ref = keys.next()).done) {
       console.warn("warning: reference '" + ref.value + "' undefined");
     }
     console.warn("There were undefined references.");
-  }
-
-  marginpar(txt: any) {
-    const id = this.nextId();
-    const marginPar = this.create(this.block, [this.create(this.inline, null, "mpbaseline"), txt]);
+  };
+  Generator.prototype.marginpar = function(txt){
+    var id, marginPar, marginRef;
+    id = this.nextId();
+    marginPar = this.create(this.block, [this.create(this.inline, null, "mpbaseline"), txt]);
     marginPar.id = id;
     this._marginpars.push(marginPar);
-    const marginRef = this.create(this.inline, null, "mpbaseline");
+    marginRef = this.create(this.inline, null, "mpbaseline");
     marginRef.id = "marginref-" + id;
     return marginRef;
-  }
-
-  // DOM creation methods - these would need to be implemented based on your DOM structure
-  create(elementType: any, content?: any, className?: string): any {
-    // Placeholder - implement based on your DOM creation needs
-    throw new Error("create method not implemented");
-  }
-
-  createText(text: string): any {
-    // Placeholder - implement based on your DOM creation needs
-    throw new Error("createText method not implemented");
-  }
-
-  createFragment(content: any[]): any {
-    // Placeholder - implement based on your DOM creation needs
-    throw new Error("createFragment method not implemented");
-  }
-
-  addAttributes(element: any): any {
-    // Placeholder - implement based on your DOM creation needs
-    throw new Error("addAttributes method not implemented");
-  }
-
-  // Element type properties - these would need to be implemented based on your DOM structure
-  get block(): any {
-    throw new Error("block property not implemented");
-  }
-
-  get inline(): any {
-    throw new Error("inline property not implemented");
-  }
-
-  anchor(id: string): any {
-    throw new Error("anchor method not implemented");
-  }
-
-  link(href: string): any {
-    throw new Error("link method not implemented");
-  }
-}
-
-// Global error function
-let error = (e: string) => {
-  console.error(e);
-  throw new Error(e);
-};
-
-
-// Deep equality comparison helper
-function deepEq$(x: any, y: any, type: string) {
-  const toString = {}.toString;
-  const hasOwnProperty = {}.hasOwnProperty;
-  const has = (obj: any, key: string) => hasOwnProperty.call(obj, key);
-  let first = true;
+  };
+  function Generator(){}
+  return Generator;
+}());
+function deepEq$(x, y, type){
+  var toString = {}.toString, hasOwnProperty = {}.hasOwnProperty,
+      has = function (obj, key) { return hasOwnProperty.call(obj, key); };
+  var first = true;
   return eq(x, y, []);
-  
-  function eq(a: any, b: any, stack: any[]) {
-    let className, length, size, result, alength, blength, key, sizeB;
+  function eq(a, b, stack) {
+    var className, length, size, result, alength, blength, r, key, ref, sizeB;
     if (a == null || b == null) { return a === b; }
     if (a.__placeholder__ || b.__placeholder__) { return true; }
     if (a === b) { return a !== 0 || 1 / a == 1 / b; }
@@ -733,11 +601,8 @@ function deepEq$(x: any, y: any, type: string) {
     return result;
   }
 }
-
-// Array includes helper
-function in$(x: any, xs: any[]) {
-  let i = -1;
-  const l = xs.length >>> 0;
+function in$(x, xs){
+  var i = -1, l = xs.length >>> 0;
   while (++i < l) if (x === xs[i]) return true;
   return false;
 }

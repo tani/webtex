@@ -1,66 +1,68 @@
-function getVariable(el: Element, propertyName: string): string {
+function getVariable(el, propertyName) {
     return String(getComputedStyle(el).getPropertyValue('--' + propertyName)).trim();
-}
+};
 
-function processTheElements(): void {
-    const thes = document.querySelectorAll('.the');
-    for (const theElement of thes) {
-        const v = getVariable(theElement, theElement.getAttribute('display-var') || '');
+function processTheElements() {
+    var thes = document.querySelectorAll('.the');
+    for (var i = 0; i < thes.length; i++) {
+        var v = getVariable(thes[i], thes[i].getAttribute('display-var'));
         // only mutate if it actually changed
-        if (theElement.textContent != v) {
-            theElement.textContent = v;
+        if (thes[i].textContent != v) {
+            thes[i].textContent = v;
         }
     }
 }
 
-function _vertical(el: Element, tb: 'top' | 'bottom'): number {
+function _vertical(el, tb) {
+    var doc, docEl, rect, win;
+
     // return zero for disconnected and hidden (display: none) elements, IE <= 11 only
     // running getBoundingClientRect() on a disconnected node in IE throws an error
-    if (!el.getClientRects().length) {
+    if ( !el.getClientRects().length ) {
         return 0;
     }
 
-    const rect = el.getBoundingClientRect();
-    const doc = el.ownerDocument;
-    const docEl = doc.documentElement;
-    const win = doc.defaultView;
+    rect = el.getBoundingClientRect();
 
-    return rect[tb] + (win?.pageYOffset || 0) - docEl.clientTop;
+    doc = el.ownerDocument;
+    docEl = doc.documentElement;
+    win = doc.defaultView;
+
+    return rect[tb] + win.pageYOffset - docEl.clientTop;
 }
 
-function offsetTop(el: Element): number {
+function offsetTop(el) {
     return _vertical(el, "top");
 }
 
-function offsetBottom(el: Element): number {
+function offsetBottom(el) {
     return _vertical(el, "bottom");
 }
 
-function offsetBaseline(el: Element): number {
-    const mpbaseline = el.querySelector('.mpbaseline');
-    return offsetBottom(mpbaseline!);
+function offsetBaseline(el) {
+    var mpbaseline = el.querySelector('.mpbaseline');
+    return offsetBottom(mpbaseline);
 }
 
-function heightAboveBaseline(el: Element): number {
-    const baseline = offsetBaseline(el);
-    const top = offsetTop(el);
+function heightAboveBaseline(el) {
+    var baseline = offsetBaseline(el);
+    var top = offsetTop(el);
     return baseline - top;
 }
 
-function positionMarginpars(): void {
-    const mpars = document.querySelectorAll('.marginpar > div');
-    let prevBottom = 0;
+function positionMarginpars() {
+    var mpars = document.querySelectorAll('.marginpar > div');
+    var prevBottom = 0;
 
-    mpars.forEach((mpar) => {
-        const mpref = document.querySelector('.body #marginref-' + mpar.id);
-        if (!mpref) return;
+    mpars.forEach(function(mpar) {
+        var mpref = document.querySelector('.body #marginref-' + mpar.id);
 
-        const baselineref = offsetBottom(mpref);
-        const heightAB = heightAboveBaseline(mpar);
-        const height = (mpar as HTMLElement).offsetHeight;
+        var baselineref = offsetBottom(mpref);
+        var heightAB = heightAboveBaseline(mpar);
+        var height = (mpar as HTMLElement).offsetHeight;
 
         // round to 1 digit
-        const top = Math.round((baselineref - heightAB - prevBottom) * 10) / 10;
+        var top = Math.round((baselineref - heightAB - prevBottom) * 10) / 10;
 
         // only mutate if it actually changed
         if ((mpar as HTMLElement).style.marginTop != Math.max(0, top) + "px") {
@@ -73,12 +75,12 @@ function positionMarginpars(): void {
 }
 
 // don't call resize event handlers too often
-const optimizedResize = (() => {
-    const callbacks: (() => void)[] = [];
-    let running = false;
+var optimizedResize = (function() {
+    var callbacks = [],
+        running = false;
 
     // fired on resize event
-    const resize = () => {
+    function resize() {
         if (!running) {
             running = true;
 
@@ -88,39 +90,39 @@ const optimizedResize = (() => {
                 setTimeout(runCallbacks, 66);
             }
         }
-    };
+    }
 
     // run the actual callbacks
-    const runCallbacks = () => {
-        callbacks.forEach((callback) => callback());
+    function runCallbacks() {
+        callbacks.forEach(function(callback) { callback(); });
         running = false;
-    };
+    }
 
     // adds callback to loop
-    const addCallback = (callback: () => void) => {
+    function addCallback(callback) {
         if (callback) {
             callbacks.push(callback);
         }
-    };
+    }
 
     return {
         // public method to add additional callback
-        add: (callback: () => void) => {
+        add: function(callback) {
             if (!callbacks.length) {
                 window.addEventListener('resize', resize);
             }
             addCallback(callback);
         }
-    };
-})();
+    }
+}());
 
 // setup event listeners
 
-function completed(): void {
+function completed() {
     document.removeEventListener("DOMContentLoaded", completed);
-    window.removeEventListener("load", positionMarginpars);
+	window.removeEventListener("load", positionMarginpars);
 
-    const observer = new MutationObserver(() => {
+    var observer = new MutationObserver(function() {
         processTheElements();
         positionMarginpars();
     });

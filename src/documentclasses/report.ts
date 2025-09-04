@@ -1,12 +1,21 @@
 import { Base } from './base';
 
-export class Report extends Base {
-  static displayName = 'Report';
-  static css = "css/book.css";
-  static args = Base.args;
+interface ReportConstructor {
+  (generator: any, options: any): void;
+  css: string;
+  args: any;
+  superclass?: any;
+  prototype: any;
+}
 
-  constructor(generator: any, options: any) {
-    super(generator, options);
+var export$;
+export { export$ as Report }
+var Report: ReportConstructor;
+export$ = Report = (function(superclass){
+  var args, x$, prototype = extend$((import$(Report, superclass).displayName = 'Report', Report), superclass).prototype, constructor = Report;
+  Report.css = "css/book.css";
+  function Report(generator, options){
+    (Report as any).superclass.apply(this, arguments);
     this.g.newCounter('chapter');
     this.g.addToReset('section', 'chapter');
     this.g.setCounter('secnumdepth', 2);
@@ -15,73 +24,73 @@ export class Report extends Base {
     this.g.addToReset('table', 'chapter');
     this.g.addToReset('footnote', 'chapter');
   }
-
-  chaptername(): string[] {
+  Report.prototype['chaptername'] = function(){
     return ["Chapter"];
-  }
-
-  bibname(): string[] {
+  };
+  Report.prototype['bibname'] = function(){
     return ["Bibliography"];
-  }
-
-  part(s?: boolean, toc?: any, ttl?: any): any[] {
+  };
+  args = Report.args = Base.args;
+  x$ = args;
+  x$['part'] = x$['chapter'] = ['V', 's', 'X', 'o?', 'g'];
+  Report.prototype['part'] = function(s, toc, ttl){
     return [this.g.startsection('part', -1, s, toc, ttl)];
-  }
-
-  chapter(s?: boolean, toc?: any, ttl?: any): any[] {
+  };
+  Report.prototype['chapter'] = function(s, toc, ttl){
     return [this.g.startsection('chapter', 0, s, toc, ttl)];
-  }
-
-  thechapter(): string[] {
+  };
+  Report.prototype['thechapter'] = function(){
     return [this.g.arabic(this.g.counter('chapter'))];
-  }
-
-  thesection(): string[] {
+  };
+  Report.prototype['thesection'] = function(){
     return this.thechapter().concat("." + this.g.arabic(this.g.counter('section')));
-  }
-
-  thefigure(): string[] {
+  };
+  Report.prototype['thefigure'] = function(){
     return (this.g.counter('chapter') > 0
       ? this.thechapter().concat(".")
       : []).concat(this.g.arabic(this.g.counter('figure')));
-  }
-
-  thetable(): string[] {
+  };
+  Report.prototype['thetable'] = function(){
     return (this.g.counter('chapter') > 0
       ? this.thechapter().concat(".")
       : []).concat(this.g.arabic(this.g.counter('table')));
-  }
-
-  tableofcontents(): any[] {
+  };
+  args['tableofcontents'] = ['V'];
+  Report.prototype['tableofcontents'] = function(){
     return this.chapter(true, undefined, this.g.macro('contentsname')).concat([this.g._toc]);
-  }
-
-  abstract(): any[] {
+  };
+  args['abstract'] = ['V'];
+  Report.prototype['abstract'] = function(){
+    var head;
     this.g.setFontSize("small");
     this.g.enterGroup();
     this.g.setFontWeight("bf");
-    const head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
+    head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
     this.g.exitGroup();
-    return [head].concat((this as any).quotation());
-  }
-
-  endabstract(): void {
-    (this as any).endquotation();
-  }
-
-  appendix(): void {
+    return [head].concat(this.quotation());
+  };
+  Report.prototype['endabstract'] = function(){
+    this.endquotation();
+  };
+  args['appendix'] = ['V'];
+  Report.prototype['appendix'] = function(){
     this.g.setCounter('chapter', 0);
     this.g.setCounter('section', 0);
-    (this as any)['chaptername'] = (this as any)['appendixname'];
-    (this as any)['thechapter'] = function(this: Report) {
+    this['chaptername'] = this['appendixname'];
+    this['thechapter'] = function(){
       return [this.g.Alph(this.g.counter('chapter'))];
     };
-  }
+  };
+  return Report;
+}(Base));
+function extend$(sub, sup){
+  function fun(){} fun.prototype = (sub.superclass = sup).prototype;
+  (sub.prototype = new fun).constructor = sub;
+  if (typeof sup.extended == 'function') sup.extended(sub);
+  return sub;
 }
-
-// Set up static args configuration
-const args = Report.args;
-args['part'] = args['chapter'] = ['V', 's', 'X', 'o?', 'g'];
-args['tableofcontents'] = ['V'];
-args['abstract'] = ['V'];
-args['appendix'] = ['V'];
+function import$(obj, src){
+  var own = {}.hasOwnProperty;
+  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+  return obj;
+}

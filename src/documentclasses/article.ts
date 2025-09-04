@@ -1,48 +1,63 @@
 import { Base } from './base';
 
-export class Article extends Base {
-  static displayName = 'Article';
-  static css = "css/article.css";
-  static args = Base.args;
+interface ArticleConstructor {
+  (generator: any, options: any): void;
+  css: string;
+  args: any;
+  superclass?: any;
+  prototype: any;
+}
 
-  constructor(generator: any, options: any) {
-    super(generator, options);
+var export$;
+export { export$ as Article }
+var Article: ArticleConstructor;
+export$ = Article = (function(superclass){
+  var args, prototype = extend$((import$(Article, superclass).displayName = 'Article', Article), superclass).prototype, constructor = Article;
+  Article.css = "css/article.css";
+  function Article(generator, options){
+    (Article as any).superclass.apply(this, arguments);
     this.g.setCounter('secnumdepth', 3);
     this.g.setCounter('tocdepth', 3);
   }
-
-  refname(): string[] {
+  args = Article.args = Base.args;
+  Article.prototype['refname'] = function(){
     return ["References"];
-  }
-
-  tableofcontents(): any[] {
+  };
+  args['tableofcontents'] = ['V'];
+  Article.prototype['tableofcontents'] = function(){
     return this.section(true, undefined, this.g.macro('contentsname')).concat([this.g._toc]);
-  }
-
-  abstract(): any[] {
+  };
+  args['abstract'] = ['V'];
+  Article.prototype['abstract'] = function(){
+    var head;
     this.g.setFontSize("small");
     this.g.enterGroup();
     this.g.setFontWeight("bf");
-    const head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
+    head = this.g.create(this.g.list, this.g.macro("abstractname"), "center");
     this.g.exitGroup();
-    return [head].concat((this as any).quotation());
-  }
-
-  endabstract(): void {
-    (this as any).endquotation();
-  }
-
-  appendix(): void {
+    return [head].concat(this.quotation());
+  };
+  Article.prototype['endabstract'] = function(){
+    this.endquotation();
+  };
+  args['appendix'] = ['V'];
+  Article.prototype['appendix'] = function(){
     this.g.setCounter('section', 0);
     this.g.setCounter('subsection', 0);
-    (this as any)['thesection'] = function(this: Article) {
+    this['thesection'] = function(){
       return [this.g.Alph(this.g.counter('section'))];
     };
-  }
+  };
+  return Article;
+}(Base));
+function extend$(sub, sup){
+  function fun(){} fun.prototype = (sub.superclass = sup).prototype;
+  (sub.prototype = new fun).constructor = sub;
+  if (typeof sup.extended == 'function') sup.extended(sub);
+  return sub;
 }
-
-// Set up static args configuration
-const args = Article.args;
-args['tableofcontents'] = ['V'];
-args['abstract'] = ['V'];
-args['appendix'] = ['V'];
+function import$(obj, src){
+  var own = {}.hasOwnProperty;
+  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
+  return obj;
+}

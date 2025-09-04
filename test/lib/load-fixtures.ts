@@ -1,48 +1,33 @@
+var load;
 'use strict';
-
-import * as fs from 'fs';
-import * as path from 'path';
-
-interface Fixture {
-  id: number;
-  header: string;
-  source: string;
-  result: string;
-}
-
-interface FixtureResult {
-  file?: string;
-  fixtures: Fixture[];
-}
-const parse = (input: string, separator: string): FixtureResult => {
-  // Escape separator for regex
-  const escapedSeparator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
-  const separatorRegex = new RegExp('(?:^|\\r\\n|\\n|\\r)(?:' + escapedSeparator + '(?:$|\\r\\n|\\n|\\r)(?!' + escapedSeparator + ')|' + escapedSeparator + '(?=$|\\r\\n|\\n|\\r))');
-  const lines = input.split(separatorRegex);
-  const result: FixtureResult = {
+var fs, p, parse;
+fs = require('fs');
+p = require('path');
+parse = function(input, separator){
+  var lines, result, fid, i$, to$, line, fixture;
+  separator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+  separator = RegExp('(?:^|\\r\\n|\\n|\\r)(?:' + separator + '(?:$|\\r\\n|\\n|\\r)(?!' + separator + ')|' + separator + '(?=$|\\r\\n|\\n|\\r))');
+  lines = input.split(separator);
+  result = {
     fixtures: []
   };
-  let fid = 1;
-  
-  for (let i = 0; i < lines.length; i += 3) {
-    const fixture: Fixture = {
+  fid = 1;
+  for (i$ = 0, to$ = lines.length; i$ < to$; i$ += 3) {
+    line = i$;
+    fixture = {
       id: fid++,
-      header: lines[i].trim(),
-      source: lines[i + 1],
-      result: lines[i + 2]
+      header: lines[line].trim(),
+      source: lines[line + 1],
+      result: lines[line + 2]
     };
-    
     if (fixture.source === undefined || fixture.result === undefined) {
       break;
     }
-    
     if (!fixture.source.trim() && !fixture.result.trim()) {
       continue;
     }
-    
     result.fixtures.push(fixture);
   }
-  
   return result;
 };
 /* Read a file with fixtures.
@@ -58,19 +43,19 @@ const parse = (input: string, separator: string): FixtureResult => {
             ]
         }
 */
-const load = (filePath: string, separator: string = '.'): FixtureResult => {
-  const stat = fs.statSync(filePath);
-  
+load = function(path, separator){
+  var stat, input, result;
+  separator == null && (separator = '.');
+  stat = fs.statSync(path);
   if (stat.isFile()) {
-    const input = fs.readFileSync(filePath, 'utf8');
-    const result = parse(input, separator);
-    result.file = filePath;
+    input = fs.readFileSync(path, 'utf8');
+    result = parse(input, separator);
+    result.file = path;
     return result;
   }
-  
   return {
     fixtures: []
   };
 };
 
-export { load };
+module.exports = { load };

@@ -4,26 +4,24 @@ import builtinDocumentclasses from './documentclasses';
 import builtinPackages from './packages';
 import assign from 'lodash/assign';
 import assignIn from 'lodash/assignIn';
-
-const providedPackages = ['calc', 'pspicture', 'picture', 'pict2e', 'keyval', 'comment'];
-
-class LaTeX {
-  static displayName = 'LaTeX';
-  static symbols = symbols;
-  static args: Record<string, string[]> = {};
-  
-  _title: any = null;
-  _author: any = null;
-  _date: any = null;
-  _thanks: any = null;
-  g: any;
-  
-  constructor(generator: any, CustomMacros?: any) {
+var export$;
+export { export$ as LaTeX }
+var LaTeX, slice$ = [].slice, arrayFrom$ = Array.from || function(x){return slice$.call(x);};
+export$ = LaTeX = (function(){
+  LaTeX.displayName = 'LaTeX';
+  var providedPackages, args, x$, i$, y$, ref$, len$, z$, z1$, z2$, z3$, z4$, z5$, z6$, z7$, z8$, z9$, z10$, z11$, z12$, z13$, z14$, z15$, prototype = LaTeX.prototype, constructor = LaTeX;
+  providedPackages = ['calc', 'pspicture', 'picture', 'pict2e', 'keyval', 'comment'];
+  LaTeX.prototype._title = null;
+  LaTeX.prototype._author = null;
+  LaTeX.prototype._date = null;
+  LaTeX.prototype._thanks = null;
+  function LaTeX(generator, CustomMacros){
+    var ref$;
     if (CustomMacros) {
       assignIn(this, new CustomMacros(generator));
-      assign(LaTeX.args, CustomMacros.args);
-      if (CustomMacros.symbols != null) {
-        CustomMacros.symbols.forEach((value: any, key: string) => {
+      assign(args, CustomMacros.args);
+      if ((ref$ = CustomMacros.symbols) != null) {
+        ref$.forEach(function(value, key){
           return symbols.set(key, value);
         });
       }
@@ -88,12 +86,12 @@ class LaTeX {
     this.g.newLength('dblfloatsep');
     this.g.newLength('dbltextfloatsep');
   }
-
-  // Basic commands
-  empty() {}
-  
-  TeX() {
-    let tex: any, e: any;
+  LaTeX.symbols = symbols;
+  args = LaTeX.args = {};
+  args['empty'] = ['HV'];
+  LaTeX.prototype['empty'] = function(){};
+  LaTeX.prototype['TeX'] = function(){
+    var tex, e;
     this.g.enterGroup();
     tex = this.g.create(this.g.inline);
     tex.setAttribute('class', 'tex');
@@ -103,10 +101,9 @@ class LaTeX {
     tex.appendChild(this.g.createText('X'));
     this.g.exitGroup();
     return [tex];
-  }
-  
-  LaTeX() {
-    let latex: any, a: any, e: any;
+  };
+  LaTeX.prototype['LaTeX'] = function(){
+    var latex, a, e;
     this.g.enterGroup();
     latex = this.g.create(this.g.inline);
     latex.setAttribute('class', 'latex');
@@ -119,75 +116,72 @@ class LaTeX {
     latex.appendChild(this.g.createText('X'));
     this.g.exitGroup();
     return [latex];
-  }
-  
-  today() {
+  };
+  LaTeX.prototype['today'] = function(){
     return [new Date().toLocaleDateString('en', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })];
-  }
-  
-  newline() {
+  };
+  LaTeX.prototype['newline'] = function(){
     return [this.g.create(this.g.linebreak)];
-  }
-  
-  negthinspace() {
+  };
+  LaTeX.prototype['negthinspace'] = function(){
     return [this.g.create(this.g.inline, undefined, 'negthinspace')];
-  }
-
-  // Column commands
-  onecolumn() {}
-  twocolumn() {}
-
-  // Break commands
-  smallbreak() {
+  };
+  args['par'] = ['V'];
+  args['item'] = ['V'];
+  args['onecolumn'] = ['V'];
+  LaTeX.prototype['onecolumn'] = function(){};
+  args['twocolumn'] = ['V', 'o?'];
+  LaTeX.prototype['twocolumn'] = function(){};
+  x$ = args;
+  x$['smallbreak'] = x$['medbreak'] = x$['bigbreak'] = ['V'];
+  LaTeX.prototype['smallbreak'] = function(){
     return [this.g.createVSpaceSkip("smallskip")];
-  }
-  
-  medbreak() {
+  };
+  LaTeX.prototype['medbreak'] = function(){
     return [this.g.createVSpaceSkip("medskip")];
-  }
-  
-  bigbreak() {
+  };
+  LaTeX.prototype['bigbreak'] = function(){
     return [this.g.createVSpaceSkip("bigskip")];
-  }
-
-  addvspace(l: any) {
+  };
+  args['addvspace'] = ['V', 'l'];
+  LaTeX.prototype['addvspace'] = function(l){
     return this.g.createVSpace(l);
-  }
-  
-  marginpar(txt: any) {
+  };
+  args['marginpar'] = ['H', 'g'];
+  LaTeX.prototype['marginpar'] = function(txt){
     return [this.g.marginpar(txt)];
-  }
-  
-  abstractname() {
+  };
+  LaTeX.prototype['abstractname'] = function(){
     return ["Abstract"];
-  }
-
-  // Title page commands
-  title(t: any) {
+  };
+  args['title'] = ['HV', 'g'];
+  args['author'] = ['HV', 'g'];
+  args['and'] = ['H'];
+  args['date'] = ['HV', 'g'];
+  args['thanks'] = ['HV', 'g'];
+  LaTeX.prototype['title'] = function(t){
     this._title = t;
-  }
-  
-  author(a: any) {
+  };
+  LaTeX.prototype['author'] = function(a){
     this._author = a;
-  }
-  
-  date(d: any) {
+  };
+  LaTeX.prototype['date'] = function(d){
     this._date = d;
-  }
-  
-  and() {
+  };
+  LaTeX.prototype['and'] = function(){
     return this.g.macro('quad');
+  };
+  LaTeX.prototype['thanks'] = LaTeX['footnote'];
+  for (i$ = 0, len$ = (ref$ = ['rm', 'sf', 'tt', 'md', 'bf', 'up', 'it', 'sl', 'sc', 'normal']).length; i$ < len$; ++i$) {
+    y$ = ref$[i$];
+    args['text' + y$] = ['H', 'X', 'g'];
   }
-  
-  thanks = (LaTeX as any)['footnote'];
-
-  // Text formatting commands
-  textrm(arg?: any) {
+  LaTeX.prototype['textrm'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontFamily("rm");
@@ -196,9 +190,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textsf(arg?: any) {
+  };
+  LaTeX.prototype['textsf'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontFamily("sf");
@@ -207,9 +200,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  texttt(arg?: any) {
+  };
+  LaTeX.prototype['texttt'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontFamily("tt");
@@ -218,9 +210,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textmd(arg?: any) {
+  };
+  LaTeX.prototype['textmd'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontWeight("md");
@@ -229,9 +220,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textbf(arg?: any) {
+  };
+  LaTeX.prototype['textbf'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontWeight("bf");
@@ -240,9 +230,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textup(arg?: any) {
+  };
+  LaTeX.prototype['textup'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontShape("up");
@@ -251,9 +240,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textit(arg?: any) {
+  };
+  LaTeX.prototype['textit'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontShape("it");
@@ -262,9 +250,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textsl(arg?: any) {
+  };
+  LaTeX.prototype['textsl'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontShape("sl");
@@ -273,9 +260,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textsc(arg?: any) {
+  };
+  LaTeX.prototype['textsc'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontShape("sc");
@@ -284,9 +270,8 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-  
-  textnormal(arg?: any) {
+  };
+  LaTeX.prototype['textnormal'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       this.g.setFontFamily("rm");
@@ -297,9 +282,9 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
-  }
-
-  emph(arg?: any) {
+  };
+  args['emph'] = ['H', 'X', 'g'];
+  LaTeX.prototype['emph'] = function(arg){
     if (arguments.length === 0) {
       this.g.enterGroup();
       return this.g.setFontShape("em");
@@ -308,205 +293,178 @@ class LaTeX {
       this.g.exitGroup();
       return [arg];
     }
+  };
+  for (i$ = 0, len$ = (ref$ = ['rm', 'sf', 'tt']).length; i$ < len$; ++i$) {
+    z$ = ref$[i$];
+    args[z$ + "family"] = ['HV'];
   }
-
-  // Font family commands
-  rmfamily() {
+  for (i$ = 0, len$ = (ref$ = ['md', 'bf']).length; i$ < len$; ++i$) {
+    z1$ = ref$[i$];
+    args[z1$ + "series"] = ['HV'];
+  }
+  for (i$ = 0, len$ = (ref$ = ['up', 'it', 'sl', 'sc']).length; i$ < len$; ++i$) {
+    z2$ = ref$[i$];
+    args[z2$ + "shape"] = ['HV'];
+  }
+  for (i$ = 0, len$ = (ref$ = ['normalfont', 'em']).length; i$ < len$; ++i$) {
+    z3$ = ref$[i$];
+    args[z3$] = ['HV'];
+  }
+  for (i$ = 0, len$ = (ref$ = ['tiny', 'scriptsize', 'footnotesize', 'small', 'normalsize', 'large', 'Large', 'LARGE', 'huge', 'Huge']).length; i$ < len$; ++i$) {
+    z4$ = ref$[i$];
+    args[z4$] = ['HV'];
+  }
+  LaTeX.prototype['rmfamily'] = function(){
     this.g.setFontFamily("rm");
-  }
-  
-  sffamily() {
+  };
+  LaTeX.prototype['sffamily'] = function(){
     this.g.setFontFamily("sf");
-  }
-  
-  ttfamily() {
+  };
+  LaTeX.prototype['ttfamily'] = function(){
     this.g.setFontFamily("tt");
-  }
-  
-  mdseries() {
+  };
+  LaTeX.prototype['mdseries'] = function(){
     this.g.setFontWeight("md");
-  }
-  
-  bfseries() {
+  };
+  LaTeX.prototype['bfseries'] = function(){
     this.g.setFontWeight("bf");
-  }
-  
-  upshape() {
+  };
+  LaTeX.prototype['upshape'] = function(){
     this.g.setFontShape("up");
-  }
-  
-  itshape() {
+  };
+  LaTeX.prototype['itshape'] = function(){
     this.g.setFontShape("it");
-  }
-  
-  slshape() {
+  };
+  LaTeX.prototype['slshape'] = function(){
     this.g.setFontShape("sl");
-  }
-  
-  scshape() {
+  };
+  LaTeX.prototype['scshape'] = function(){
     this.g.setFontShape("sc");
-  }
-  
-  normalfont() {
+  };
+  LaTeX.prototype['normalfont'] = function(){
     this.g.setFontFamily("rm");
     this.g.setFontWeight("md");
     this.g.setFontShape("up");
+  };
+  for (i$ = 0, len$ = (ref$ = ['tiny', 'scriptsize', 'footnotesize', 'small', 'normalsize', 'large', 'Large', 'LARGE', 'huge', 'Huge']).length; i$ < len$; ++i$) {
+    z5$ = ref$[i$];
+    prototype[z5$] = fn$(z5$);
   }
-
-  // Font size commands
-  tiny() { return this.g.setFontSize('tiny'); }
-  scriptsize() { return this.g.setFontSize('scriptsize'); }
-  footnotesize() { return this.g.setFontSize('footnotesize'); }
-  small() { return this.g.setFontSize('small'); }
-  normalsize() { return this.g.setFontSize('normalsize'); }
-  large() { return this.g.setFontSize('large'); }
-  Large() { return this.g.setFontSize('Large'); }
-  LARGE() { return this.g.setFontSize('LARGE'); }
-  huge() { return this.g.setFontSize('huge'); }
-  Huge() { return this.g.setFontSize('Huge'); }
-
-  em() {
+  LaTeX.prototype['em'] = function(){
     this.g.setFontShape("em");
-  }
-
-  // Enumeration commands
-  theenumi() {
+  };
+  LaTeX.prototype['theenumi'] = function(){
     return [this.g.arabic(this.g.counter('enumi'))];
-  }
-  
-  theenumii() {
+  };
+  LaTeX.prototype['theenumii'] = function(){
     return [this.g.alph(this.g.counter('enumii'))];
-  }
-  
-  theenumiii() {
+  };
+  LaTeX.prototype['theenumiii'] = function(){
     return [this.g.roman(this.g.counter('enumiii'))];
-  }
-  
-  theenumiv() {
+  };
+  LaTeX.prototype['theenumiv'] = function(){
     return [this.g.Alph(this.g.counter('enumiv'))];
-  }
-  
-  labelenumi() {
+  };
+  LaTeX.prototype['labelenumi'] = function(){
     return this.theenumi().concat(".");
-  }
-  
-  labelenumii() {
-    return ["("].concat(Array.from(this.theenumii()), [")"]);
-  }
-  
-  labelenumiii() {
+  };
+  LaTeX.prototype['labelenumii'] = function(){
+    return ["("].concat(arrayFrom$(this.theenumii()), [")"]);
+  };
+  LaTeX.prototype['labelenumiii'] = function(){
     return this.theenumiii().concat(".");
-  }
-  
-  labelenumiv() {
+  };
+  LaTeX.prototype['labelenumiv'] = function(){
     return this.theenumiv().concat(".");
-  }
-  
-  'p@enumii'() {
+  };
+  LaTeX.prototype['p@enumii'] = function(){
     return this.theenumi();
-  }
-  
-  'p@enumiii'() {
+  };
+  LaTeX.prototype['p@enumiii'] = function(){
     return this.theenumi().concat("(", this.theenumii(), ")");
-  }
-  
-  'p@enumiv'() {
+  };
+  LaTeX.prototype['p@enumiv'] = function(){
     return this["p@enumiii"]().concat(this.theenumiii());
-  }
-
-  // List item commands
-  labelitemi() {
+  };
+  LaTeX.prototype['labelitemi'] = function(){
     return [this.g.symbol('textbullet')];
-  }
-  
-  labelitemii() {
+  };
+  LaTeX.prototype['labelitemii'] = function(){
     this.normalfont();
     this.bfseries();
     return [this.g.symbol('textendash')];
-  }
-  
-  labelitemiii() {
+  };
+  LaTeX.prototype['labelitemiii'] = function(){
     return [this.g.symbol('textasteriskcentered')];
-  }
-  
-  labelitemiv() {
+  };
+  LaTeX.prototype['labelitemiv'] = function(){
     return [this.g.symbol('textperiodcentered')];
-  }
-
-  // Alignment commands
-  centering() {
+  };
+  z6$ = args;
+  z6$['centering'] = z6$['raggedright'] = z6$['raggedleft'] = ['HV'];
+  LaTeX.prototype['centering'] = function(){
     this.g.setAlignment("centering");
-  }
-  
-  raggedright() {
+  };
+  LaTeX.prototype['raggedright'] = function(){
     this.g.setAlignment("raggedright");
-  }
-  
-  raggedleft() {
+  };
+  LaTeX.prototype['raggedleft'] = function(){
     this.g.setAlignment("raggedleft");
-  }
-
-  center() {
+  };
+  z7$ = args;
+  z7$['center'] = z7$['flushleft'] = z7$['flushright'] = ['V'];
+  LaTeX.prototype['center'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.list, null, "center")];
-  }
-  
-  endcenter() {
+  };
+  LaTeX.prototype['endcenter'] = function(){
     this.g.endlist();
-  }
-  
-  flushleft() {
+  };
+  LaTeX.prototype['flushleft'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.list, null, "flushleft")];
-  }
-  
-  endflushleft() {
+  };
+  LaTeX.prototype['endflushleft'] = function(){
     this.g.endlist();
-  }
-  
-  flushright() {
+  };
+  LaTeX.prototype['flushright'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.list, null, "flushright")];
-  }
-  
-  endflushright() {
+  };
+  LaTeX.prototype['endflushright'] = function(){
     this.g.endlist();
-  }
-
-  titlepage() {
+  };
+  z8$ = args;
+  z8$['titlepage'] = ['V'];
+  LaTeX.prototype['titlepage'] = function(){
     return [this.g.create(this.g.titlepage)];
-  }
-
-  // Quote environments
-  quote() {
+  };
+  z9$ = args;
+  z9$['quote'] = z9$['quotation'] = z9$['verse'] = ['V'];
+  LaTeX.prototype['quote'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.quote)];
-  }
-  
-  endquote() {
+  };
+  LaTeX.prototype['endquote'] = function(){
     this.g.endlist();
-  }
-  
-  quotation() {
+  };
+  LaTeX.prototype['quotation'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.quotation)];
-  }
-  
-  endquotation() {
+  };
+  LaTeX.prototype['endquotation'] = function(){
     this.g.endlist();
-  }
-  
-  verse() {
+  };
+  LaTeX.prototype['verse'] = function(){
     this.g.startlist();
     return [this.g.create(this.g.verse)];
-  }
-  
-  endverse() {
+  };
+  LaTeX.prototype['endverse'] = function(){
     this.g.endlist();
-  }
-
-  // List environments
-  itemize(items?: any) {
+  };
+  args['itemize'] = ['V', 'X', 'items'];
+  LaTeX.prototype['itemize'] = function(items){
+    var label, this$ = this;
     if (arguments.length === 0) {
       this.g.startlist();
       this.g.stepCounter('@itemdepth');
@@ -515,24 +473,24 @@ class LaTeX {
       }
       return;
     }
-    const label = "labelitem" + this.g.roman(this.g.counter('@itemdepth'));
-    return [this.g.create(this.g.unorderedList, items.map((item: any) => {
-      let makelabel: any;
-      this.g.enterGroup();
-      makelabel = this.g.create(this.g.itemlabel, this['llap'](item.label !== null
+    label = "labelitem" + this.g.roman(this.g.counter('@itemdepth'));
+    return [this.g.create(this.g.unorderedList, items.map(function(item){
+      var makelabel;
+      this$.g.enterGroup();
+      makelabel = this$.g.create(this$.g.itemlabel, this$['llap'](item.label !== null
         ? item.label
-        : this.g.macro(label)));
-      this.g.exitGroup();
-      return this.g.create(this.g.listitem, [makelabel, item.text]);
-    }))]; 
-  }
-  
-  enditemize() {
+        : this$.g.macro(label)));
+      this$.g.exitGroup();
+      return this$.g.create(this$.g.listitem, [makelabel, item.text]);
+    }))];
+  };
+  LaTeX.prototype['enditemize'] = function(){
     this.g.endlist();
     this.g.setCounter('@itemdepth', this.g.counter('@itemdepth') - 1);
-  }
-
-  enumerate(items?: any) {
+  };
+  args['enumerate'] = ['V', 'X', 'enumitems'];
+  LaTeX.prototype['enumerate'] = function(items){
+    var itemCounter, this$ = this;
     if (arguments.length === 0) {
       this.g.startlist();
       this.g.stepCounter('@enumdepth');
@@ -541,96 +499,88 @@ class LaTeX {
       }
       return;
     }
-    const itemCounter = "enum" + this.g.roman(this.g.counter('@enumdepth'));
+    itemCounter = "enum" + this.g.roman(this.g.counter('@enumdepth'));
     this.g.setCounter(itemCounter, 0);
-    return [this.g.create(this.g.orderedList, items.map((item: any) => {
-      let label: any, makelabel: any;
-      label = this.g.create(this.g.inline, item.label.node);
+    return [this.g.create(this.g.orderedList, items.map(function(item){
+      var label, makelabel;
+      label = this$.g.create(this$.g.inline, item.label.node);
       if (item.label.id) {
         label.id = item.label.id;
       }
-      makelabel = this.g.create(this.g.itemlabel, this['llap'](label));
-      return this.g.create(this.g.listitem, [makelabel, item.text]);
-    }))]; 
-  }
-  
-  endenumerate() {
+      makelabel = this$.g.create(this$.g.itemlabel, this$['llap'](label));
+      return this$.g.create(this$.g.listitem, [makelabel, item.text]);
+    }))];
+  };
+  LaTeX.prototype['endenumerate'] = function(){
     this.g.endlist();
     this.g.setCounter('@enumdepth', this.g.counter('@enumdepth') - 1);
-  }
-
-  description(items?: any) {
+  };
+  args['description'] = ['V', 'X', 'items'];
+  LaTeX.prototype['description'] = function(items){
+    var this$ = this;
     if (arguments.length === 0) {
       this.g.startlist();
       return;
     }
-    return [this.g.create(this.g.descriptionList, items.map((item: any) => {
-      let dt: any, dd: any;
-      dt = this.g.create(this.g.term, item.label);
-      dd = this.g.create(this.g.description, item.text);
-      return this.g.createFragment([dt, dd]);
+    return [this.g.create(this.g.descriptionList, items.map(function(item){
+      var dt, dd;
+      dt = this$.g.create(this$.g.term, item.label);
+      dd = this$.g.create(this$.g.description, item.text);
+      return this$.g.createFragment([dt, dd]);
     }))];
-  }
-  
-  enddescription() {
+  };
+  LaTeX.prototype['enddescription'] = function(){
     this.g.endlist();
-  }
-
-  // Picture and spacing commands
-  picture(size: any, offset?: any, content?: any) {
+  };
+  args['picture'] = ['H', 'v', 'v?', 'h'];
+  LaTeX.prototype['picture'] = function(size, offset, content){
     return [this.g.createPicture(size, offset, content)];
-  }
-
-  hspace(s: any, l: any) {
+  };
+  args['hspace'] = ['H', 's', 'l'];
+  LaTeX.prototype['hspace'] = function(s, l){
     return [this.g.createHSpace(l)];
-  }
-
-  label(label: any) {
+  };
+  args['label'] = ['HV', 'g'];
+  LaTeX.prototype['label'] = function(label){
     this.g.setLabel(label.textContent);
-  }
-
-  ref(label: any) {
+  };
+  args['ref'] = ['H', 'g'];
+  LaTeX.prototype['ref'] = function(label){
     return [this.g.ref(label.textContent)];
-  }
-
-  // Box commands
-  llap(txt: any) {
+  };
+  z10$ = args;
+  z10$['llap'] = z10$['rlap'] = z10$['clap'] = z10$['smash'] = z10$['hphantom'] = z10$['vphantom'] = z10$['phantom'] = ['H', 'hg'];
+  LaTeX.prototype['llap'] = function(txt){
     return [this.g.create(this.g.inline, txt, "hbox llap")];
-  }
-
-  rlap(txt: any) {
+  };
+  LaTeX.prototype['rlap'] = function(txt){
     return [this.g.create(this.g.inline, txt, "hbox rlap")];
-  }
-
-  clap(txt: any) {
+  };
+  LaTeX.prototype['clap'] = function(txt){
     return [this.g.create(this.g.inline, txt, "hbox clap")];
-  }
-
-  smash(txt: any) {
+  };
+  LaTeX.prototype['smash'] = function(txt){
     return [this.g.create(this.g.inline, txt, "hbox smash")];
-  }
-
-  hphantom(txt: any) {
+  };
+  LaTeX.prototype['hphantom'] = function(txt){
     return [this.g.create(this.g.inline, txt, "phantom hbox smash")];
-  }
-
-  vphantom(txt: any) {
+  };
+  LaTeX.prototype['vphantom'] = function(txt){
     return [this.g.create(this.g.inline, txt, "phantom hbox rlap")];
-  }
-
-  phantom(txt: any) {
+  };
+  LaTeX.prototype['phantom'] = function(txt){
     return [this.g.create(this.g.inline, txt, "phantom hbox")];
-  }
-
-  underline(txt: any) {
+  };
+  args['underline'] = ['H', 'hg'];
+  LaTeX.prototype['underline'] = function(txt){
     return [this.g.create(this.g.inline, txt, "hbox underline")];
-  }
-
-  mbox(txt: any) {
+  };
+  args['mbox'] = ['H', 'hg'];
+  LaTeX.prototype['mbox'] = function(txt){
     return this.makebox(undefined, undefined, undefined, txt);
-  }
-
-  makebox(vec?: any, width?: any, pos?: any, txt?: any) {
+  };
+  args['makebox'] = ['H', 'v?', 'l?', 'i?', 'hg'];
+  LaTeX.prototype['makebox'] = function(vec, width, pos, txt){
     if (vec) {
       if (width && pos) {
         this.g.error("expected \\makebox(width,height)[position]{text} but got two optional arguments!");
@@ -640,13 +590,13 @@ class LaTeX {
     } else {
       return this._box(width, pos, txt, "hbox");
     }
-  }
-
-  fbox(txt: any) {
+  };
+  args['fbox'] = ['H', 'hg'];
+  args['framebox'] = ['H', 'v?', 'l?', 'i?', 'hg'];
+  LaTeX.prototype['fbox'] = function(txt){
     return this.framebox(undefined, undefined, undefined, txt);
-  }
-
-  framebox(vec?: any, width?: any, pos?: any, txt?: any) {
+  };
+  LaTeX.prototype['framebox'] = function(vec, width, pos, txt){
     if (vec) {
       if (width && pos) {
         return this.g.error("expected \\framebox(width,height)[position]{text} but got two optional arguments!");
@@ -659,10 +609,9 @@ class LaTeX {
         return this._box(width, pos, txt, "hbox frame");
       }
     }
-  }
-
-  private _box(width: any, pos: any, txt: any, classes: string) {
-    let content: any, box: any;
+  };
+  LaTeX.prototype._box = function(width, pos, txt, classes){
+    var content, box;
     if (width) {
       if (!pos) {
         pos = "c";
@@ -690,10 +639,10 @@ class LaTeX {
       box.setAttribute("style", "width:" + width.value);
     }
     return [box];
-  }
-
-  parbox(pos?: any, height?: any, innerPos?: any, width?: any, txt?: any) {
-    let classes: string, style: string, content: any, box: any;
+  };
+  args['parbox'] = ['H', 'i?', 'l?', 'i?', 'l', 'g'];
+  LaTeX.prototype['parbox'] = function(pos, height, innerPos, width, txt){
+    var classes, style, content, box;
     if (!pos) {
       pos = "c";
     }
@@ -739,46 +688,51 @@ class LaTeX {
     box = this.g.create(this.g.inline, content, classes);
     box.setAttribute("style", style);
     return [box];
-  }
-
-  // Picture drawing commands
-  thinlines() {
+  };
+  /*
+  \shortstack[pos]{...\\...\\...}, pos: r,l,c (horizontal alignment)
+  
+  
+  \begin{minipage}[pos][height][inner-pos]{width}
+  */;
+  z11$ = args;
+  z11$['thicklines'] = ['HV'];
+  z11$['thinlines'] = ['HV'];
+  z11$['linethickness'] = ['HV', 'l'];
+  z11$['arrowlength'] = ['HV', 'l'];
+  LaTeX.prototype['thinlines'] = function(){
     this.g.setLength('@wholewidth', new this.g.Length(0.4, "pt"));
-  }
-
-  thicklines() {
+  };
+  LaTeX.prototype['thicklines'] = function(){
     this.g.setLength('@wholewidth', new this.g.Length(0.8, "pt"));
-  }
-
-  linethickness(l: any) {
+  };
+  LaTeX.prototype['linethickness'] = function(l){
     if (l.unit !== "sp") {
       this.g.error("relative units for \\linethickness not supported!");
     }
     this.g.setLength('@wholewidth', l);
-  }
-
-  arrowlength(l: any) {
+  };
+  LaTeX.prototype['arrowlength'] = function(l){
     this.g.setLength('@arrowlength', l);
-  }
-
-  maxovalrad() {
+  };
+  LaTeX.prototype['maxovalrad'] = function(){
     return "20pt";
-  }
-
-  qbeziermax() {
+  };
+  LaTeX.prototype['qbeziermax'] = function(){
     return 500;
-  }
-
-  frame(txt: any) {
-    let el: any, w: any;
+  };
+  args['dashbox'] = ['H', 'cl', 'v', 'i?', 'g'];
+  args['frame'] = ['H', 'hg'];
+  LaTeX.prototype['frame'] = function(txt){
+    var el, w;
     el = this.g.create(this.g.inline, txt, "hbox pframe");
     w = this.g.length('@wholewidth');
     el.setAttribute("style", "border-width:" + w.value);
     return [el];
-  }
-
-  put(v: any, obj: any) {
-    let wrapper: any, strut: any;
+  };
+  args['put'] = ['H', 'v', 'g', 'is'];
+  LaTeX.prototype['put'] = function(v, obj){
+    var wrapper, strut;
     wrapper = this.g.create(this.g.inline, obj, "put-obj");
     if (v.y.cmp(this.g.Length.zero) >= 0) {
       wrapper.setAttribute("style", "left:" + v.x.value);
@@ -790,26 +744,27 @@ class LaTeX {
       wrapper.setAttribute("style", "left:" + v.x.value + ";bottom:" + v.y.value);
     }
     return this.rlap(this.g.create(this.g.inline, [wrapper, strut], "picture"));
-  }
-
-  multiput(v: any, dv: any, n: number, obj: any) {
-    let res: any[] = [];
-    for (let i = 0; i < n; ++i) {
+  };
+  args['multiput'] = ['H', 'v', 'v', 'n', 'g'];
+  LaTeX.prototype['multiput'] = function(v, dv, n, obj){
+    var res, i$, i;
+    res = [];
+    for (i$ = 0; i$ < n; ++i$) {
+      i = i$;
       res = res.concat(this['put'](v.add(dv.mul(i)), obj.cloneNode(true)));
     }
     return res;
-  }
-
-  qbezier(N?: number, v1?: any, v?: any, v2?: any) {
+  };
+  args['qbezier'] = ['H', 'n?', 'v', 'v', 'v'];
+  LaTeX.prototype['qbezier'] = function(N, v1, v, v2){
     return [this._path("M" + v1.x.pxpct + "," + v1.y.pxpct + " Q" + v.x.pxpct + "," + v.y.pxpct + " " + v2.x.pxpct + "," + v2.y.pxpct, N)];
-  }
-
-  cbezier(N?: number, v1?: any, v?: any, v2?: any, v3?: any) {
+  };
+  args['cbezier'] = ['H', 'n?', 'v', 'v', 'v', 'v'];
+  LaTeX.prototype['cbezier'] = function(N, v1, v, v2, v3){
     return [this._path("M" + v1.x.pxpct + "," + v1.y.pxpct + " C" + v.x.pxpct + "," + v.y.pxpct + " " + v2.x.pxpct + "," + v2.y.pxpct + " " + v3.x.pxpct + "," + v3.y.pxpct, N)];
-  }
-
-  private _path(p: string, N?: number) {
-    let linethickness: any, svg: any, draw: any, path: any, pw: any, lenSection: any, bbox: any;
+  };
+  LaTeX.prototype._path = function(p, N){
+    var linethickness, svg, draw, path, pw, lenSection, bbox;
     linethickness = this.g.length('@wholewidth');
     svg = this.g.create(this.g.inline, undefined, "picture-object");
     draw = this.g.SVG().addTo(svg);
@@ -817,7 +772,7 @@ class LaTeX {
       color: "#000",
       width: linethickness.value
     }).fill('none');
-    if (N && N > 0) {
+    if (N > 0) {
       N = Math.min(N, this['qbeziermax']() - 1);
       pw = linethickness.px;
       lenSection = (path.length() - (N + 1) * pw) / N;
@@ -836,10 +791,10 @@ class LaTeX {
     draw.size(this.g.round(bbox.width) + "px", this.g.round(bbox.height) + "px").viewbox(this.g.round(bbox.x), this.g.round(bbox.y), this.g.round(bbox.width), this.g.round(bbox.height));
     draw.flip('y', 0);
     return this.g.create(this.g.inline, svg, "picture");
-  }
-
-  circle(s?: any, d?: any) {
-    let svg: any, linethickness: any, draw: any, offset: any;
+  };
+  args['circle'] = ['H', 's', 'cl'];
+  LaTeX.prototype['circle'] = function(s, d){
+    var svg, linethickness, draw, offset;
     d = d.abs();
     svg = this.g.create(this.g.inline, undefined, "picture-object");
     linethickness = this.g.length('@wholewidth');
@@ -860,27 +815,26 @@ class LaTeX {
     svg.setAttribute("style", "left:" + offset + ";bottom:" + offset);
     draw.flip('y', 0);
     return [this.g.create(this.g.inline, svg, "picture")];
-  }
-
-  line(v: any, l: any) {
+  };
+  args['line'] = ['H', 'v', 'cl'];
+  LaTeX.prototype['line'] = function(v, l){
     return [this._line.apply(this, this._slopeLengthToCoords(v, l))];
-  }
-
-  vector(v: any, l: any) {
+  };
+  args['vector'] = ['H', 'v', 'cl'];
+  LaTeX.prototype['vector'] = function(v, l){
     return [this._vector.apply(this, this._slopeLengthToCoords(v, l))];
-  }
-
-  Line(vs: any, ve: any) {
+  };
+  args['Line'] = ['H', 'v', 'v'];
+  LaTeX.prototype['Line'] = function(vs, ve){
     return [this._line(vs, ve)];
-  }
-
-  Vector(vs: any, ve: any) {
+  };
+  args['Vector'] = ['H', 'v', 'v'];
+  LaTeX.prototype['Vector'] = function(vs, ve){
     return [this._vector(vs, ve)];
-  }
-
-  private _slopeLengthToCoords(v: any, l: any) {
-    let linethickness: any, zero: any, x: any, y: any;
-    if (v.x.value === v.y.value && v.y.value === 0) {
+  };
+  LaTeX.prototype._slopeLengthToCoords = function(v, l){
+    var ref$, linethickness, zero, x, y;
+    if (v.x.value === (ref$ = v.y.value) && ref$ === 0) {
       this.g.error("illegal slope (0,0)");
     }
     if (v.x.unit !== v.y.unit || v.x.unit !== "sp") {
@@ -902,10 +856,9 @@ class LaTeX {
       y = y.mul(-1);
     }
     return [new Vector(zero, zero), new Vector(x, y)];
-  }
-
-  private _line(vs: any, ve: any) {
-    let svg: any, draw: any, linethickness: any, bbox: any;
+  };
+  LaTeX.prototype._line = function(vs, ve){
+    var svg, draw, linethickness, bbox;
     if (vs.x.unit !== vs.y.unit || vs.x.unit !== "sp") {
       this.g.error("relative units not allowed for line");
     }
@@ -930,10 +883,9 @@ class LaTeX {
     draw.size(this.g.round(bbox.width) + "px", this.g.round(bbox.height) + "px").viewbox(this.g.round(bbox.x), this.g.round(bbox.y), this.g.round(bbox.width), this.g.round(bbox.height));
     draw.flip('y', 0);
     return this.g.create(this.g.inline, svg, "picture");
-  }
-
-  private _vector(vs: any, ve: any) {
-    let linethickness: any, svg: any, draw: any, hl: number, hw: number, max: any, hhl: any, al: any, s: any, bbox: any;
+  };
+  LaTeX.prototype._vector = function(vs, ve){
+    var linethickness, svg, draw, hl, hw, max, hhl, al, s, bbox, this$ = this;
     if (vs.x.unit !== vs.y.unit || vs.x.unit !== "sp") {
       this.g.error("relative units not allowed for vector");
     }
@@ -961,8 +913,8 @@ class LaTeX {
     bbox = draw.line(s.x.px, s.y.px, ve.x.px, ve.y.px).stroke({
       color: "#000",
       width: linethickness.value
-    }).marker('end', hl, hw, (marker: any) => {
-      return marker.path("M0,0 Q" + this.g.round(2 * hl / 3) + "," + this.g.round(hw / 2) + " " + hl + "," + this.g.round(hw / 2) + " Q" + this.g.round(2 * hl / 3) + "," + this.g.round(hw / 2) + " 0," + hw + " z");
+    }).marker('end', hl, hw, function(marker){
+      return marker.path("M0,0 Q" + this$.g.round(2 * hl / 3) + "," + this$.g.round(hw / 2) + " " + hl + "," + this$.g.round(hw / 2) + " Q" + this$.g.round(2 * hl / 3) + "," + this$.g.round(hw / 2) + " 0," + hw + " z");
     }).bbox();
     bbox.x -= linethickness.px + hhl.px;
     bbox.y -= linethickness.px + hhl.px;
@@ -976,10 +928,10 @@ class LaTeX {
     draw.flip('y', 0);
     draw.addTo(svg);
     return this.g.create(this.g.inline, svg, "picture");
-  }
-
-  oval(maxrad?: any, size?: any, part?: any) {
-    let linethickness: any, rad: any, draw: any, oval: any, rect: any, bbox: any, clip: any, svg: any;
+  };
+  args['oval'] = ['H', 'cl?', 'v', 'i?'];
+  LaTeX.prototype['oval'] = function(maxrad, size, part){
+    var linethickness, rad, draw, oval, rect, bbox, clip, svg;
     linethickness = this.g.length('@wholewidth');
     if (!maxrad) {
       maxrad = new this.g.Length(20, "px");
@@ -1055,92 +1007,79 @@ class LaTeX {
     draw.flip('y', 0);
     draw.addTo(svg);
     return [this.g.create(this.g.inline, svg, "picture")];
-  }
-
-  private _intersect(r1: any, r2: any) {
+  };
+  LaTeX.prototype._intersect = function(r1, r2){
     return {
       x: this.g.Length.max(r1.x, r2.x),
       y: this.g.Length.max(r1.y, r2.y),
       w: this.g.Length.max(this.g.Length.zero, this.g.Length.min(r1.x.add(r1.w), r2.x.add(r2.w)).sub(this.g.Length.max(r1.x, r2.x))),
       h: this.g.Length.max(this.g.Length.zero, this.g.Length.min(r1.y.add(r1.h), r2.y.add(r2.h)).sub(this.g.Length.max(r1.y, r2.y)))
     };
-  }
-
-  // Length commands
-  newlength(id: string) {
+  };
+  args['newlength'] = ['HV', 'm'];
+  LaTeX.prototype['newlength'] = function(id){
     this.g.newLength(id);
-  }
-
-  setlength(id: string, l: any) {
+  };
+  args['setlength'] = ['HV', 'm', 'l'];
+  LaTeX.prototype['setlength'] = function(id, l){
     this.g.setLength(id, l);
-  }
-
-  addtolength(id: string, l: any) {
+  };
+  args['addtolength'] = ['HV', 'm', 'l'];
+  LaTeX.prototype['addtolength'] = function(id, l){
     this.g.setLength(id, this.g.length(id).add(l));
-  }
-
-  // Counter commands
-  newcounter(c: string, p?: string) {
+  };
+  args['newcounter'] = ['HV', 'i', 'i?'];
+  LaTeX.prototype['newcounter'] = function(c, p){
     this.g.newCounter(c, p);
-  }
-
-  stepcounter(c: string) {
+  };
+  args['stepcounter'] = ['HV', 'i'];
+  LaTeX.prototype['stepcounter'] = function(c){
     this.g.stepCounter(c);
-  }
-
-  addtocounter(c: string, n: number) {
+  };
+  args['addtocounter'] = ['HV', 'i', 'n'];
+  LaTeX.prototype['addtocounter'] = function(c, n){
     this.g.setCounter(c, this.g.counter(c) + n);
-  }
-
-  setcounter(c: string, n: number) {
+  };
+  args['setcounter'] = ['HV', 'i', 'n'];
+  LaTeX.prototype['setcounter'] = function(c, n){
     this.g.setCounter(c, n);
-  }
-
-  refstepcounter(c: string) {
+  };
+  args['refstepcounter'] = ['H', 'i'];
+  LaTeX.prototype['refstepcounter'] = function(c){
     this.g.stepCounter(c);
     return [this.g.refCounter(c)];
-  }
-
-  // Counter formatting commands
-  alph(c: string) {
+  };
+  z12$ = args;
+  z12$['alph'] = z12$['Alph'] = z12$['arabic'] = z12$['roman'] = z12$['Roman'] = z12$['fnsymbol'] = ['H', 'i'];
+  LaTeX.prototype['alph'] = function(c){
     return [this.g['alph'](this.g.counter(c))];
-  }
-
-  Alph(c: string) {
+  };
+  LaTeX.prototype['Alph'] = function(c){
     return [this.g['Alph'](this.g.counter(c))];
-  }
-
-  arabic(c: string) {
+  };
+  LaTeX.prototype['arabic'] = function(c){
     return [this.g['arabic'](this.g.counter(c))];
-  }
-
-  roman(c: string) {
+  };
+  LaTeX.prototype['roman'] = function(c){
     return [this.g['roman'](this.g.counter(c))];
-  }
-
-  Roman(c: string) {
+  };
+  LaTeX.prototype['Roman'] = function(c){
     return [this.g['Roman'](this.g.counter(c))];
-  }
-
-  fnsymbol(c: string) {
+  };
+  LaTeX.prototype['fnsymbol'] = function(c){
     return [this.g['fnsymbol'](this.g.counter(c))];
-  }
-
-  // File inclusion commands
-  input(file: any) {}
-
-  include(file: any) {}
-
-  // Helper method to instantiate document class without setting up guards
-  private _instantiateDocumentClass(options?: any, documentclass?: string, version?: string) {
-    let Class: any, Export: any, e: any;
-    
-    // Use default document class if none specified
-    if (!documentclass) {
-      documentclass = "article";
-    }
-    
-    Class = builtinDocumentclasses[documentclass!];
+  };
+  args['input'] = ['V', 'g'];
+  LaTeX.prototype['input'] = function(file){};
+  args['include'] = ['V', 'g'];
+  LaTeX.prototype['include'] = function(file){};
+  args['documentclass'] = ['P', 'kv?', 'k', 'k?'];
+  LaTeX.prototype['documentclass'] = function(options, documentclass, version){
+    var Class, Export, e;
+    this['documentclass'] = function(){
+      this.g.error("Two \\documentclass commands. The document may only declare one class.");
+    };
+    Class = builtinDocumentclasses[documentclass];
     if (!Class) {
       try {
         Export = require("./documentclasses/" + documentclass);
@@ -1153,23 +1092,14 @@ class LaTeX {
     }
     this.g.documentClass = new Class(this.g, options);
     assignIn(this, this.g.documentClass);
-    assign(LaTeX.args, Class.args);
-  }
-
-  // Document structure commands
-  documentclass(options?: any, documentclass?: string, version?: string) {
-    this['documentclass'] = () => {
-      this.g.error("Two \\documentclass commands. The document may only declare one class.");
-    };
-    
-    this._instantiateDocumentClass(options, documentclass, version);
-  }
-
-  usepackage(opts?: any, packages?: string[], version?: string) {
-    let options: any, pkg: string, Package: any, Export: any;
+    assign(args, Class.args);
+  };
+  args['usepackage'] = ['P', 'kv?', 'csv', 'k?'];
+  LaTeX.prototype['usepackage'] = function(opts, packages, version){
+    var options, i$, len$, pkg, Package, Export, ref$, e;
     options = Object.assign({}, this.g.documentClass.options, opts);
-    for (let i = 0; i < packages!.length; ++i) {
-      pkg = packages![i];
+    for (i$ = 0, len$ = packages.length; i$ < len$; ++i$) {
+      pkg = packages[i$];
       if (providedPackages.includes(pkg)) {
         continue;
       }
@@ -1188,147 +1118,60 @@ class LaTeX {
           }
         }
         assignIn(this, new Package(this.g, options));
-        assign(LaTeX.args, Package.args);
-        if (Package.symbols != null) {
-          Package.symbols.forEach((value: any, key: string) => {
-            return symbols.set(key, value);
-          });
+        assign(args, Package.args);
+        if ((ref$ = Package.symbols) != null) {
+          ref$.forEach(fn$);
         }
-      } catch (e) {
+      } catch (e$) {
+        e = e$;
         console.error("error loading package \"" + pkg + "\": " + e);
       }
     }
+    function fn$(value, key){
+      return symbols.set(key, value);
+    }
+  };
+  args['includeonly'] = ['P', 'csv'];
+  LaTeX.prototype['includeonly'] = function(filelist){};
+  args['makeatletter'] = ['P'];
+  LaTeX.prototype['makeatletter'] = function(){};
+  args['makeatother'] = ['P'];
+  LaTeX.prototype['makeatother'] = function(){};
+  z13$ = args;
+  z13$['pagestyle'] = ['HV', 'i'];
+  LaTeX.prototype['pagestyle'] = function(s){};
+  z14$ = args;
+  z14$['linebreak'] = ['HV', 'n?'];
+  z14$['nolinebreak'] = ['HV', 'n?'];
+  z14$['fussy'] = ['HV'];
+  z14$['sloppy'] = ['HV'];
+  LaTeX.prototype['linebreak'] = function(o){};
+  LaTeX.prototype['nolinebreak'] = function(o){};
+  LaTeX.prototype['fussy'] = function(){};
+  LaTeX.prototype['sloppy'] = function(){};
+  z15$ = args;
+  z15$['pagebreak'] = ['HV', 'n?'];
+  z15$['nopagebreak'] = ['HV', 'n?'];
+  z15$['samepage'] = ['HV'];
+  z15$['enlargethispage'] = ['HV', 's', 'l'];
+  z15$['newpage'] = ['HV'];
+  z15$['clearpage'] = ['HV'];
+  z15$['cleardoublepage'] = ['HV'];
+  z15$['vfill'] = ['HV'];
+  z15$['thispagestyle'] = ['HV', 'i'];
+  LaTeX.prototype['pagebreak'] = function(o){};
+  LaTeX.prototype['nopagebreak'] = function(o){};
+  LaTeX.prototype['samepage'] = function(){};
+  LaTeX.prototype['enlargethispage'] = function(s, l){};
+  LaTeX.prototype['newpage'] = function(){};
+  LaTeX.prototype['clearpage'] = function(){};
+  LaTeX.prototype['cleardoublepage'] = function(){};
+  LaTeX.prototype['vfill'] = function(){};
+  LaTeX.prototype['thispagestyle'] = function(s){};
+  return LaTeX;
+  function fn$(f){
+    return function(){
+      return this.g.setFontSize(f);
+    };
   }
-
-  includeonly(filelist: string[]) {}
-
-  makeatletter() {}
-
-  makeatother() {}
-
-  // Page style commands
-  pagestyle(s: string) {}
-
-  // Line breaking commands
-  linebreak(o?: number) {}
-  nolinebreak(o?: number) {}
-  fussy() {}
-  sloppy() {}
-
-  // Page breaking commands
-  pagebreak(o?: number) {}
-  nopagebreak(o?: number) {}
-  samepage() {}
-  enlargethispage(s?: any, l?: any) {}
-  newpage() {}
-  clearpage() {}
-  cleardoublepage() {}
-  vfill() {}
-  thispagestyle(s?: string) {}
-}
-
-// Initialize static args with required LaTeX command signatures
-LaTeX.args['empty'] = ['HV'];
-LaTeX.args['par'] = ['V'];
-LaTeX.args['item'] = ['V'];
-LaTeX.args['onecolumn'] = ['V'];
-LaTeX.args['twocolumn'] = ['V', 'o?'];
-LaTeX.args['smallbreak'] = LaTeX.args['medbreak'] = LaTeX.args['bigbreak'] = ['V'];
-LaTeX.args['addvspace'] = ['V', 'l'];
-LaTeX.args['marginpar'] = ['H', 'g'];
-LaTeX.args['title'] = ['HV', 'g'];
-LaTeX.args['author'] = ['HV', 'g'];
-LaTeX.args['and'] = ['H'];
-LaTeX.args['date'] = ['HV', 'g'];
-LaTeX.args['thanks'] = ['HV', 'g'];
-
-// Text formatting commands
-for (const format of ['rm', 'sf', 'tt', 'md', 'bf', 'up', 'it', 'sl', 'sc', 'normal']) {
-  LaTeX.args['text' + format] = ['H', 'X', 'g'];
-}
-LaTeX.args['emph'] = ['H', 'X', 'g'];
-
-// Font family, series, and shape commands
-for (const family of ['rm', 'sf', 'tt']) {
-  LaTeX.args[family + 'family'] = ['HV'];
-}
-for (const series of ['md', 'bf']) {
-  LaTeX.args[series + 'series'] = ['HV'];
-}
-for (const shape of ['up', 'it', 'sl', 'sc']) {
-  LaTeX.args[shape + 'shape'] = ['HV'];
-}
-for (const cmd of ['normalfont', 'em']) {
-  LaTeX.args[cmd] = ['HV'];
-}
-for (const size of ['tiny', 'scriptsize', 'footnotesize', 'small', 'normalsize', 'large', 'Large', 'LARGE', 'huge', 'Huge']) {
-  LaTeX.args[size] = ['HV'];
-}
-
-// Alignment and layout commands
-LaTeX.args['centering'] = LaTeX.args['raggedright'] = LaTeX.args['raggedleft'] = ['HV'];
-LaTeX.args['center'] = LaTeX.args['flushleft'] = LaTeX.args['flushright'] = ['V'];
-LaTeX.args['titlepage'] = ['V'];
-LaTeX.args['quote'] = LaTeX.args['quotation'] = LaTeX.args['verse'] = ['V'];
-LaTeX.args['itemize'] = ['V', 'X', 'items'];
-LaTeX.args['enumerate'] = ['V', 'X', 'enumitems'];
-LaTeX.args['description'] = ['V', 'X', 'items'];
-LaTeX.args['picture'] = ['H', 'v', 'v?', 'h'];
-LaTeX.args['hspace'] = ['H', 's', 'l'];
-LaTeX.args['label'] = ['HV', 'g'];
-LaTeX.args['ref'] = ['H', 'g'];
-LaTeX.args['llap'] = LaTeX.args['rlap'] = LaTeX.args['clap'] = LaTeX.args['smash'] = LaTeX.args['hphantom'] = LaTeX.args['vphantom'] = LaTeX.args['phantom'] = ['H', 'hg'];
-LaTeX.args['underline'] = ['H', 'hg'];
-LaTeX.args['mbox'] = ['H', 'hg'];
-LaTeX.args['makebox'] = ['H', 'v?', 'l?', 'i?', 'hg'];
-LaTeX.args['fbox'] = ['H', 'hg'];
-LaTeX.args['framebox'] = ['H', 'v?', 'l?', 'i?', 'hg'];
-LaTeX.args['parbox'] = ['H', 'i?', 'l?', 'i?', 'l', 'g'];
-LaTeX.args['thicklines'] = ['HV'];
-LaTeX.args['thinlines'] = ['HV'];
-LaTeX.args['linethickness'] = ['HV', 'l'];
-LaTeX.args['arrowlength'] = ['HV', 'l'];
-LaTeX.args['dashbox'] = ['H', 'cl', 'v', 'i?', 'g'];
-LaTeX.args['frame'] = ['H', 'hg'];
-LaTeX.args['put'] = ['H', 'v', 'g', 'is'];
-LaTeX.args['multiput'] = ['H', 'v', 'v', 'n', 'g'];
-LaTeX.args['qbezier'] = ['H', 'n?', 'v', 'v', 'v'];
-LaTeX.args['cbezier'] = ['H', 'n?', 'v', 'v', 'v', 'v'];
-LaTeX.args['circle'] = ['H', 's', 'cl'];
-LaTeX.args['line'] = ['H', 'v', 'cl'];
-LaTeX.args['vector'] = ['H', 'v', 'cl'];
-LaTeX.args['Line'] = ['H', 'v', 'v'];
-LaTeX.args['Vector'] = ['H', 'v', 'v'];
-LaTeX.args['oval'] = ['H', 'cl?', 'v', 'i?'];
-LaTeX.args['newlength'] = ['HV', 'm'];
-LaTeX.args['setlength'] = ['HV', 'm', 'l'];
-LaTeX.args['addtolength'] = ['HV', 'm', 'l'];
-LaTeX.args['newcounter'] = ['HV', 'i', 'i?'];
-LaTeX.args['stepcounter'] = ['HV', 'i'];
-LaTeX.args['addtocounter'] = ['HV', 'i', 'n'];
-LaTeX.args['setcounter'] = ['HV', 'i', 'n'];
-LaTeX.args['refstepcounter'] = ['H', 'i'];
-LaTeX.args['alph'] = LaTeX.args['Alph'] = LaTeX.args['arabic'] = LaTeX.args['roman'] = LaTeX.args['Roman'] = LaTeX.args['fnsymbol'] = ['H', 'i'];
-LaTeX.args['input'] = ['V', 'g'];
-LaTeX.args['include'] = ['V', 'g'];
-LaTeX.args['documentclass'] = ['P', 'kv?', 'k', 'k?'];
-LaTeX.args['usepackage'] = ['P', 'kv?', 'csv', 'k?'];
-LaTeX.args['includeonly'] = ['P', 'csv'];
-LaTeX.args['makeatletter'] = ['P'];
-LaTeX.args['makeatother'] = ['P'];
-LaTeX.args['pagestyle'] = ['HV', 'i'];
-LaTeX.args['linebreak'] = ['HV', 'n?'];
-LaTeX.args['nolinebreak'] = ['HV', 'n?'];
-LaTeX.args['fussy'] = ['HV'];
-LaTeX.args['sloppy'] = ['HV'];
-LaTeX.args['pagebreak'] = ['HV', 'n?'];
-LaTeX.args['nopagebreak'] = ['HV', 'n?'];
-LaTeX.args['samepage'] = ['HV'];
-LaTeX.args['enlargethispage'] = ['HV', 's', 'l'];
-LaTeX.args['newpage'] = ['HV'];
-LaTeX.args['clearpage'] = ['HV'];
-LaTeX.args['cleardoublepage'] = ['HV'];
-LaTeX.args['vfill'] = ['HV'];
-LaTeX.args['thispagestyle'] = ['HV', 'i'];
-
-export { LaTeX };
+}());

@@ -1,3 +1,4 @@
 import { Graphicx } from './graphicx';
-
-export const Graphics = Graphicx;
+var Graphics;
+export { Graphics }
+Graphics = Graphicx;

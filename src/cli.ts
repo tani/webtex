@@ -1,37 +1,36 @@
 #!/usr/bin/env node
-const { createHTMLWindow, config } = require('svgdom');
-const util = require('util');
-const path = require('path');
-const fs = require('fs-extra');
-const stdin = require('stdin');
-const program = require('commander');
-const beautifyHtml = require('js-beautify').html;
-const { he, parse, HtmlGenerator } = require('../dist/latex.js');
-const en = require('hyphenation.en-us');
-const de = require('hyphenation.de');
-const info = require('../package.json');
-
-let options: any, macros: string, CustomMacros: any, htmlOptions: any, readFile: any, input: Promise<any>, dir: string | boolean, css: string, fonts: string, js: string;
+var ref$, createHTMLWindow, config, util, path, fs, stdin, program, beautifyHtml, he, parse, HtmlGenerator, en, de, info, addStyle, options, that, macros, CustomMacros, htmlOptions, readFile, input, dir, css, fonts, js, slice$ = [].slice, arrayFrom$ = Array.from || function(x){return slice$.call(x);};
+ref$ = require('svgdom'), createHTMLWindow = ref$.createHTMLWindow, config = ref$.config;
 global.window = createHTMLWindow();
 global.document = window.document;
+util = require('util');
+path = require('path');
+fs = require('fs-extra');
+stdin = require('stdin');
+program = require('commander');
+beautifyHtml = require('js-beautify').html;
+ref$ = require('../dist/latex.js'), he = ref$.he, parse = ref$.parse, HtmlGenerator = ref$.HtmlGenerator;
+en = require('hyphenation.en-us');
+de = require('hyphenation.de');
+info = require('../package.json');
 he.encode.options.strict = true;
 he.encode.options.useNamedReferences = true;
-const addStyle = (url: string, styles?: string[]) => {
+addStyle = function(url, styles){
   if (!styles) {
     return [url];
   } else {
-    return Array.from(styles).concat([url]);
+    return arrayFrom$(styles).concat([url]);
   }
 };
-program.name(info.name).version(info.version).description(info.description).usage('[options] [files...]').option('-o, --output <file>', 'specify output file, otherwise STDOUT will be used').option('-a, --assets [dir]', 'copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)').option('-u, --url <base URL>', 'set the base URL to use for the assets (default: use relative URLs)').option('-b, --body', 'don\'t include HTML boilerplate and CSS, only output the contents of body').option('-e, --entities', 'encode HTML entities in the output instead of using UTF-8 characters').option('-p, --pretty', 'beautify the html (this may add/remove spaces unintentionally)').option('-c, --class <class>', 'set a default documentclass for documents without a preamble', 'article').option('-m, --macros <file>', 'load a JavaScript file with additional custom macros').option('-s, --stylesheet <url>', 'specify an additional style sheet to use (can be repeated)', addStyle).option('-n, --no-hyphenation', 'don\'t insert soft hyphens (disables automatic hyphenation in the browser)').option('-l, --language <lang>', 'set hyphenation language', 'en').on('--help', () => {
+program.name(info.name).version(info.version).description(info.description).usage('[options] [files...]').option('-o, --output <file>', 'specify output file, otherwise STDOUT will be used').option('-a, --assets [dir]', 'copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)').option('-u, --url <base URL>', 'set the base URL to use for the assets (default: use relative URLs)').option('-b, --body', 'don\'t include HTML boilerplate and CSS, only output the contents of body').option('-e, --entities', 'encode HTML entities in the output instead of using UTF-8 characters').option('-p, --pretty', 'beautify the html (this may add/remove spaces unintentionally)').option('-c, --class <class>', 'set a default documentclass for documents without a preamble', 'article').option('-m, --macros <file>', 'load a JavaScript file with additional custom macros').option('-s, --stylesheet <url>', 'specify an additional style sheet to use (can be repeated)', addStyle).option('-n, --no-hyphenation', 'don\'t insert soft hyphens (disables automatic hyphenation in the browser)').option('-l, --language <lang>', 'set hyphenation language', 'en').on('--help', function(){
   return console.log('\nIf no input files are given, STDIN is read.');
 }).parse(process.argv);
 options = program.opts();
-if (options.macros) {
-  macros = path.resolve(process.cwd(), options.macros);
+if (that = options.macros) {
+  macros = path.resolve(process.cwd(), that);
   CustomMacros = require(macros);
-  if (CustomMacros['default']) {
-    CustomMacros = CustomMacros['default'];
+  if (that = CustomMacros['default']) {
+    CustomMacros = that;
   } else {
     CustomMacros = CustomMacros[path.parse(macros).name];
   }
@@ -42,35 +41,35 @@ if (options.body && (options.stylesheet || options.url)) {
 }
 htmlOptions = {
   hyphenate: options.hyphenation,
-  languagePatterns: (() => {
-    switch (options.language) {
+  languagePatterns: (function(){
+    switch (that = options.language) {
     case 'en':
       return en;
     case 'de':
       return de;
     default:
-      console.error(`error: language '${options.language}' is not supported yet`);
+      console.error("error: language '" + that + "' is not supported yet");
       return process.exit(1);
     }
-  })(),
+  }()),
   documentClass: options['class'],
   CustomMacros: CustomMacros,
   styles: options.style || []
 };
 readFile = util.promisify(fs.readFile);
 if (program.args.length) {
-  input = Promise.all(program.args.map((file: string) => {
+  input = Promise.all(program.args.map(function(file){
     return readFile(file);
   }));
 } else {
-  input = new Promise((resolve, reject) => {
-    stdin((str: string) => {
+  input = new Promise(function(resolve, reject){
+    stdin(function(str){
       resolve(str);
     });
   });
 }
-input.then((text: any) => {
-  let generator: any, div: HTMLDivElement, html: string;
+input.then(function(text){
+  var generator, div, html;
   if (text.join) {
     text = text.join("\n\n");
   }
@@ -102,7 +101,7 @@ input.then((text: any) => {
   } else {
     return process.stdout.write(html + '\n');
   }
-}).catch((err: Error) => {
+})['catch'](function(err){
   console.error(err.toString());
   return process.exit(1);
 });
