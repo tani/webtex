@@ -1,19 +1,21 @@
 // Global takeScreenshot function using Playwright
-import { chromium } from 'playwright';
-import { writeFileSync, mkdirSync } from 'fs';
-import { dirname } from 'path';
 
+import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
+import { chromium } from "playwright";
 
-(globalThis as any).takeScreenshot = async function(html: string, filename: string) {
-  // Add .png extension if not present
-  const screenshotPath = filename.endsWith('.png') ? filename : `${filename}.png`;
-  console.log(`Taking screenshot for: ${screenshotPath}`);
-  
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  
-  // Set up the page with CSS and HTML
-  const fullHtml = `
+(globalThis as any).takeScreenshot = async (html: string, filename: string) => {
+	// Add .png extension if not present
+	const screenshotPath = filename.endsWith(".png")
+		? filename
+		: `${filename}.png`;
+	console.log(`Taking screenshot for: ${screenshotPath}`);
+
+	const browser = await chromium.launch();
+	const page = await browser.newPage();
+
+	// Set up the page with CSS and HTML
+	const fullHtml = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -28,14 +30,14 @@ import { dirname } from 'path';
     </body>
     </html>
   `;
-  
-  await page.setContent(fullHtml);
-  
-  // Ensure directory exists
-  mkdirSync(dirname(screenshotPath), { recursive: true });
-  
-  // Take screenshot
-  await page.screenshot({ path: screenshotPath, fullPage: true });
-  
-  await browser.close();
+
+	await page.setContent(fullHtml);
+
+	// Ensure directory exists
+	mkdirSync(dirname(screenshotPath), { recursive: true });
+
+	// Take screenshot
+	await page.screenshot({ path: screenshotPath, fullPage: true });
+
+	await browser.close();
 };

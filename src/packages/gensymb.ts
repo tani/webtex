@@ -1,26 +1,24 @@
-import he from 'he';
+import he from "he";
 
-interface Generator {
-  // Basic generator interface for packages
-}
+type Generator = Record<string, unknown>;
 
 export class Gensymb {
-  static displayName = 'Gensymb';
-  static args: Record<string, any[]> = {};
+	static displayName = "Gensymb";
+	static args: Record<string, any[]> = {};
 
-  static symbols = new Map([
-    ['degree', he.decode('&deg;')], 
-    ['celsius', '\u2103'], 
-    ['perthousand', he.decode('&permil;')], 
-    ['ohm', '\u2126'], 
-    ['micro', he.decode('&mu;')]
-  ]);
+	static symbols = new Map([
+		["degree", he.decode("&deg;")],
+		["celsius", "\u2103"],
+		["perthousand", he.decode("&permil;")],
+		["ohm", "\u2126"],
+		["micro", he.decode("&mu;")],
+	]);
 
-  private g: Generator;
-  private options?: any;
+	g: Generator;
+	options?: any;
 
-  constructor(generator: Generator, options?: any) {
-    this.g = generator;
-    this.options = options;
-  }
+	constructor(generator: Generator, options?: any) {
+		this.g = generator;
+		this.options = options;
+	}
 }

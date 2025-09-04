@@ -1,8 +1,2 @@
-export declare class LaTeXJSComponent extends HTMLElement {
-    constructor();
-    shadow: ShadowRoot;
-    onContentReady(): Promise<void>;
-    connectedCallback(): void;
-}
-
-export declare let LaTeXJSComponent: typeof LaTeXJSComponent | null;
+// Runtime export is a variable that may be null in non-browser contexts
+export declare const LaTeXJSComponent: typeof HTMLElement | null;

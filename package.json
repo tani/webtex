@@ -1,105 +1,111 @@
 {
-  "name": "latex.js",
-  "description": "JavaScript LaTeX to HTML5 translator",
-  "version": "0.12.6",
-  "author": {
-    "name": "Michael Brade",
-    "email": "brade@kde.org"
-  },
-  "keywords": [
-    "pegjs",
-    "latex",
-    "parser",
-    "html5"
-  ],
-  "bin": {
-    "latex.js": "./bin/latex.js"
-  },
-  "module": "./dist/latex.mjs",
-  "main": "./dist/latex.js",
-  "exports": {
-    "import": "./dist/latex.mjs",
-    "require": "./dist/latex.js"
-  },
-  "browser": "./dist/latex.js",
-  "files": [
-    "bin/latex.js",
-    "dist/latex.js",
-    "dist/latex.js.map",
-    "dist/latex.mjs",
-    "dist/latex.mjs.map",
-    "dist/css/",
-    "dist/fonts/",
-    "dist/js/",
-    "dist/packages/",
-    "dist/documentclasses/"
-  ],
-  "scripts": {
-    "clean": "rimraf dist bin test/coverage test/test-results.xml",
-    "prebuild": "npm run clean && mkdirp dist/css dist/js dist/fonts dist/documentclasses dist/packages bin && touch dist/documentclasses/.keep dist/packages/.keep",
-    "build:assets": "cp -r src/css/* dist/css/ && cp -r src/fonts/* dist/fonts/ && cp -r src/js/* dist/js/ && cp node_modules/katex/dist/fonts/*.woff2 dist/fonts/",
-    "build:packages": "tsc src/packages/*.ts --outDir dist/packages --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && npm run build:packages:placeholders",
-    "build:packages:placeholders": "node -e \"const fs=require('fs');const template=fs.readFileSync('lib/package-placeholder-template.js','utf8');['geometry','layout','showframe','luatextra','lua-visual-debug'].forEach(pkg=>{const className=pkg.charAt(0).toUpperCase()+pkg.slice(1).replace(/-(.)/g,(m,c)=>c.toUpperCase());fs.writeFileSync('dist/packages/'+pkg+'.js',template.replace(/PACKAGE_NAME/g,className))});\"",
-    "build:documentclasses": "tsc src/documentclasses/*.ts --outDir dist/documentclasses --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
-    "build:cli": "tsc src/cli.ts --outDir bin --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && mv bin/cli.js bin/latex.js && chmod +x bin/latex.js",
-    "build:lib": "rollup -c",
-    "build": "npm run prebuild && npm run build:assets && npm run build:packages && npm run build:documentclasses && npm run build:cli && npm run build:lib",
-    "pretest": "npm run build",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "test:screenshots": "vitest run -t screenshot"
-  },
-  "dependencies": {
-    "commander": "^9.5.0",
-    "fs-extra": "^11.3.1",
-    "hyphenation.de": "*",
-    "hyphenation.en-us": "*",
-    "js-beautify": "^1.15.4",
-    "stdin": "*",
-    "svgdom": "^0.1.8"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^28.0.6",
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.4",
-    "@svgdotjs/svg.js": "3.x",
-    "@types/node": "^24.3.0",
-    "@vitest/ui": "^3.2.4",
-    "decache": "^4.6.2",
-    "glob": "^11.0.3",
-    "he": "^1.2.0",
-    "hypher": "^0.2.5",
-    "katex": "^0.16.22",
-    "lodash": "^4.17.21",
-    "mkdirp": "^3.0.1",
-    "nyc": "^17.1.0",
-    "pegjs": "^0.10.0",
-    "playwright": "^1.55.0",
-    "puppeteer": "^24.18.0",
-    "rimraf": "^6.0.1",
-    "rollup": "^4.50.0",
-    "rollup-plugin-string": "^3.0.0",
-    "rollup-plugin-visualizer": "^6.0.3",
-    "slugify": "^1.6.6",
-    "tmp": "^0.2.3",
-    "tslib": "^2.8.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/michael-brade/LaTeX.js.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/michael-brade/LaTeX.js/issues"
-  },
-  "homepage": "https://latex.js.org",
-  "engines": {
-    "node": ">= 14.0"
-  }
+	"name": "latex.js",
+	"description": "JavaScript LaTeX to HTML5 translator",
+	"version": "0.12.6",
+	"author": {
+		"name": "Michael Brade",
+		"email": "brade@kde.org"
+	},
+	"keywords": [
+		"pegjs",
+		"latex",
+		"parser",
+		"html5"
+	],
+	"bin": {
+		"latex.js": "./bin/latex.js"
+	},
+	"module": "./dist/latex.mjs",
+	"main": "./dist/latex.js",
+	"exports": {
+		"import": "./dist/latex.mjs",
+		"require": "./dist/latex.js"
+	},
+	"browser": "./dist/latex.js",
+	"files": [
+		"bin/latex.js",
+		"dist/latex.js",
+		"dist/latex.js.map",
+		"dist/latex.mjs",
+		"dist/latex.mjs.map",
+		"dist/css/",
+		"dist/fonts/",
+		"dist/js/",
+		"dist/packages/",
+		"dist/documentclasses/"
+	],
+	"scripts": {
+		"clean": "rimraf dist bin test/coverage test/test-results.xml",
+		"prebuild": "npm run clean && mkdirp dist/css dist/js dist/fonts dist/documentclasses dist/packages bin && touch dist/documentclasses/.keep dist/packages/.keep",
+		"build:assets": "cp -r src/css/* dist/css/ && cp -r src/fonts/* dist/fonts/ && cp -r src/js/* dist/js/ && cp node_modules/katex/dist/fonts/*.woff2 dist/fonts/",
+		"build:packages": "tsc src/packages/*.ts --outDir dist/packages --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && npm run build:packages:placeholders",
+		"build:packages:placeholders": "node -e \"const fs=require('fs');const template=fs.readFileSync('lib/package-placeholder-template.js','utf8');['geometry','layout','showframe','luatextra','lua-visual-debug'].forEach(pkg=>{const className=pkg.charAt(0).toUpperCase()+pkg.slice(1).replace(/-(.)/g,(m,c)=>c.toUpperCase());fs.writeFileSync('dist/packages/'+pkg+'.js',template.replace(/PACKAGE_NAME/g,className))});\"",
+		"build:documentclasses": "tsc src/documentclasses/*.ts --outDir dist/documentclasses --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
+		"build:cli": "tsc src/cli.ts --outDir bin --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule && mv bin/cli.js bin/latex.js && chmod +x bin/latex.js",
+		"build:lib": "rollup -c",
+		"build": "npm run prebuild && npm run build:assets && npm run build:packages && npm run build:documentclasses && npm run build:cli && npm run build:lib",
+		"pretest": "npm run build",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"test:coverage": "vitest run --coverage",
+		"test:screenshots": "vitest run -t screenshot",
+		"lint": "biome check",
+		"lint:fix": "biome check --write",
+		"format": "biome format --write",
+		"format:check": "biome format"
+	},
+	"dependencies": {
+		"commander": "^9.5.0",
+		"fs-extra": "^11.3.1",
+		"hyphenation.de": "*",
+		"hyphenation.en-us": "*",
+		"js-beautify": "^1.15.4",
+		"stdin": "*",
+		"svgdom": "^0.1.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@rollup/plugin-commonjs": "^28.0.6",
+		"@rollup/plugin-node-resolve": "^16.0.1",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-typescript": "^12.1.4",
+		"@svgdotjs/svg.js": "3.x",
+		"@types/node": "^24.3.0",
+		"@vitest/ui": "^3.2.4",
+		"@vitest/coverage-v8": "^3.2.4",
+		"decache": "^4.6.2",
+		"glob": "^11.0.3",
+		"he": "^1.2.0",
+		"hypher": "^0.2.5",
+		"katex": "^0.16.22",
+		"lodash": "^4.17.21",
+		"mkdirp": "^3.0.1",
+		"nyc": "^17.1.0",
+		"pegjs": "^0.10.0",
+		"playwright": "^1.55.0",
+		"puppeteer": "^24.18.0",
+		"rimraf": "^6.0.1",
+		"rollup": "^4.50.0",
+		"rollup-plugin-string": "^3.0.0",
+		"rollup-plugin-visualizer": "^6.0.3",
+		"slugify": "^1.6.6",
+		"tmp": "^0.2.3",
+		"tslib": "^2.8.1",
+		"tsx": "^4.20.5",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/michael-brade/LaTeX.js.git"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/michael-brade/LaTeX.js/issues"
+	},
+	"homepage": "https://latex.js.org",
+	"engines": {
+		"node": ">= 14.0"
+	}
 }

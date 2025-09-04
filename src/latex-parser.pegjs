@@ -1,6 +1,6 @@
 {
-    var { Vector } = require('./types');
-    var g = options.generator;
+    const { Vector } = require('./types');
+    const g = options.generator;
     g.setErrorFn(error);
     g.location = location;
 }
@@ -47,9 +47,9 @@ document =
     {
         g.exitGroup();
         g.isBalanced() || error("groups need to be balanced!");
-        var l = g.endBalanced();
+        const l = g.endBalanced();
         // this error should be impossible, it's just to be safe
-        l == 1 && g.isBalanced() || error("grammar error: " + l + " levels of balancing are remaining, or the last level is unbalanced!");
+        l === 1 && g.isBalanced() || error(`grammar error: ${l} levels of balancing are remaining, or the last level is unbalanced!`);
 
         g.createDocument(pars);
         g.logUndefinedRefs();
@@ -66,7 +66,7 @@ paragraph =
     be:break?
     {
         bb.length > 0 && g.break();
-        var p = g.create(g.par, txt, n ? "noindent" : "");
+        const p = g.create(g.par, txt, n ? "noindent" : "");
         be && g.break();
         return p;
     }
@@ -216,11 +216,11 @@ macro =
 
 only_preamble =
     m:identifier
-    { error("macro only allowed in preamble: " + m); }
+    { error(`macro only allowed in preamble: ${m}`); }
 
 unknown_macro =
     m:identifier
-    { error("unknown macro: \\" + m); }
+    { error(`unknown macro: \\${m}`); }
 
 
 
@@ -238,7 +238,7 @@ key =
 
 key_val "key=value" =
     k:key v:(_ '=' _ v:(key / &{ error("value expected") }) { return v.trim(); })?
-    { return [k.trim(), v == null ? true : v ]; }
+    { return [k.trim(), v === null ? true : v ]; }
 
 
 macro_args =
@@ -337,7 +337,7 @@ keyval_optgroup =   _ begin_optgroup
                         kv_list:(_ ',' {return null;} / _ kv:key_val {return kv;})*
                     _ end_optgroup
                     {
-                        return new Map(kv_list.filter(kv => kv != null));
+                        return new Map(kv_list.filter(kv => kv !== null));
                     }
 
 // {val1,val2,val3}
@@ -345,7 +345,7 @@ csv_group       =   _ begin_group _
                         v_list:(_ ',' {return null;} / _ v:key {return v.trim();})*
                     _ end_group
                     {
-                        return v_list.filter(v => v != null);
+                        return v_list.filter(v => v !== null);
                     }
 
 // lengths
@@ -497,14 +497,14 @@ num_value       =   "(" expr:num_expr ")"                   { return expr; }
                   / real
                   / c:value                                 { return g.counter(c); }
 
-num_factor      =   s:("+"/"-") _ n:num_factor              { return s == "-" ? -n : n; }
+num_factor      =   s:("+"/"-") _ n:num_factor              { return s === "-" ? -n : n; }
                   / num_value
 
 num_term        =   head:num_factor tail:(_ ("*" / "/") _ num_factor)*
                 {
-                    var result = head, i;
+                    let result = head;
 
-                    for (i = 0; i < tail.length; i++) {
+                    for (let i = 0; i < tail.length; i++) {
                         if (tail[i][1] === "*") { result = Math.trunc(result * tail[i][3]); }
                         if (tail[i][1] === "/") { result = Math.trunc(result / tail[i][3]); }
                     }
@@ -514,9 +514,9 @@ num_term        =   head:num_factor tail:(_ ("*" / "/") _ num_factor)*
 
 num_expr        =   _ head:num_term tail:(_ ("+" / "-") _ num_term)* _
                 {
-                    var result = head, i;
+                    let result = head;
 
-                    for (i = 0; i < tail.length; i++) {
+                    for (let i = 0; i < tail.length; i++) {
                         if (tail[i][1] === "+") { result += tail[i][3]; }
                         if (tail[i][1] === "-") { result -= tail[i][3]; }
                     }
@@ -575,7 +575,7 @@ fn              = ">" ("wheel" / "twheel")
 fn_arg          = float     // TODO...
 
 
-c_prefix        = m:"-"* { return m.length % 2 == 0; }
+c_prefix        = m:"-"* { return m.length % 2 === 0; }
 
 c_name          = $(char / digit)+ / $(".")
 
@@ -601,30 +601,30 @@ model_list      = core:(core_model ":")? cm:color_model cml:("/" color_model)*
                 {
                     if (core) core = core[0];
 
-                    var list = [ cm ];
+                    const list = [ cm ];
                     cml.forEach(m => list.push(m[1]));
 
                     return {
-                        core: core,
+                        core,
                         models: list
                     }
                 }
 
 
 color_spec      = f:float fl:((sp / ",") float)*
-                  { var list = [ f ]; fl.forEach(f => list.push(f[1])); return list; }
+                  { const list = [ f ]; fl.forEach(f => list.push(f[1])); return list; }
                 / c_name
 
 color_spec_list = cs:color_spec csl:("/" color_spec)*
                 {
-                    var list = [ cs ];
+                    const list = [ cs ];
                     csl.forEach(s => list.push(s[1]));
                     return list;
                 }
 
 color_set_spec  = n:c_name "," s:color_spec_list sl:(";" _ c_name "," color_spec_list)*
                 {
-                    var list = [ { name: n, speclist: s } ];
+                    const list = [ { name: n, speclist: s } ];
 
                     sl.forEach(s => list.push({
                         name: s[2],
@@ -647,7 +647,7 @@ columns =
         c:(_c:column _s:column_separator* { return Array.isArray(_c) ? _c.concat(_s) : [_c].concat(_s); })+
     end_group
     {
-        return c.reduce(function(a, b) { return a.concat(b); }, s)
+        return c.reduce((a, b) => a.concat(b), s)
     }
 
 column =
@@ -658,11 +658,11 @@ column =
     /
     "*" reps:expr_group c:columns
     {
-        var result = []
-        for (var i = 0; i < reps; i++) {
-            result = result.concat(c.slice())
+        let result = [];
+        for (let i = 0; i < reps; i++) {
+            result = result.concat(c.slice());
         }
-        return result
+        return result;
     }
 
 column_separator =
@@ -685,8 +685,8 @@ column_separator =
 vspace_hmode    =   "vspace" "*"?   l:length_group      { return g.createVSpaceInline(l); }
 vspace_vmode    =   "vspace" "*"?   l:length_group      { return g.createVSpace(l); }
 
-smbskip_hmode   =   s:$("small"/"med"/"big")"skip" !char _ { return g.createVSpaceSkipInline(s + "skip"); }
-smbskip_vmode   =   s:$("small"/"med"/"big")"skip" !char _ { return g.createVSpaceSkip(s + "skip"); }
+smbskip_hmode   =   s:$("small"/"med"/"big")"skip" !char _ { return g.createVSpaceSkipInline(`${s}skip`); }
+smbskip_vmode   =   s:$("small"/"med"/"big")"skip" !char _ { return g.createVSpaceSkip(`${s}skip`); }
 
 //  \\[length] is defined in the linebreak rule further down
 
@@ -698,10 +698,10 @@ smbskip_vmode   =   s:$("small"/"med"/"big")"skip" !char _ { return g.createVSpa
 // TODO: this should use the current font size!
 verb            =   "verb" s:"*"? _ !char
                     b:.
-                        v:$(!nl t:. !{ return b == t; })*
+                        v:$(!nl t:. !{ return b === t; })*
                     e:.
                     {
-                        b == e || error("\\verb is missing its end delimiter: " + b);
+                        b === e || error(`\\verb is missing its end delimiter: ${b}`);
                         if (s)
                             v = v.replace(/ /g, g.visp);
 
@@ -723,7 +723,7 @@ begin_env "\\begin" =
         s:nextArgStar?
     end_group
     {
-        return { id, end: id + (s ? "*" : "") };
+        return { id, end: `${id}${s ? "*" : ""}` };
     }
 
 end_env "\\end" =
@@ -731,7 +731,7 @@ end_env "\\end" =
     escape end
     begin_group id:identifier _ s:"*"? end_group
     {
-        return id + (s ? "*" : "");
+        return `${id}${s ? "*" : ""}`;
     }
 
 
@@ -757,7 +757,7 @@ h_environment =
         // if node is a text node, just add it
         // potential spaces after \begin and \end have to be added explicitely
 
-        var pf = g.createFragment(p);
+        const pf = g.createFragment(p);
         if (pf && node && node.length > 0 && node[node.length - 1].nodeType === 1) {
             node[node.length - 1].appendChild(sb);
             node[node.length - 1].appendChild(pf);
@@ -776,12 +776,12 @@ environment =
         p:paragraph*                                        // then parse environment contents (if macro left some)
     end_id:end_env
     {
-        var end = g.end(id.end, end_id);
+        const end = g.end(id.end, end_id);
 
         // if nodes are created by macro, add content as children to the last element
         // if node is a text node, just add it
 
-        var pf = g.createFragment(p);
+        const pf = g.createFragment(p);
         if (pf && node && node.length > 0 && node[node.length - 1].nodeType === 1) {
             node[node.length - 1].appendChild(pf);
             return g.createFragment(node, end);
@@ -822,8 +822,8 @@ enumitems =
             // null is no opt_group (\item ...)
             // undefined is an empty one (\item[] ...)
             if (label === null) {
-                var itemCounter = "enum" + g.roman(g.counter("@enumdepth"));
-                var itemId = "item-" + g.nextId();
+                const itemCounter = `enum${g.roman(g.counter("@enumdepth"))}`;
+                const itemId = `item-${g.nextId()}`;
                 g.stepCounter(itemCounter);
                 g.refCounter(itemCounter, itemId);
                 return {
@@ -1007,7 +1007,7 @@ diacritic "diacritic macro" =
     escape
     d:$(char !char / !char .)  &{ return g.hasDiacritic(d); }
     _
-    c:(begin_group c:primitive? end_group s:space? { return g.diacritic(d, c) + (s ? s:""); }
+    c:(begin_group c:primitive? end_group s:space? { return g.diacritic(d, c) + (s || ""); }
       /            c:primitive                     { return g.diacritic(d, c); })
     {
         return c;
@@ -1052,7 +1052,7 @@ float "float value"     = f:$(
 
 // distinguish length/counter: if it's not a counter, it is a length
 the                     = "the" !char _ t:(
-                            c:value &{ return g.hasCounter(c);} { return g.createText("" + g.counter(c)); }
+                            c:value &{ return g.hasCounter(c);} { return g.createText(`${g.counter(c)}`); }
                             / escape id:identifier _            { return g.theLength(id); }
                         )                                       { return t; }
 

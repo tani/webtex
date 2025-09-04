@@ -1,39 +1,37 @@
-import he from 'he';
+import he from "he";
 
-interface Generator {
-  // Basic generator interface for packages
-}
+type Generator = Record<string, unknown>;
 
 export class Textcomp {
-  static displayName = 'Textcomp';
-  static args: Record<string, any[]> = {};
+	static displayName = "Textcomp";
+	static args: Record<string, any[]> = {};
 
-  static symbols = new Map([
-    ['textcentoldstyle', '\uF7A2'], 
-    ['textdollaroldstyle', '\uF724'], 
-    ['textguarani', '\u20B2'], 
-    ['textcopyleft', '\u1F12F'], 
-    ['textzerooldstyle', '\uF730'], 
-    ['textoneoldstyle', '\uF731'], 
-    ['texttwooldstyle', '\uF732'], 
-    ['textthreeoldstyle', '\uF733'], 
-    ['textfouroldstyle', '\uF734'], 
-    ['textfiveoldstyle', '\uF735'], 
-    ['textsixoldstyle', '\uF736'], 
-    ['textsevenoldstyle', '\uF737'], 
-    ['texteightoldstyle', '\uF738'], 
-    ['textnineoldstyle', '\uF739'], 
-    ['textborn', '\u2B51'], 
-    ['textdied', he.decode('&dagger;')], 
-    ['textpilcrow', he.decode('&para;')], 
-    ['textdblhyphen', '\u2E40']
-  ]);
+	static symbols = new Map([
+		["textcentoldstyle", "\uF7A2"],
+		["textdollaroldstyle", "\uF724"],
+		["textguarani", "\u20B2"],
+		["textcopyleft", "\u1F12F"],
+		["textzerooldstyle", "\uF730"],
+		["textoneoldstyle", "\uF731"],
+		["texttwooldstyle", "\uF732"],
+		["textthreeoldstyle", "\uF733"],
+		["textfouroldstyle", "\uF734"],
+		["textfiveoldstyle", "\uF735"],
+		["textsixoldstyle", "\uF736"],
+		["textsevenoldstyle", "\uF737"],
+		["texteightoldstyle", "\uF738"],
+		["textnineoldstyle", "\uF739"],
+		["textborn", "\u2B51"],
+		["textdied", he.decode("&dagger;")],
+		["textpilcrow", he.decode("&para;")],
+		["textdblhyphen", "\u2E40"],
+	]);
 
-  private g: Generator;
-  private options?: any;
+	g: Generator;
+	options?: any;
 
-  constructor(generator: Generator, options?: any) {
-    this.g = generator;
-    this.options = options;
-  }
+	constructor(generator: Generator, options?: any) {
+		this.g = generator;
+		this.options = options;
+	}
 }

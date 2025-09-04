@@ -1,4 +1,3 @@
-import { XColor } from './xcolor';
-var Color;
-export { Color }
-Color = XColor;
+import { XColor } from "./xcolor";
+
+export const Color = XColor;

@@ -1,32 +1,41 @@
-import fs from 'fs';
-import p from 'path';
+import fs from "node:fs";
 
-const parse = function(input: string, separator: string) {
-  var lines, result, fid, i$, to$, line, fixture;
-  const escapedSeparator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
-  const separatorRegex = RegExp('(?:^|\\r\\n|\\n|\\r)(?:' + escapedSeparator + '(?:$|\\r\\n|\\n|\\r)(?!' + escapedSeparator + ')|' + escapedSeparator + '(?=$|\\r\\n|\\n|\\r))');
-  lines = input.split(separatorRegex);
-  result = {
-    fixtures: []
-  };
-  fid = 1;
-  for (i$ = 0, to$ = lines.length; i$ < to$; i$ += 3) {
-    line = i$;
-    fixture = {
-      id: fid++,
-      header: lines[line].trim(),
-      source: lines[line + 1],
-      result: lines[line + 2]
-    };
-    if (fixture.source === undefined || fixture.result === undefined) {
-      break;
-    }
-    if (!fixture.source.trim() && !fixture.result.trim()) {
-      continue;
-    }
-    result.fixtures.push(fixture);
-  }
-  return result;
+interface FixtureItem {
+	id: number;
+	header: string;
+	source: string;
+	result: string;
+}
+
+interface FixturesResult {
+	file?: string;
+	fixtures: FixtureItem[];
+}
+
+const parse = (input: string, separator: string): FixturesResult => {
+	const escapedSeparator = separator.replace(/[.?*+^$[\]\\(){}|-]/g, "\\$&");
+	const separatorRegex = RegExp(
+		`(?:^|\r\n|\n|\r)(?:${escapedSeparator}(?:$|\r\n|\n|\r)(?!${escapedSeparator})|${escapedSeparator}(?=$|\r\n|\n|\r))`,
+	);
+	const lines: string[] = input.split(separatorRegex);
+	const result: FixturesResult = { fixtures: [] };
+	let fid = 1;
+	for (let i = 0; i < lines.length; i += 3) {
+		const fixture: FixtureItem = {
+			id: fid++,
+			header: (lines[i] ?? "").trim(),
+			source: lines[i + 1] ?? "",
+			result: lines[i + 2] ?? "",
+		};
+		if (fixture.source === undefined || fixture.result === undefined) {
+			break;
+		}
+		if (!fixture.source.trim() && !fixture.result.trim()) {
+			continue;
+		}
+		result.fixtures.push(fixture);
+	}
+	return result;
 };
 /* Read a file with fixtures.
     @param path         the path to the file with fixtures
@@ -41,17 +50,13 @@ const parse = function(input: string, separator: string) {
             ]
         }
 */
-export const load = function(path: string, separator: string = '.') {
-  var stat, input, result;
-  stat = fs.statSync(path);
-  if (stat.isFile()) {
-    input = fs.readFileSync(path, 'utf8');
-    result = parse(input, separator);
-    result.file = path;
-    return result;
-  }
-  return {
-    fixtures: []
-  };
+export const load = (path: string, separator: string = "."): FixturesResult => {
+	const stat = fs.statSync(path);
+	if (stat.isFile()) {
+		const input = fs.readFileSync(path, "utf8");
+		const result = parse(input, separator);
+		result.file = path;
+		return result;
+	}
+	return { fixtures: [] };
 };
-
