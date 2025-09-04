@@ -1,42 +1,50 @@
-var export$;
-export { export$ as Echo }
-'use strict';
-var Echo;
-export$ = Echo = (function(){
-  Echo.displayName = 'Echo';
-  var args, prototype = Echo.prototype, constructor = Echo;
-  args = Echo.args = {};
-  function Echo(generator, options){}
-  args.gobbleO = ['H', 'o?'];
-  Echo.prototype['gobbleO'] = function(){
+interface Generator {
+  // Basic generator interface for packages
+}
+
+export class Echo {
+  static displayName = 'Echo';
+  static args: Record<string, any[]> = {
+    'gobbleO': ['H', 'o?'],
+    'echoO': ['H', 'o?'],
+    'echoOGO': ['H', 'o?', 'g', 'o?'],
+    'echoGOG': ['H', 'g', 'o?', 'g']
+  };
+
+  private g: Generator;
+  private options?: any;
+
+  constructor(generator: Generator, options?: any) {
+    this.g = generator;
+    this.options = options;
+  }
+
+  gobbleO(): any[] {
     return [];
-  };
-  args.echoO = ['H', 'o?'];
-  Echo.prototype['echoO'] = function(o){
+  }
+
+  echoO(o?: any): any[] {
     return ["-", o, "-"];
-  };
-  args.echoOGO = ['H', 'o?', 'g', 'o?'];
-  Echo.prototype['echoOGO'] = function(o1, g, o2){
-    var x$;
-    x$ = [];
+  }
+
+  echoOGO(o1?: any, g?: any, o2?: any): any[] {
+    const result: any[] = [];
     if (o1) {
-      x$.push("-", o1, "-");
+      result.push("-", o1, "-");
     }
-    x$.push("+", g, "+");
+    result.push("+", g, "+");
     if (o2) {
-      x$.push("-", o2, "-");
+      result.push("-", o2, "-");
     }
-    return x$;
-  };
-  args.echoGOG = ['H', 'g', 'o?', 'g'];
-  Echo.prototype['echoGOG'] = function(g1, o, g2){
-    var x$;
-    x$ = ["+", g1, "+"];
+    return result;
+  }
+
+  echoGOG(g1: any, o?: any, g2?: any): any[] {
+    const result = ["+", g1, "+"];
     if (o) {
-      x$.push("-", o, "-");
+      result.push("-", o, "-");
     }
-    x$.push("+", g2, "+");
-    return x$;
-  };
-  return Echo;
-}());
+    result.push("+", g2, "+");
+    return result;
+  }
+}

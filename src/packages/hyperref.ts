@@ -1,23 +1,34 @@
-var export$;
-export { export$ as Hyperref }
-'use strict';
-var Hyperref;
-export$ = Hyperref = (function(){
-  Hyperref.displayName = 'Hyperref';
-  var args, prototype = Hyperref.prototype, constructor = Hyperref;
-  args = Hyperref.args = {};
-  function Hyperref(generator, options){}
-  args['href'] = ['H', 'o?', 'u', 'g'];
-  Hyperref.prototype['href'] = function(opts, url, txt){
+interface Generator {
+  create(element: any, content: any): any;
+  link(url?: string): any;
+  createText(text: string): any;
+}
+
+export class Hyperref {
+  static displayName = 'Hyperref';
+  static args: Record<string, any[]> = {
+    'href': ['H', 'o?', 'u', 'g'],
+    'url': ['H', 'u'],
+    'nolinkurl': ['H', 'u']
+  };
+
+  private g: Generator;
+  private options?: any;
+
+  constructor(generator: Generator, options?: any) {
+    this.g = generator;
+    this.options = options;
+  }
+
+  href(opts: any, url: string, txt: any): any[] {
     return [this.g.create(this.g.link(url), txt)];
-  };
-  args['url'] = ['H', 'u'];
-  Hyperref.prototype['url'] = function(url){
+  }
+
+  url(url: string): any[] {
     return [this.g.create(this.g.link(url), this.g.createText(url))];
-  };
-  args['nolinkurl'] = ['H', 'u'];
-  Hyperref.prototype['nolinkurl'] = function(url){
+  }
+
+  nolinkurl(url: string): any[] {
     return [this.g.create(this.g.link(), this.g.createText(url))];
-  };
-  return Hyperref;
-}());
+  }
+}

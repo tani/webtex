@@ -1,27 +1,47 @@
-var export$;
-export { export$ as Graphicx }
-'use strict';
-var Graphicx;
-export$ = Graphicx = (function(){
-  Graphicx.displayName = 'Graphicx';
-  var args, prototype = Graphicx.prototype, constructor = Graphicx;
-  args = Graphicx.args = {};
-  function Graphicx(generator, options){}
-  args['rotatebox'] = ['H', 'kv?', 'n', 'hg'];
-  Graphicx.prototype['rotatebox'] = function(kvl, angle, text){};
-  args['scalebox'] = ['H', 'n', 'n?', 'g'];
-  Graphicx.prototype['scalebox'] = function(hsc, vsc, text){};
-  args['reflectbox'] = ['H', 'g'];
-  Graphicx.prototype['reflectbox'] = function(text){
-    return this['scalebox'](-1, 1, text);
+interface Generator {
+  createImage(width: any, height: any, file: any): any;
+}
+
+export class Graphicx {
+  static displayName = 'Graphicx';
+  static args: Record<string, any[]> = {
+    'rotatebox': ['H', 'kv?', 'n', 'hg'],
+    'scalebox': ['H', 'n', 'n?', 'g'],
+    'reflectbox': ['H', 'g'],
+    'resizebox': ['H', 's', 'l', 'l', 'g'],
+    'graphicspath': ['HV', 'gl'],
+    'includegraphics': ['H', 's', 'kv?', 'kv?', 'k']
   };
-  args['resizebox'] = ['H', 's', 'l', 'l', 'g'];
-  Graphicx.prototype['resizebox'] = function(s, hl, vl, text){};
-  args['graphicspath'] = ['HV', 'gl'];
-  Graphicx.prototype['graphicspath'] = function(paths){};
-  args['includegraphics'] = ['H', 's', 'kv?', 'kv?', 'k'];
-  Graphicx.prototype['includegraphics'] = function(s, kvl, kvl2, file){
+
+  private g: Generator;
+  private options?: any;
+
+  constructor(generator: Generator, options?: any) {
+    this.g = generator;
+    this.options = options;
+  }
+
+  rotatebox(kvl: any, angle: any, text: any): any[] {
+    return [];
+  }
+
+  scalebox(hsc: any, vsc?: any, text?: any): any[] {
+    return [];
+  }
+
+  reflectbox(text: any): any[] {
+    return this.scalebox(-1, 1, text);
+  }
+
+  resizebox(s: any, hl: any, vl: any, text: any): any[] {
+    return [];
+  }
+
+  graphicspath(paths: any): any[] {
+    return [];
+  }
+
+  includegraphics(s: any, kvl: any, kvl2: any, file: any): any[] {
     return [this.g.createImage(kvl.get("width"), kvl.get("height"), file)];
-  };
-  return Graphicx;
-}());
+  }
+}

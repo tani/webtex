@@ -1369,7 +1369,23 @@ export class LaTeX {
         }
         
         if (Package) {
-          assignIn(this, new Package(this.g, options));
+          const packageInstance = new Package(this.g, options);
+          
+          // Copy instance properties
+          assignIn(this, packageInstance);
+          
+          // Copy prototype methods (for ES6 classes)
+          const proto = Object.getPrototypeOf(packageInstance);
+          const methodNames = Object.getOwnPropertyNames(proto).filter(name => 
+            name !== 'constructor' && typeof proto[name] === 'function'
+          );
+          
+          for (const methodName of methodNames) {
+            if (!(methodName in this)) {
+              this[methodName] = packageInstance[methodName].bind(packageInstance);
+            }
+          }
+          
           assign(LaTeX.args, Package.args);
           if (Package.symbols) {
             Package.symbols.forEach((value: string, key: string) => {

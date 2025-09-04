@@ -1,119 +1,117 @@
-var export$;
-export { export$ as XColor }
-'use strict';
-var XColor;
-export$ = XColor = (function(){
-  XColor.displayName = 'XColor';
-  var args, colors, symbols, prototype = XColor.prototype, constructor = XColor;
-  args = XColor.args = {};
-  colors = XColor.colors = new Map([["red", {}], ["green", {}], ["blue", {}], ["cyan", {}], ["magenta", {}], ["yellow", {}], ["black", {}], ["gray", {}], ["white", {}], ["darkgray", {}], ["lightgray", {}], ["brown", {}], ["lime", {}], ["olive", {}], ["orange", {}], ["pink", {}], ["purple", {}], ["teal", {}], ["violet", {}]]);
-  symbols = XColor.symbols = new Map([]);
-  function XColor(generator, options){
-    var i$, ref$, len$, opt;
-    this.g = generator;
-    if (options) {
-      this.options = options;
-    }
-    for (i$ = 0, len$ = (ref$ = this.options).length; i$ < len$; ++i$) {
-      opt = ref$[i$];
-      opt = Object.keys(opt)[0];
-      switch (opt) {
-      case "natural":
-        break;
-      case "rgb":
-        break;
-      case "cmy":
-        break;
-      case "cmyk":
-        break;
-      case "hsb":
-        break;
-      case "gray":
-        break;
-      case "RGB":
-        break;
-      case "HTML":
-        break;
-      case "HSB":
-        break;
-      case "Gray":
-        break;
-      case "monochrome":
-        break;
-      case "dvipsnames":
-        break;
-      case "dvipsnames*":
-        break;
-      case "svgnames":
-        break;
-      case "svgnames*":
-        break;
-      case "x11names":
-        break;
-      case "x11names*":
-        break;
-      default:
+interface Generator {
+  error(message: string): any;
+}
 
-      }
+export class XColor {
+  static displayName = 'XColor';
+  static args: Record<string, any[]> = {
+    'definecolorset': ['P', 'i?', 'c-ml', 'ie', 'ie', 'c-ssp'],
+    'definecolor': ['P', 'i?', 'i', 'c-ml', 'c-spl'],
+    'color': ["HV", [['c-ml?', 'c-spl'], ['c']]],
+    'textcolor': ["HV", [['c-ml?', 'c-spl'], ['c']], "g"],
+    'colorbox': ['H', 'i?', 'c', 'g'],
+    'fcolorbox': ['H', 'i?', 'c', 'c', 'g']
+  };
+
+  static colors = new Map([
+    ["red", {}], ["green", {}], ["blue", {}], ["cyan", {}], 
+    ["magenta", {}], ["yellow", {}], ["black", {}], ["gray", {}], 
+    ["white", {}], ["darkgray", {}], ["lightgray", {}], ["brown", {}], 
+    ["lime", {}], ["olive", {}], ["orange", {}], ["pink", {}], 
+    ["purple", {}], ["teal", {}], ["violet", {}]
+  ]);
+
+  static symbols = new Map<string, string>();
+
+  private g: Generator;
+  private options?: any;
+
+  constructor(generator: Generator, options?: any) {
+    this.g = generator;
+    this.options = options;
+
+    if (this.options && this.options.forEach) {
+      this.options.forEach((value: any, key: string) => {
+        switch (key) {
+          case "natural":
+          case "rgb":
+          case "cmy":
+          case "cmyk":
+          case "hsb":
+          case "gray":
+          case "RGB":
+          case "HTML":
+          case "HSB":
+          case "Gray":
+          case "monochrome":
+          case "dvipsnames":
+          case "dvipsnames*":
+          case "svgnames":
+          case "svgnames*":
+          case "x11names":
+          case "x11names*":
+            // Color model options - not implemented yet
+            break;
+          default:
+            // Unknown option
+            break;
+        }
+      });
     }
   }
-  args['definecolorset'] = ['P', 'i?', 'c-ml', 'ie', 'ie', 'c-ssp'];
-  XColor.prototype['definecolorset'] = function(type, models, hd, tl, setspec){
-    var i$, len$, spec;
+  definecolorset(type: any, models: any, hd: string = "", tl: string = "", setspec: any[]): void {
     if (type !== null && type !== "named" && type !== "ps") {
       this.g.error("unknown color type");
     }
-    if (!hd) {
-      hd = "";
-    }
-    if (!tl) {
-      tl = "";
-    }
-    for (i$ = 0, len$ = setspec.length; i$ < len$; ++i$) {
-      spec = setspec[i$];
+    
+    for (const spec of setspec) {
       this.definecolor(type, hd + spec.name + tl, models, spec.speclist);
     }
-  };
-  args['definecolor'] = ['P', 'i?', 'i', 'c-ml', 'c-spl'];
-  XColor.prototype['definecolor'] = function(type, name, models, colorspec){
-    var color, i$, ref$, len$, i, model;
+  }
+
+  definecolor(type: any, name: string, models: any, colorspec: any[]): void {
     if (type !== null && type !== "named" && type !== "ps") {
       this.g.error("unknown color type");
     }
     if (models.models.length !== colorspec.length) {
       this.g.error("color models and specs don't match");
     }
-    color = {};
-    for (i$ = 0, len$ = (ref$ = models.models).length; i$ < len$; ++i$) {
-      i = i$;
-      model = ref$[i$];
+    
+    const color: Record<string, any> = {};
+    for (let i = 0; i < models.models.length; i++) {
+      const model = models.models[i];
       color[model] = colorspec[i];
     }
-    colors.set(name, color);
-  };
-  args['color'] = ["HV", [['c-ml?', 'c-spl'], ['c']]];
-  XColor.prototype['color'] = function(){
-    if (arguments.length === 1) {
+    XColor.colors.set(name, color);
+  }
+
+  color(...args: any[]): any[] {
+    if (args.length === 1) {
       // Handle color expression
+      return [];
     } else {
       // Handle model/color spec
+      return [];
     }
-  };
-  args['textcolor'] = ["HV", [['c-ml?', 'c-spl'], ['c']], "g"];
-  XColor.prototype['textcolor'] = function(){
-    if (arguments.length === 2) {
+  }
+
+  textcolor(...args: any[]): any[] {
+    if (args.length === 2) {
       // Return the text content without color styling for now
-      return [arguments[1]];
+      return [args[1]];
     }
     // For 3 arguments (model, color, text)
-    if (arguments.length === 3) {
-      return [arguments[2]];
+    if (args.length === 3) {
+      return [args[2]];
     }
     return [];
-  };
-  args['colorbox'] = ['H', 'i?', 'c', 'g'];
-  XColor.prototype['colorbox'] = function(model, color, text){};
-  args['fcolorbox'] = ['H', 'i?', 'c', 'c', 'g'];
-  XColor.prototype['fcolorbox'] = function(model, color, text){};
-  return XColor;
-}());
+  }
+
+  colorbox(model: any, color: any, text: any): any[] {
+    return [];
+  }
+
+  fcolorbox(model: any, color: any, text: any): any[] {
+    return [];
+  }
+}
