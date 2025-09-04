@@ -48,7 +48,6 @@
 		"format:check": "biome format"
 	},
 	"dependencies": {
-		"fs-extra": "^11.3.1",
 		"gunshi": "^0.26.3",
 		"hyphenation.de": "*",
 		"hyphenation.en-us": "*",

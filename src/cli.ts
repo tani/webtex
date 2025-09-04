@@ -2,14 +2,13 @@
 import { createHTMLWindow } from "svgdom";
 import util from "node:util";
 import path from "node:path";
-import fsExtra from "fs-extra";
+import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, cpSync, readFile as fsReadFile } from "node:fs";
 import stdin from "stdin";
 import { cli } from "gunshi";
 import prettier from "prettier";
 import { he, parse as latexParse, HtmlGenerator } from "../dist/latex.js";
 import en from "hyphenation.en-us";
 import de from "hyphenation.de";
-import { readFileSync } from "node:fs";
 
 const info = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
@@ -121,7 +120,7 @@ async function main(ctx: any) {
 		styles: options.stylesheet ? options.stylesheet.split(',').map((s: string) => s.trim()) : [],
 	};
 	
-	const readFile = util.promisify(fsExtra.readFile);
+	const readFile = util.promisify(fsReadFile);
 	const input = files.length
 		? Promise.all(files.map((file: string) => readFile(file, 'utf8')))
 		: new Promise<string>((resolve) => {
@@ -174,7 +173,7 @@ async function main(ctx: any) {
 			}
 
 			if (options.output) {
-				fsExtra.writeFileSync(options.output, html);
+				writeFileSync(options.output, html);
 			} else {
 				process.stdout.write(`${html}\n`);
 			}
@@ -194,7 +193,7 @@ async function main(ctx: any) {
 		} else {
 			dir = path.posix.dirname(path.resolve(options.output));
 		}
-	} else if (fsExtra.existsSync(dir) && !fsExtra.statSync(dir).isDirectory()) {
+	} else if (existsSync(dir) && !statSync(dir).isDirectory()) {
 		console.error(
 			"assets error: the given path exists but is not a directory: ",
 			dir,
@@ -206,12 +205,12 @@ async function main(ctx: any) {
 		const css = path.join(dir, "css");
 		const fonts = path.join(dir, "fonts");
 		const js = path.join(dir, "js");
-		fsExtra.mkdirpSync(css);
-		fsExtra.mkdirpSync(fonts);
-		fsExtra.mkdirpSync(js);
-		fsExtra.copySync(path.join(__dirname, "../dist/css"), css);
-		fsExtra.copySync(path.join(__dirname, "../dist/fonts"), fonts);
-		fsExtra.copySync(path.join(__dirname, "../dist/js"), js);
+		mkdirSync(css, { recursive: true });
+		mkdirSync(fonts, { recursive: true });
+		mkdirSync(js, { recursive: true });
+		cpSync(path.join(__dirname, "../dist/css"), css, { recursive: true });
+		cpSync(path.join(__dirname, "../dist/fonts"), fonts, { recursive: true });
+		cpSync(path.join(__dirname, "../dist/js"), js, { recursive: true });
 	}
 }
 
