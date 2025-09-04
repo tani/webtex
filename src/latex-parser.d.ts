@@ -8,4 +8,3 @@ export interface SyntaxError extends Error {
 }
 
 export function parse(input: string, options?: { generator?: any }): any;
-export { SyntaxError };

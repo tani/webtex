@@ -1,8 +1,9 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
+		"target": "ES2022",
 		"module": "ESNext",
 		"moduleResolution": "node",
+		"rootDir": ".",
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"allowJs": true,
@@ -23,9 +24,11 @@
 		"forceConsistentCasingInFileNames": true,
 		"lib": ["ES2022", "DOM"],
 		"types": ["node"],
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"downlevelIteration": true,
+		"noEmit": true
 	},
-	"include": ["src/**/*", "test/**/*"],
+	"include": ["src/**/*"],
 	"files": ["test/types/globals.d.ts"],
 	"exclude": ["node_modules", "dist", "docs", "website", "**/*.d.ts"]
 }
