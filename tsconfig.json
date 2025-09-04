@@ -22,7 +22,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2020", "DOM"],
-    "types": ["node", "mocha", "chai"],
+    "types": ["node"],
     "resolveJsonModule": true
   },
   "include": [

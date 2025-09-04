@@ -2,11 +2,11 @@
 const { createHTMLWindow } = require('svgdom');
 const util = require('util');
 const path = require('path');
-const fs = require('fs-extra');
+const fsExtra = require('fs-extra');
 const stdin = require('stdin');
 const { program } = require('commander');
 const { html: beautifyHtml } = require('js-beautify');
-const { he, parse, HtmlGenerator } = require('../dist/latex.js');
+const { he, parse: latexParse, HtmlGenerator } = require('../dist/latex.js');
 const en = require('hyphenation.en-us');
 const de = require('hyphenation.de');
 const info = require('../package.json');
@@ -59,7 +59,7 @@ const htmlOptions = {
   CustomMacros: CustomMacros,
   styles: options.style || []
 };
-const readFile = util.promisify(fs.readFile);
+const readFile = util.promisify(fsExtra.readFile);
 const input = program.args.length
   ? Promise.all(program.args.map(file => readFile(file)))
   : new Promise<string>((resolve) => {
@@ -75,7 +75,7 @@ const processInput = async () => {
       text = text.join("\n\n");
     }
     
-    const generator = parse(text, {
+    const generator = latexParse(text, {
       generator: new HtmlGenerator(htmlOptions)
     });
     
@@ -104,7 +104,7 @@ const processInput = async () => {
     }
     
     if (options.output) {
-      fs.writeFileSync(options.output, html);
+      fsExtra.writeFileSync(options.output, html);
     } else {
       process.stdout.write(html + '\n');
     }
@@ -123,7 +123,7 @@ if (options.assets === true) {
   } else {
     dir = path.posix.dirname(path.resolve(options.output));
   }
-} else if (fs.existsSync(dir) && !fs.statSync(dir).isDirectory()) {
+} else if (fsExtra.existsSync(dir) && !fsExtra.statSync(dir).isDirectory()) {
   console.error("assets error: the given path exists but is not a directory: ", dir);
   process.exit(1);
 }
@@ -131,10 +131,10 @@ if (dir) {
   const css = path.join(dir, 'css');
   const fonts = path.join(dir, 'fonts');
   const js = path.join(dir, 'js');
-  fs.mkdirpSync(css);
-  fs.mkdirpSync(fonts);
-  fs.mkdirpSync(js);
-  fs.copySync(path.join(__dirname, '../dist/css'), css);
-  fs.copySync(path.join(__dirname, '../dist/fonts'), fonts);
-  fs.copySync(path.join(__dirname, '../dist/js'), js);
+  fsExtra.mkdirpSync(css);
+  fsExtra.mkdirpSync(fonts);
+  fsExtra.mkdirpSync(js);
+  fsExtra.copySync(path.join(__dirname, '../dist/css'), css);
+  fsExtra.copySync(path.join(__dirname, '../dist/fonts'), fonts);
+  fsExtra.copySync(path.join(__dirname, '../dist/js'), js);
 }

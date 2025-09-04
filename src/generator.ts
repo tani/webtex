@@ -160,7 +160,7 @@ export class Generator {
     this.newCounter('enumiii');
     this.newCounter('enumiv');
     
-    this._macros = new Macros(this, this._options?.CustomMacros);
+    this._macros = new Macros(this as any, this._options?.CustomMacros);
   }
 
   public nextId(): number {
@@ -172,11 +172,11 @@ export class Generator {
     return Math.round(num * factor) / factor;
   }
 
-  public error(e: string): void {
-    errorFn(e);
+  public error(e: string): any {
+    return errorFn(e);
   }
 
-  public setErrorFn(e: (msg: string) => void): void {
+  public setErrorFn(e: (msg: string) => never): void {
     errorFn = e;
   }
 
@@ -233,7 +233,7 @@ export class Generator {
     const result = this._macros[name]?.apply(this._macros, args);
     return result?.filter((x: any) => x !== undefined).map((x: any) => {
       if (typeof x === 'string' || x instanceof String) {
-        return this.createText(x);
+        return this.createText(x.toString());
       } else {
         return this.addAttributes(x);
       }
