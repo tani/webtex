@@ -21,8 +21,8 @@ const makeLengthClass = (generator: LengthGenerator) => {
   ]);
 
   class Length {
-    private _value: number = 0;
-    private _unit: string = "";
+    _value: number = 0;
+    _unit: string = "";
     static zero: Length;
 
     constructor(value: number, unit: string) {
@@ -141,8 +141,8 @@ interface VectorLength {
 }
 
 class Vector {
-  private _x: VectorLength;
-  private _y: VectorLength;
+  _x: VectorLength;
+  _y: VectorLength;
 
   constructor(x: VectorLength, y: VectorLength) {
     this._x = x;
