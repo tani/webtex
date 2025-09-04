@@ -62,13 +62,13 @@ function assetCopyPlugin() {
 function typescriptModulesPlugin() {
 	return {
 		name: "typescript-modules",
-		async closeBundle() {
+		async writeBundle() {
 			console.log("Building TypeScript modules...");
 
 			try {
 				// Build packages
 				await execAsync(
-					"tsc src/packages/*.ts --outDir dist/packages --target ES2022 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
+					"tsc src/packages/*.ts --outDir dist/packages --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck",
 				);
 
 				// Build package placeholders
@@ -98,22 +98,32 @@ function typescriptModulesPlugin() {
 
 				// Build documentclasses
 				await execAsync(
-					"tsc src/documentclasses/*.ts --outDir dist/documentclasses --target ES2022 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
+					"tsc src/documentclasses/*.ts --outDir dist/documentclasses --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck",
 				);
 				writeFileSync("dist/documentclasses/.keep", "");
 
-				// Build CLI
+				console.log("TypeScript modules built successfully!");
+			} catch (error) {
+				console.error("Error building TypeScript modules:", error);
+				throw error;
+			}
+		},
+		async closeBundle() {
+			console.log("Building CLI...");
+
+			try {
+				// Build CLI as ESM (after main library is built)
 				await execAsync(
-					"tsc src/cli.ts --outDir bin --target ES2022 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule",
+					"tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node",
 				);
 
 				// Rename and make executable
 				cpSync("bin/cli.js", "bin/latex.js");
 				await execAsync("chmod +x bin/latex.js");
 
-				console.log("TypeScript modules built successfully!");
+				console.log("CLI built successfully!");
 			} catch (error) {
-				console.error("Error building TypeScript modules:", error);
+				console.error("Error building CLI:", error);
 				throw error;
 			}
 		},
@@ -130,6 +140,8 @@ export default defineConfig(({ mode }) => {
 			minify: prod ? "terser" : false,
 			lib: {
 				entry: "src/index.ts",
+				name: "LaTeX",
+				formats: ["es"],
 			},
 			rollupOptions: {
 				plugins: [
@@ -137,7 +149,7 @@ export default defineConfig(({ mode }) => {
 					resolve({ extensions: [".ts", ".js", ".mjs"], preferBuiltins: true }),
 					pegjs({
 						plugins: [ignoreInfiniteLoop],
-						target: "commonjs",
+						target: "es",
 						exportVar: "parser",
 						format: "bare",
 						trace: false,
@@ -145,16 +157,10 @@ export default defineConfig(({ mode }) => {
 					commonjs({ ignoreDynamicRequires: true }),
 					visualizer({ filename: "dist/latex.stats.html", sourcemap: prod }),
 				],
-				output: [
-					{
-						format: "es",
-						entryFileNames: "latex.mjs",
-					},
-					{
-						format: "cjs",
-						entryFileNames: "latex.js",
-					},
-				],
+				output: {
+					format: "es",
+					entryFileNames: "latex.js",
+				},
 			},
 		},
 		plugins: [

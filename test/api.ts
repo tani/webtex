@@ -6,7 +6,7 @@ import { describe, expect, test } from "vitest";
 
 describe("LaTeX.js API test", () => {
 	test("node legacy module API", async () => {
-		const node = spawnProcess("node", [path.join(__dirname, "api/node.js")], {
+		const node = spawnProcess("node", [path.join(__dirname, "api/node.cjs")], {
 			env: {
 				PATH: process.env.PATH,
 			},

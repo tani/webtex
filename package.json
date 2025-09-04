@@ -15,19 +15,17 @@
 	"bin": {
 		"latex.js": "./bin/latex.js"
 	},
-	"module": "./dist/latex.mjs",
+	"type": "module",
 	"main": "./dist/latex.js",
 	"exports": {
-		"import": "./dist/latex.mjs",
-		"require": "./dist/latex.js"
+		"import": "./dist/latex.js",
+		"default": "./dist/latex.js"
 	},
-	"browser": "./dist/latex.mjs",
+	"browser": "./dist/latex.js",
 	"files": [
 		"bin/latex.js",
 		"dist/latex.js",
 		"dist/latex.js.map",
-		"dist/latex.mjs",
-		"dist/latex.mjs.map",
 		"dist/css/",
 		"dist/fonts/",
 		"dist/js/",
