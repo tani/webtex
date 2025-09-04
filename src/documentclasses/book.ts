@@ -1,50 +1,65 @@
 import { Report } from './report';
 
-interface BookConstructor {
-  (generator: any, options: any): void;
-  css: string;
-  args: any;
-  superclass?: any;
-  prototype: any;
+interface Generator {
+  newCounter(name: string, resetBy?: string): void;
+  addToReset(counter: string, resetBy: string): void;
+  setLength(name: string, value: any): void;
+  length(name: string): any;
+  Length: any;
+  setCounter(name: string, value: number): void;
+  counter(name: string): number;
+  arabic(value: number): string;
+  Roman(value: number): string;
+  Alph(value: number): string;
+  startsection(type: string, level: number, starred: boolean, toc?: any, title?: any): any;
+  setTitle(title: any): void;
+  create(element: any, content: any, className?: string): any;
+  createVSpace(length: any): any;
+  macro(name: string): any;
+  title: any;
+  author: any;
+  date: any;
+  list: any;
+  _toc: any;
+  setFontSize(size: string): void;
+  enterGroup(): void;
+  exitGroup(): void;
+  setFontWeight(weight: string): void;
 }
 
-var export$;
-export { export$ as Book }
-var Book: BookConstructor;
-export$ = Book = (function(superclass){
-  var args, x$, y$, prototype = extend$((import$(Book, superclass).displayName = 'Book', Book), superclass).prototype, constructor = Book;
-  Book.css = "css/book.css";
-  function Book(generator, options){
-    (Book as any).superclass.apply(this, arguments);
+export class Book extends Report {
+  static displayName = 'Book';
+  static css = "css/book.css";
+  static args = {
+    ...Report.args,
+    'part': ['V', 's', 'X', 'o?', 'g'],
+    'chapter': ['V', 's', 'X', 'o?', 'g'],
+    'frontmatter': ['V'],
+    'mainmatter': ['V'],
+    'backmatter': ['V']
+  };
+
+  private '@mainmatter': boolean = true;
+  protected g: Generator;
+
+  constructor(generator: Generator, options?: any) {
+    super(generator, options);
     this['@mainmatter'] = true;
   }
-  args = Book.args = Report.args;
-  x$ = args;
-  x$['part'] = x$['chapter'] = ['V', 's', 'X', 'o?', 'g'];
-  Book.prototype['chapter'] = function(s, toc, ttl){
-    return [this.g.startsection('chapter', 0, s || !this["@mainmatter"], toc, ttl)];
-  };
-  y$ = args;
-  y$['frontmatter'] = y$['mainmatter'] = y$['backmatter'] = ['V'];
-  Book.prototype['frontmatter'] = function(){
+
+  chapter(s: boolean, toc?: any, ttl?: any): any[] {
+    return [this.g.startsection('chapter', 0, s || !this['@mainmatter'], toc, ttl)];
+  }
+
+  frontmatter(): void {
     this['@mainmatter'] = false;
-  };
-  Book.prototype['mainmatter'] = function(){
+  }
+
+  mainmatter(): void {
     this['@mainmatter'] = true;
-  };
-  Book.prototype['backmatter'] = function(){
+  }
+
+  backmatter(): void {
     this['@mainmatter'] = false;
-  };
-  return Book;
-}(Report));
-function extend$(sub, sup){
-  function fun(){} fun.prototype = (sub.superclass = sup).prototype;
-  (sub.prototype = new fun).constructor = sub;
-  if (typeof sup.extended == 'function') sup.extended(sub);
-  return sub;
-}
-function import$(obj, src){
-  var own = {}.hasOwnProperty;
-  for (var key in src) if (own.call(src, key)) obj[key] = src[key];
-  return obj;
+  }
 }

@@ -1341,6 +1341,30 @@ export class LaTeX {
 
     this.g.documentClass = new Class(this.g, options);
     assignIn(this, this.g.documentClass);
+    
+    // Copy prototype methods (for ES6 classes) - walk the entire prototype chain
+    // Collect all methods, starting from most specific to least specific
+    const methods: Record<string, Function> = {};
+    let proto = Object.getPrototypeOf(this.g.documentClass);
+    while (proto && proto.constructor !== Object) {
+      const methodNames = Object.getOwnPropertyNames(proto).filter(name => 
+        name !== 'constructor' && typeof proto[name] === 'function'
+      );
+      for (const methodName of methodNames) {
+        // Only add if not already collected (preserves most specific version)
+        if (!(methodName in methods)) {
+          methods[methodName] = proto[methodName];
+        }
+      }
+      proto = Object.getPrototypeOf(proto);
+    }
+    
+    // Now bind and copy all collected methods - ALWAYS override existing methods
+    for (const methodName in methods) {
+      // Always override, don't check if it exists
+      this[methodName] = methods[methodName].bind(this.g.documentClass);
+    }
+    
     assign(LaTeX.args, Class.args);
   }
 

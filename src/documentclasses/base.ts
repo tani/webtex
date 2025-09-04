@@ -1,18 +1,49 @@
-var export$;
-export { export$ as Base }
-'use strict';
-var Base;
-export$ = Base = (function(){
-  Base.displayName = 'Base';
-  var args, x$, prototype = Base.prototype, constructor = Base;
-  args = Base.args = {};
-  Base.prototype.options = new Map;
-  function Base(generator, options){
-    var pt345, inch, textwidth, margins, oddsidemargin, marginparwidth, this$ = this;
+interface Generator {
+  newCounter(name: string, resetBy?: string): void;
+  addToReset(counter: string, resetBy: string): void;
+  setLength(name: string, value: any): void;
+  length(name: string): any;
+  Length: any;
+  setCounter(name: string, value: number): void;
+  counter(name: string): number;
+  arabic(value: number): string;
+  Roman(value: number): string;
+  startsection(type: string, level: number, starred: boolean, toc?: any, title?: any): any;
+  setTitle(title: any): void;
+  create(element: any, content: any, className?: string): any;
+  createVSpace(length: any): any;
+  macro(name: string): any;
+  title: any;
+  author: any;
+  date: any;
+  list: any;
+}
+
+export class Base {
+  static displayName = 'Base';
+  static args: Record<string, any[]> = {
+    'part': ['V', 's', 'X', 'o?', 'g'],
+    'section': ['V', 's', 'X', 'o?', 'g'],
+    'subsection': ['V', 's', 'X', 'o?', 'g'],
+    'subsubsection': ['V', 's', 'X', 'o?', 'g'],
+    'paragraph': ['V', 's', 'X', 'o?', 'g'],
+    'subparagraph': ['V', 's', 'X', 'o?', 'g'],
+    'maketitle': ['V']
+  };
+
+  protected g: Generator;
+  public options: Map<string, any> = new Map();
+  protected _title: any = null;
+  protected _author: any = null;
+  protected _date: any = null;
+  protected _thanks: any = null;
+
+  constructor(generator: Generator, options?: any) {
     this.g = generator;
     if (options) {
       this.options = options;
     }
+
     this.g.newCounter('part');
     this.g.newCounter('section');
     this.g.newCounter('subsection', 'section');
@@ -24,8 +55,9 @@ export$ = Base = (function(){
     this.g.setLength('paperheight', new this.g.Length(11, "in"));
     this.g.setLength('paperwidth', new this.g.Length(8.5, "in"));
     this.g.setLength('@@size', new this.g.Length(10, "pt"));
-    this.options.forEach(function(v, k){
-      var tmp, value;
+
+    this.options.forEach((v, k) => {
+      let tmp, value;
       switch (k) {
       case "oneside":
         break;
@@ -44,131 +76,169 @@ export$ = Base = (function(){
       case "leqno":
         break;
       case "a4paper":
-        this$.g.setLength('paperheight', new this$.g.Length(297, "mm"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(210, "mm"));
+        this.g.setLength('paperheight', new this.g.Length(297, "mm"));
+        this.g.setLength('paperwidth', new this.g.Length(210, "mm"));
+        break;
       case "a5paper":
-        this$.g.setLength('paperheight', new this$.g.Length(210, "mm"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(148, "mm"));
+        this.g.setLength('paperheight', new this.g.Length(210, "mm"));
+        this.g.setLength('paperwidth', new this.g.Length(148, "mm"));
+        break;
       case "b5paper":
-        this$.g.setLength('paperheight', new this$.g.Length(250, "mm"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(176, "mm"));
+        this.g.setLength('paperheight', new this.g.Length(250, "mm"));
+        this.g.setLength('paperwidth', new this.g.Length(176, "mm"));
+        break;
       case "letterpaper":
-        this$.g.setLength('paperheight', new this$.g.Length(11, "in"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(8.5, "in"));
+        this.g.setLength('paperheight', new this.g.Length(11, "in"));
+        this.g.setLength('paperwidth', new this.g.Length(8.5, "in"));
+        break;
       case "legalpaper":
-        this$.g.setLength('paperheight', new this$.g.Length(14, "in"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(8.5, "in"));
+        this.g.setLength('paperheight', new this.g.Length(14, "in"));
+        this.g.setLength('paperwidth', new this.g.Length(8.5, "in"));
+        break;
       case "executivepaper":
-        this$.g.setLength('paperheight', new this$.g.Length(10.5, "in"));
-        return this$.g.setLength('paperwidth', new this$.g.Length(7.25, "in"));
+        this.g.setLength('paperheight', new this.g.Length(10.5, "in"));
+        this.g.setLength('paperwidth', new this.g.Length(7.25, "in"));
+        break;
       case "landscape":
-        tmp = this$.g.length('paperheight');
-        this$.g.setLength('paperheight', this$.g.length('paperwidth'));
-        return this$.g.setLength('paperwidth', tmp);
+        tmp = this.g.length('paperheight');
+        this.g.setLength('paperheight', this.g.length('paperwidth'));
+        this.g.setLength('paperwidth', tmp);
+        break;
       default:
         value = parseFloat(k);
         if (!isNaN(value) && k.endsWith("pt") && String(value) === k.substring(0, k.length - 2)) {
-          return this$.g.setLength('@@size', new this$.g.Length(value, "pt"));
+          this.g.setLength('@@size', new this.g.Length(value, "pt"));
         }
       }
     });
-    pt345 = new this.g.Length(345, "pt");
-    inch = new this.g.Length(1, "in");
-    textwidth = this.g.length('paperwidth').sub(inch.mul(2));
+
+    const pt345 = new this.g.Length(345, "pt");
+    const inch = new this.g.Length(1, "in");
+    let textwidth = this.g.length('paperwidth').sub(inch.mul(2));
     if (textwidth.cmp(pt345) === 1) {
       textwidth = pt345;
     }
     this.g.setLength('textwidth', textwidth);
     this.g.setLength('marginparsep', new this.g.Length(11, "pt"));
     this.g.setLength('marginparpush', new this.g.Length(5, "pt"));
-    margins = this.g.length('paperwidth').sub(this.g.length('textwidth'));
-    oddsidemargin = margins.mul(0.5).sub(inch);
-    marginparwidth = margins.mul(0.5).sub(this.g.length('marginparsep')).sub(inch.mul(0.8));
+    const margins = this.g.length('paperwidth').sub(this.g.length('textwidth'));
+    const oddsidemargin = margins.mul(0.5).sub(inch);
+    let marginparwidth = margins.mul(0.5).sub(this.g.length('marginparsep')).sub(inch.mul(0.8));
     if (marginparwidth.cmp(inch.mul(2)) === 1) {
       marginparwidth = inch.mul(2);
     }
     this.g.setLength('oddsidemargin', oddsidemargin);
     this.g.setLength('marginparwidth', marginparwidth);
   }
-  Base.prototype['contentsname'] = function(){
+
+  contentsname(): string[] {
     return ["Contents"];
-  };
-  Base.prototype['listfigurename'] = function(){
+  }
+
+  listfigurename(): string[] {
     return ["List of Figures"];
-  };
-  Base.prototype['listtablename'] = function(){
+  }
+
+  listtablename(): string[] {
     return ["List of Tables"];
-  };
-  Base.prototype['partname'] = function(){
+  }
+
+  partname(): string[] {
     return ["Part"];
-  };
-  Base.prototype['figurename'] = function(){
+  }
+
+  figurename(): string[] {
     return ["Figure"];
-  };
-  Base.prototype['tablename'] = function(){
+  }
+
+  tablename(): string[] {
     return ["Table"];
-  };
-  Base.prototype['appendixname'] = function(){
+  }
+
+  appendixname(): string[] {
     return ["Appendix"];
-  };
-  Base.prototype['indexname'] = function(){
+  }
+
+  indexname(): string[] {
     return ["Index"];
-  };
-  x$ = args;
-  x$['part'] = x$['section'] = x$['subsection'] = x$['subsubsection'] = x$['paragraph'] = x$['subparagraph'] = ['V', 's', 'X', 'o?', 'g'];
-  Base.prototype['part'] = function(s, toc, ttl){
+  }
+
+  part(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('part', 0, s, toc, ttl)];
-  };
-  Base.prototype['section'] = function(s, toc, ttl){
+  }
+
+  section(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('section', 1, s, toc, ttl)];
-  };
-  Base.prototype['subsection'] = function(s, toc, ttl){
+  }
+
+  subsection(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('subsection', 2, s, toc, ttl)];
-  };
-  Base.prototype['subsubsection'] = function(s, toc, ttl){
+  }
+
+  subsubsection(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('subsubsection', 3, s, toc, ttl)];
-  };
-  Base.prototype['paragraph'] = function(s, toc, ttl){
+  }
+
+  paragraph(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('paragraph', 4, s, toc, ttl)];
-  };
-  Base.prototype['subparagraph'] = function(s, toc, ttl){
+  }
+
+  subparagraph(s: boolean, toc?: any, ttl?: any): any[] {
     return [this.g.startsection('subparagraph', 5, s, toc, ttl)];
-  };
-  Base.prototype['thepart'] = function(){
+  }
+
+  thepart(): string[] {
     return [this.g.Roman(this.g.counter('part'))];
-  };
-  Base.prototype['thesection'] = function(){
+  }
+
+  thesection(): string[] {
     return [this.g.arabic(this.g.counter('section'))];
-  };
-  Base.prototype['thesubsection'] = function(){
-    return this.thesection().concat("." + this.g.arabic(this.g.counter('subsection')));
-  };
-  Base.prototype['thesubsubsection'] = function(){
-    return this.thesubsection().concat("." + this.g.arabic(this.g.counter('subsubsection')));
-  };
-  Base.prototype['theparagraph'] = function(){
-    return this.thesubsubsection().concat("." + this.g.arabic(this.g.counter('paragraph')));
-  };
-  Base.prototype['thesubparagraph'] = function(){
-    return this.theparagraph().concat("." + this.g.arabic(this.g.counter('subparagraph')));
-  };
-  args['maketitle'] = ['V'];
-  Base.prototype['maketitle'] = function(){
-    var title, author, date, that, maketitle;
+  }
+
+  thesubsection(): string[] {
+    return this.thesection().concat(".", this.g.arabic(this.g.counter('subsection')));
+  }
+
+  thesubsubsection(): string[] {
+    return this.thesubsection().concat(".", this.g.arabic(this.g.counter('subsubsection')));
+  }
+
+  theparagraph(): string[] {
+    return this.thesubsubsection().concat(".", this.g.arabic(this.g.counter('paragraph')));
+  }
+
+  thesubparagraph(): string[] {
+    return this.theparagraph().concat(".", this.g.arabic(this.g.counter('subparagraph')));
+  }
+
+  maketitle(): any[] {
     this.g.setTitle(this._title);
-    title = this.g.create(this.g.title, this._title);
-    author = this.g.create(this.g.author, this._author);
-    date = this.g.create(this.g.date, (that = this._date)
-      ? that
-      : this.g.macro('today'));
-    maketitle = this.g.create(this.g.list, [this.g.createVSpace(new this.g.Length(2, "em")), title, this.g.createVSpace(new this.g.Length(1.5, "em")), author, this.g.createVSpace(new this.g.Length(1, "em")), date, this.g.createVSpace(new this.g.Length(1.5, "em"))], "center");
+    const title = this.g.create(this.g.title, this._title);
+    const author = this.g.create(this.g.author, this._author);
+    const date = this.g.create(this.g.date, this._date ? this._date : this.g.macro('today'));
+    const maketitle = this.g.create(this.g.list, [
+      this.g.createVSpace(new this.g.Length(2, "em")), 
+      title, 
+      this.g.createVSpace(new this.g.Length(1.5, "em")), 
+      author, 
+      this.g.createVSpace(new this.g.Length(1, "em")), 
+      date, 
+      this.g.createVSpace(new this.g.Length(1.5, "em"))
+    ], "center");
+    
     this.g.setCounter('footnote', 0);
     this._title = null;
     this._author = null;
     this._date = null;
     this._thanks = null;
-    this['title'] = this['author'] = this['date'] = this['thanks'] = this['and'] = this['maketitle'] = function(){};
+    
+    // Clear methods after use
+    (this as any)['title'] = (this as any)['author'] = (this as any)['date'] = (this as any)['thanks'] = (this as any)['and'] = (this as any)['maketitle'] = function(){};
+    
     return [maketitle];
-  };
-  return Base;
-}());
+  }
+
+  // Methods that might be inherited and called by other document classes
+  quotation: () => any[];
+  endquotation: () => void;
+}
