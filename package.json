@@ -48,8 +48,8 @@
 		"format:check": "biome format"
 	},
 	"dependencies": {
-		"commander": "^9.5.0",
 		"fs-extra": "^11.3.1",
+		"gunshi": "^0.26.3",
 		"hyphenation.de": "*",
 		"hyphenation.en-us": "*",
 		"js-beautify": "^1.15.4",

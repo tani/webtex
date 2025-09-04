@@ -11,8 +11,8 @@ const latexjs = cmd(binFile);
 
 describe("LaTeX.js CLI test", () => {
 	test("get version", async () => {
-		const result = await latexjs.execute(["-V"]);
-		expect(result.stdout).toContain(pkg.version + EOL);
+		const result = await latexjs.execute(["-v"]);
+		expect(result.stdout).toContain(pkg.version);
 	});
 
 	test("get help", async () => {

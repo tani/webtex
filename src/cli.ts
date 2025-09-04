@@ -4,7 +4,7 @@ import util from "node:util";
 import path from "node:path";
 import fsExtra from "fs-extra";
 import stdin from "stdin";
-import { program } from "commander";
+import { cli } from "gunshi";
 import beautify from "js-beautify";
 const { html: beautifyHtml } = beautify;
 import { he, parse as latexParse, HtmlGenerator } from "../dist/latex.js";
@@ -18,68 +18,77 @@ global.window = createHTMLWindow();
 global.document = window.document;
 he.encode.options.strict = true;
 he.encode.options.useNamedReferences = true;
-const addStyle = (url: string, styles?: string[]): string[] => {
-	if (!styles) {
-		return [url];
-	} else {
-		return Array.from(styles).concat([url]);
-	}
+const command = {
+	name: info.name,
+	description: info.description,
+	usage: "[options] [files...]",
+	args: {
+		output: {
+			type: 'string' as const,
+			short: 'o',
+			description: 'specify output file, otherwise STDOUT will be used'
+		},
+		assets: {
+			type: 'string' as const,
+			short: 'a',
+			optional: true,
+			description: 'copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)'
+		},
+		url: {
+			type: 'string' as const,
+			short: 'u',
+			description: 'set the base URL to use for the assets (default: use relative URLs)'
+		},
+		body: {
+			type: 'boolean' as const,
+			short: 'b',
+			description: "don't include HTML boilerplate and CSS, only output the contents of body"
+		},
+		entities: {
+			type: 'boolean' as const,
+			short: 'e',
+			description: 'encode HTML entities in the output instead of using UTF-8 characters'
+		},
+		pretty: {
+			type: 'boolean' as const,
+			short: 'p',
+			description: 'beautify the html (this may add/remove spaces unintentionally)'
+		},
+		class: {
+			type: 'string' as const,
+			short: 'c',
+			default: 'article',
+			description: 'set a default documentclass for documents without a preamble'
+		},
+		macros: {
+			type: 'string' as const,
+			short: 'm',
+			description: 'load a JavaScript file with additional custom macros'
+		},
+		stylesheet: {
+			type: 'string' as const,
+			short: 's',
+			description: 'specify additional style sheets to use (comma-separated for multiple)'
+		},
+		hyphenation: {
+			type: 'boolean' as const,
+			short: 'n',
+			default: true,
+			description: 'insert soft hyphens (enables automatic hyphenation in the browser)'
+		},
+		language: {
+			type: 'string' as const,
+			short: 'l',
+			default: 'en',
+			description: 'set hyphenation language'
+		}
+	},
+	run: main
 };
-program
-	.name(info.name)
-	.version(info.version)
-	.description(info.description)
-	.usage("[options] [files...]")
-	.option(
-		"-o, --output <file>",
-		"specify output file, otherwise STDOUT will be used",
-	)
-	.option(
-		"-a, --assets [dir]",
-		"copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)",
-	)
-	.option(
-		"-u, --url <base URL>",
-		"set the base URL to use for the assets (default: use relative URLs)",
-	)
-	.option(
-		"-b, --body",
-		"don't include HTML boilerplate and CSS, only output the contents of body",
-	)
-	.option(
-		"-e, --entities",
-		"encode HTML entities in the output instead of using UTF-8 characters",
-	)
-	.option(
-		"-p, --pretty",
-		"beautify the html (this may add/remove spaces unintentionally)",
-	)
-	.option(
-		"-c, --class <class>",
-		"set a default documentclass for documents without a preamble",
-		"article",
-	)
-	.option(
-		"-m, --macros <file>",
-		"load a JavaScript file with additional custom macros",
-	)
-	.option(
-		"-s, --stylesheet <url>",
-		"specify an additional style sheet to use (can be repeated)",
-		addStyle,
-	)
-	.option(
-		"-n, --no-hyphenation",
-		"don't insert soft hyphens (disables automatic hyphenation in the browser)",
-	)
-	.option("-l, --language <lang>", "set hyphenation language", "en")
-	.on("--help", () =>
-		console.log("\nIf no input files are given, STDIN is read."),
-	)
-	.parse(process.argv);
 
-async function main() {
-	const options = program.opts();
+async function main(ctx: any) {
+	const options = ctx.values;
+	const files = ctx.positionals;
 	let CustomMacros: any;
 	if (options.macros) {
 		const macros = path.resolve(process.cwd(), options.macros);
@@ -110,12 +119,12 @@ async function main() {
 		languagePatterns: getLanguagePatterns(options.language),
 		documentClass: options.class,
 		CustomMacros: CustomMacros,
-		styles: options.style || [],
+		styles: options.stylesheet ? options.stylesheet.split(',').map((s: string) => s.trim()) : [],
 	};
 	
 	const readFile = util.promisify(fsExtra.readFile);
-	const input = program.args.length
-		? Promise.all(program.args.map((file) => readFile(file)))
+	const input = files.length
+		? Promise.all(files.map((file: string) => readFile(file, 'utf8')))
 		: new Promise<string>((resolve) => {
 				stdin((str: string) => {
 					resolve(str);
@@ -200,7 +209,12 @@ async function main() {
 	}
 }
 
-main().catch((error) => {
+// Run the CLI
+await cli(process.argv.slice(2), command, {
+	name: info.name,
+	version: info.version,
+	description: info.description
+}).catch((error) => {
 	console.error("Error:", error);
 	process.exit(1);
 });
