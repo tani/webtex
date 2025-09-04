@@ -1,7 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`LaTeX.js xcolor package > ** \\color expressions > packages_xcolor_tex-____color_expressions.html 1`] = `"<div class="body"></div>"`;
-
-exports[`LaTeX.js xcolor package > ** defining colors > packages_xcolor_tex-___defining_colors.html 1`] = `"<div class="body"></div>"`;
-
-exports[`LaTeX.js xcolor package > ** simple \\color > packages_xcolor_tex-___simple__color.html 1`] = `"<div class="body"><p>This is  text.</p></div>"`;

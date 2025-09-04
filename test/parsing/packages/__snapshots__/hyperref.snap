@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`LaTeX.js hyperref package > ** \\url{} works, trims spaces > packages_hyperref_tex-____url___works__trims_spaces.html 1`] = `"<div class="body"><p><a href="https://github.com/michael-brade/LaTeX.js">https://github.com/michael-brade/LaTeX.js</a></p><p><a href="https://github.com/michael-brade/LaTeX.js">LaTeX.js source</a></p></div>"`;

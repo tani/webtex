@@ -16,7 +16,6 @@ export default defineConfig({
 			"test/types/**",
 			"test/fixtures/**",
 			"test/screenshots/**",
-			"test/integration/**",
 			"test/html/**",
 			"test/**/__snapshots__/**",
 		],

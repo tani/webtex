@@ -1,39 +1,18 @@
 # LaTeX.js Test Suite
 
-Modern, comprehensive test suite for LaTeX.js using Vitest snapshot testing for reliable LaTeX→HTML conversion verification.
+Simple, maintainable test suite for LaTeX.js using Vitest snapshot testing for reliable LaTeX→HTML conversion verification.
 
 ## Test Organization
 
 ### Core Test Suites
 - **`api.ts`** - Node.js API compatibility tests (4 tests)
 - **`cli.ts`** - Command-line interface tests (6 tests) 
+- **`parsing.spec.ts`** - Consolidated LaTeX parsing tests (144 tests)
 
-### LaTeX Parsing Tests (`/parsing/`)
-Snapshot-based tests for LaTeX parsing and HTML rendering:
-
-- **`text.spec.ts`** - Text processing and paragraphs
-- **`fonts.spec.ts`** - Font commands and sizing  
-- **`math.spec.ts`** - Mathematical expressions
-- **`environments.spec.ts`** - LaTeX environments (lists, quotes, etc.)
-- **`symbols.spec.ts`** - Special symbols and characters
-- **`boxes.spec.ts`** - Box layouts and positioning
-- **`macros.spec.ts`** - Custom macro definitions
-- **`spacing.spec.ts`** - Spacing and layout commands
-- **`sectioning.spec.ts`** - Document structure commands
-- **`groups.spec.ts`** - Group processing
-- **`counters.spec.ts`** - Counter handling
-- **`label-ref.spec.ts`** - Cross-references
-- **`layout-marginpar.spec.ts`** - Page layout and margin notes
-- **`whitespace.spec.ts`** - Whitespace handling
-- **`preamble.spec.ts`** - Document preamble processing
-- **`picture.spec.ts`** - Picture environment
-- **`packages/`** - Package-specific tests
-  - **`hyperref.spec.ts`** - Hyperref package
-  - **`xcolor.spec.ts`** - Color package
-
-### Feature Tests (`/features/`)
-- **`core-features.spec.ts`** - Comprehensive LaTeX feature snapshots
-- **`cli-output.spec.ts`** - Command-line interface output snapshots
+### Integration Tests (`/integration/`)
+High-level feature and output testing:
+- **`core-features.spec.ts`** - Comprehensive LaTeX feature snapshots (20 tests)
+- **`cli-output.spec.ts`** - Command-line interface output snapshots (7 tests)
 
 ### Visual Tests (`/visual/`)
 - **`screenshots.spec.ts`** - Screenshot regression tests for visual output
@@ -57,34 +36,34 @@ npm run test:coverage      # With coverage
 
 ### Granular Test Execution
 ```bash
-npm run test:api           # API tests only
-npm run test:cli           # CLI tests only  
-npm run test:parsing       # All LaTeX parsing tests
-npm run test:features      # Feature snapshot tests
-npm run test:visual        # Visual/screenshot tests
-npm run test:screenshots   # Screenshot tests only
+npm run test:api              # API tests only
+npm run test:cli              # CLI tests only  
+npm run test:parsing          # LaTeX parsing tests
+npm run test:integration      # Integration tests
+npm run test:visual           # Visual/screenshot tests
+npm run test:screenshots      # Screenshot tests only
 ```
 
 ### Snapshot Test Management
 ```bash
-npm run test:features:update     # Update feature snapshots
-npm run test:update-snapshots    # Update ALL snapshots in project
+npm run test:integration:update   # Update integration snapshots
+npm run test:update-snapshots     # Update ALL snapshots in project
 ```
 
 ### Individual Test Categories
 ```bash
-npx vitest test/parsing/math.spec.ts        # Math parsing tests
-npx vitest test/parsing/environments.spec.ts # Environment tests
-npx vitest test/features/core-features.spec.ts # Feature tests
+npx vitest test/parsing.spec.ts                      # All parsing tests
+npx vitest test/integration/core-features.spec.ts    # Core feature tests
+npx vitest test/integration/cli-output.spec.ts       # CLI output tests
 ```
 
 ## Test Count
-- **~210 total tests**
-  - **144 parsing tests** - LaTeX→HTML conversion with snapshot verification
+- **~179 total tests**
+  - **144 parsing tests** - Consolidated LaTeX→HTML conversion testing
   - **33 screenshot tests** - Visual regression tests  
-  - **27 feature tests** - Hand-written comprehensive feature tests
+  - **27 integration tests** - High-level feature and CLI testing
   - **10 core tests** - API and CLI functionality
-- Clean, organized structure with snapshot-based testing
+- Simple, maintainable structure with consolidated test files
 - All LaTeX features covered with automated regression detection
 - Modern testing practices with visual diff capabilities
 
@@ -112,22 +91,17 @@ All LaTeX parsing tests now use **snapshot testing** which:
 
 ```
 test/
-├── parsing/              # LaTeX parsing tests (144 tests) 
-│   ├── __snapshots__/   # Generated HTML snapshots
-│   ├── text.spec.ts     # Text processing
-│   ├── math.spec.ts     # Mathematics  
-│   ├── environments.spec.ts # LaTeX environments
-│   └── ...              # All LaTeX features
-├── features/            # Feature tests (27 tests)
-│   ├── __snapshots__/   # Feature snapshots
-│   ├── core-features.spec.ts # Comprehensive features
-│   └── cli-output.spec.ts    # CLI output
-├── visual/              # Screenshot tests (33 tests)
-│   └── screenshots.spec.ts   # Visual regression
-├── fixtures/            # Original .tex test files (preserved)
-├── lib/                 # Test utilities and helpers
-├── api.ts              # API tests (4 tests)
-└── cli.ts              # CLI tests (6 tests)
+├── parsing.spec.ts       # Consolidated LaTeX parsing tests (144 tests)
+├── api.ts               # API tests (4 tests)
+├── cli.ts               # CLI tests (6 tests)
+├── integration/         # High-level integration tests (27 tests)
+│   ├── __snapshots__/   # Integration snapshots
+│   ├── core-features.spec.ts # Comprehensive LaTeX features
+│   └── cli-output.spec.ts    # CLI output testing
+├── visual/              # Visual regression tests (33 tests)
+│   └── screenshots.spec.ts   # Screenshot testing
+├── fixtures/            # LaTeX test files (.tex)
+└── lib/                 # Test utilities and helpers
 ```
 
 ## Snapshot Best Practices
