@@ -43,7 +43,7 @@ export class Article extends Base {
 		appendix: ["V"],
 	};
 
-	declare protected g: Generator;
+	protected declare g: Generator;
 
 	constructor(generator: Generator, options?: any) {
 		super(generator, options);
