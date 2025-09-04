@@ -1,13 +1,30 @@
 import fs from "node:fs";
-import { EOL } from "node:os";
+import { EOL, tmpdir } from "node:os";
 import path from "node:path";
-import tmp from "tmp";
+import { randomUUID } from "node:crypto";
 import { describe, expect, test } from "vitest";
 import pkg from "../package.json";
 import { create as cmd } from "./lib/cmd";
 
 const binFile = path.resolve(pkg.bin[pkg.name]);
 const latexjs = cmd(binFile);
+
+// Helper function to create temporary files
+function createTempFile(postfix: string = ""): { name: string; removeCallback: () => void } {
+	const fileName = path.join(tmpdir(), `test-${randomUUID()}${postfix}`);
+	return {
+		name: fileName,
+		removeCallback: () => {
+			try {
+				if (fs.existsSync(fileName)) {
+					fs.unlinkSync(fileName);
+				}
+			} catch (error) {
+				// Ignore cleanup errors
+			}
+		}
+	};
+}
 
 describe("LaTeX.js CLI test", () => {
 	test("get version", async () => {
@@ -27,7 +44,7 @@ describe("LaTeX.js CLI test", () => {
 	});
 
 	test("compile with macro error", async () => {
-		const tmpFile = tmp.fileSync({ postfix: ".tex" });
+		const tmpFile = createTempFile(".tex");
 		fs.writeFileSync(tmpFile.name, "\\invalidcommand{test}");
 
 		try {
@@ -41,7 +58,7 @@ describe("LaTeX.js CLI test", () => {
 	});
 
 	test("compile with syntax error", async () => {
-		const tmpFile = tmp.fileSync({ postfix: ".tex" });
+		const tmpFile = createTempFile(".tex");
 		fs.writeFileSync(tmpFile.name, "This is text with { unmatched braces");
 
 		try {
@@ -55,8 +72,8 @@ describe("LaTeX.js CLI test", () => {
 	});
 
 	test("compile to HTML", async () => {
-		const tmpFile = tmp.fileSync({ postfix: ".tex" });
-		const outputFile = tmp.fileSync({ postfix: ".html" });
+		const tmpFile = createTempFile(".tex");
+		const outputFile = createTempFile(".html");
 		fs.writeFileSync(tmpFile.name, "Hello \\LaTeX{}!");
 
 		const result = await latexjs.execute([tmpFile.name, "-o", outputFile.name]);

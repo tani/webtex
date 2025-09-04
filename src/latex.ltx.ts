@@ -1,5 +1,17 @@
-import assign from "lodash/assign";
-import assignIn from "lodash/assignIn";
+// Native JavaScript replacements for lodash functions
+const assign = Object.assign;
+const assignIn = (target: any, ...sources: any[]) => {
+	sources.forEach(source => {
+		if (source) {
+			for (const key in source) {
+				if (Object.prototype.hasOwnProperty.call(source, key)) {
+					target[key] = source[key];
+				}
+			}
+		}
+	});
+	return target;
+};
 import builtinDocumentclasses from "./documentclasses";
 import builtinPackages from "./packages";
 import { symbols } from "./symbols";
