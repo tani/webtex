@@ -106,7 +106,7 @@ export class HtmlGenerator extends Generator {
 	public verbatim = "pre";
 	public img = "img";
 
-	protected _options: any;
+	declare protected _options: any;
 	private _h?: Hypher;
 	private _dom: DocumentFragment | null = null;
 

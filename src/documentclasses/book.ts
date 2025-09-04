@@ -44,7 +44,7 @@ export class Book extends Report {
 		mainmatter: ["V"],
 		backmatter: ["V"],
 	};
-	protected g: Generator;
+	declare protected g: Generator;
 
 	constructor(generator: Generator, options?: any) {
 		super(generator, options);

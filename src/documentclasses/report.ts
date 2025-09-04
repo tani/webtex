@@ -45,7 +45,7 @@ export class Report extends Base {
 		appendix: ["V"],
 	};
 
-	protected g: Generator;
+	declare protected g: Generator;
 
 	constructor(generator: Generator, options?: any) {
 		super(generator, options);
@@ -130,8 +130,8 @@ export class Report extends Base {
 		};
 	}
 
-	// Methods inherited from Base that need to be available
-	quotation: () => any[];
-	endquotation: () => void;
-	appendixname: () => string[];
+	// Methods inherited from Base or provided via macros; type-only declarations
+	declare quotation: () => any[];
+	declare endquotation: () => void;
+	declare appendixname: () => string[];
 }

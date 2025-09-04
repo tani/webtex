@@ -43,7 +43,7 @@ export class Article extends Base {
 		appendix: ["V"],
 	};
 
-	protected g: Generator;
+	declare protected g: Generator;
 
 	constructor(generator: Generator, options?: any) {
 		super(generator, options);
@@ -92,8 +92,8 @@ export class Article extends Base {
 		return super.thesection ? super.thesection() : [];
 	}
 
-	// Methods inherited from Base that need to be available
-	section: (starred?: boolean, toc?: any, title?: any) => any[];
-	quotation: () => any[];
-	endquotation: () => void;
+	// Methods inherited from Base or provided via macros; type-only declarations
+	declare section: (starred?: boolean, toc?: any, title?: any) => any[];
+	declare quotation: () => any[];
+	declare endquotation: () => void;
 }
