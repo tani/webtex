@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../lib/load-fixtures";
-import { runFixture } from "../lib/fixture-runner";
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js macros parsing", () => {
+describe("LaTeX.js macros", () => {
 	const fixtureFile = path.join(__dirname, "../fixtures/macros.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "macros.tex");
+	migrateFixtureFile(fixtureFile, "macros.tex", {
+		strategy: "snapshot-only"
 	});
 });

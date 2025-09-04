@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../../lib/load-fixtures";
-import { runFixture } from "../../lib/fixture-runner";
+import { migrateFixtureFile } from "../../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js hyperref package parsing", () => {
+describe("LaTeX.js hyperref package", () => {
 	const fixtureFile = path.join(__dirname, "../../fixtures/packages/hyperref.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "packages/hyperref.tex");
+	migrateFixtureFile(fixtureFile, "packages/hyperref.tex", {
+		strategy: "snapshot-only"
 	});
 });

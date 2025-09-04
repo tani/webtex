@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../lib/load-fixtures";
-import { runFixture } from "../lib/fixture-runner";
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js picture parsing", () => {
+describe("LaTeX.js picture", () => {
 	const fixtureFile = path.join(__dirname, "../fixtures/picture.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "picture.tex");
+	migrateFixtureFile(fixtureFile, "picture.tex", {
+		strategy: "snapshot-only"
 	});
 });

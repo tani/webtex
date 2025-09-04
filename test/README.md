@@ -1,6 +1,6 @@
-# Test Structure
+# LaTeX.js Test Suite
 
-This directory contains the reorganized test suite for LaTeX.js, organized into logical modules while preserving all existing tests.
+Modern, comprehensive test suite for LaTeX.js using Vitest snapshot testing for reliable LaTeX→HTML conversion verification.
 
 ## Test Organization
 
@@ -8,13 +8,12 @@ This directory contains the reorganized test suite for LaTeX.js, organized into 
 - **`api.ts`** - Node.js API compatibility tests (4 tests)
 - **`cli.ts`** - Command-line interface tests (6 tests) 
 
-### Parsing Tests (`/parsing/`)
-Domain-specific LaTeX parsing and rendering tests organized by functionality:
+### LaTeX Parsing Tests (`/parsing/`)
+Snapshot-based tests for LaTeX parsing and HTML rendering:
 
 - **`text.spec.ts`** - Text processing and paragraphs
-- **`fonts.spec.ts`** - Font commands and sizing
+- **`fonts.spec.ts`** - Font commands and sizing  
 - **`math.spec.ts`** - Mathematical expressions
-- **`math-snapshots.spec.ts`** - Mathematical expressions with snapshot testing
 - **`environments.spec.ts`** - LaTeX environments (lists, quotes, etc.)
 - **`symbols.spec.ts`** - Special symbols and characters
 - **`boxes.spec.ts`** - Box layouts and positioning
@@ -32,18 +31,14 @@ Domain-specific LaTeX parsing and rendering tests organized by functionality:
   - **`hyperref.spec.ts`** - Hyperref package
   - **`xcolor.spec.ts`** - Color package
 
-### Visual Tests (`/visual/`)
-- **`screenshots.spec.ts`** - Screenshot regression tests for visual output
-
-### Snapshot Tests (`/snapshots/`)
+### Feature Tests (`/features/`)
 - **`core-features.spec.ts`** - Comprehensive LaTeX feature snapshots
 - **`cli-output.spec.ts`** - Command-line interface output snapshots
 
-### Migrated Tests (`/parsing-migrated/`)
-- **`migrate-all.spec.ts`** - All fixture tests migrated to snapshot testing (101 tests)
+### Visual Tests (`/visual/`)
+- **`screenshots.spec.ts`** - Screenshot regression tests for visual output
 
 ### Shared Utilities (`/lib/`)
-- **`fixture-runner.ts`** - Shared fixture test runner (enhanced with snapshot support)
 - **`fixture-snapshot-runner.ts`** - Fixture-to-snapshot migration utilities
 - **`snapshot-runner.ts`** - Pure snapshot testing utilities
 - **`load-fixtures.ts`** - Fixture file parser
@@ -64,231 +59,139 @@ npm run test:coverage      # With coverage
 ```bash
 npm run test:api           # API tests only
 npm run test:cli           # CLI tests only  
-npm run test:parsing       # All parsing tests (original fixtures)
+npm run test:parsing       # All LaTeX parsing tests
+npm run test:features      # Feature snapshot tests
 npm run test:visual        # Visual/screenshot tests
 npm run test:screenshots   # Screenshot tests only
-npm run test:snapshots     # Snapshot tests only
-npm run test:migrated      # Migrated fixture-to-snapshot tests
 ```
 
 ### Snapshot Test Management
 ```bash
-npm run test:snapshots:update    # Update snapshot tests only
-npm run test:migrated:update     # Update migrated fixture snapshots
+npm run test:features:update     # Update feature snapshots
 npm run test:update-snapshots    # Update ALL snapshots in project
-```
-
-### Migration Commands
-```bash
-# Compare original vs migrated tests
-npm run test:parsing && npm run test:migrated
-
-# Update snapshots after intentional changes  
-npm run test:migrated:update
 ```
 
 ### Individual Test Categories
 ```bash
 npx vitest test/parsing/math.spec.ts        # Math parsing tests
 npx vitest test/parsing/environments.spec.ts # Environment tests
-npx vitest test/visual/screenshots.spec.ts   # Screenshot tests
+npx vitest test/features/core-features.spec.ts # Feature tests
 ```
 
 ## Test Count
-- **~280 total tests** (original + new snapshot tests)
-  - **144 functional tests** - Original fixture-based tests
+- **~210 total tests**
+  - **144 parsing tests** - LaTeX→HTML conversion with snapshot verification
   - **33 screenshot tests** - Visual regression tests  
-  - **101 migrated tests** - Fixture tests converted to snapshots
-  - **27 new snapshot tests** - Hand-written snapshot tests
-- Organized across ~25 test files for better maintainability
-- All fixture-based tests preserved with snapshot equivalents
-- Multiple testing strategies available for different use cases
+  - **27 feature tests** - Hand-written comprehensive feature tests
+  - **10 core tests** - API and CLI functionality
+- Clean, organized structure with snapshot-based testing
+- All LaTeX features covered with automated regression detection
+- Modern testing practices with visual diff capabilities
 
-## Migration Notes
-- **`fixtures.ts`** functionality distributed across parsing modules
-- Screenshot tests moved to dedicated visual test suite  
-- **Fixture-to-snapshot migration** tools available for gradual transition
-- All test logic and assertions preserved in multiple formats
-- Improved parallel execution and development workflow
+## Migration to Snapshot Testing
 
-## Fixture to Snapshot Migration
+This project has been **fully migrated** from fixture-based testing to modern Vitest snapshot testing:
 
-The project now supports **gradual migration** from fixture-based tests to modern snapshot testing:
-
-### Migration Strategies Available
-1. **Preserve:** Keep fixtures + add snapshots (safest)
-2. **Hybrid:** Enhanced fixtures with snapshot generation  
-3. **Snapshot-only:** Full migration to snapshots (cleanest)
-4. **Verify:** Snapshot-first with fixture fallback (balanced)
-
-### Migration Benefits
-- ✅ **Better change detection** - Visual diffs in PRs
-- ✅ **Easier maintenance** - Automatic snapshot updates
+### Benefits Achieved
+- ✅ **Visual diff reviews** - See exactly what changed in PRs
+- ✅ **Automatic snapshot updates** - `npm run test:update-snapshots`
 - ✅ **Living documentation** - Snapshots show expected output
-- ✅ **Modern tooling** - Better IDE integration
+- ✅ **Better regression detection** - Catch unintended HTML changes
+- ✅ **Easier maintenance** - No manual fixture updates needed
+- ✅ **Modern tooling** - Better IDE integration and test experience
 
-See `test/MIGRATION.md` for detailed migration guide.
+### Snapshot Testing Approach
+All LaTeX parsing tests now use **snapshot testing** which:
+1. **Captures HTML output** from LaTeX→HTML conversion
+2. **Stores snapshots** in `__snapshots__/` directories
+3. **Compares future runs** against stored snapshots  
+4. **Shows visual diffs** when output changes
+5. **Updates easily** with `npm run test:update-snapshots`
 
-## Snapshot Testing Guide
+## Test Structure Overview
 
-### What are Snapshots?
-Snapshot tests capture the output of your code at a point in time. When the test runs, it compares the current output against the stored snapshot. If they differ, the test fails, indicating either a bug or an intentional change.
-
-### Benefits for LaTeX.js
-- **HTML Output Verification**: Automatically verify LaTeX→HTML conversion results
-- **Regression Detection**: Catch unintended changes in rendered output
-- **Documentation**: Snapshots serve as living documentation of expected output
-- **Refactoring Safety**: Ensure changes don't break existing functionality
-
-### Snapshot Test Types
-
-#### 1. LaTeX Fragment Snapshots
-Test individual LaTeX constructs:
-
-```typescript
-import { createLatexSnapshot } from "../lib/snapshot-runner";
-
-createLatexSnapshot(
-	"basic math", 
-	"$E = mc^2$"
-);
-```
-
-#### 2. Document Snapshots  
-Test complete LaTeX documents:
-
-```typescript
-import { createDocumentSnapshot } from "../lib/snapshot-runner";
-
-createDocumentSnapshot(
-	"complete article",
-	`\\documentclass{article}
-\\begin{document}
-\\section{Test}
-Content here.
-\\end{document}`
-);
-```
-
-#### 3. Fixture-based Snapshots
-Enhance existing fixture tests with snapshots:
-
-```typescript
-import { runSnapshotFixture } from "../lib/snapshot-runner";
-
-loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-	runSnapshotFixture(fixture, "math.tex", { nameSuffix: " (snapshot)" });
-});
-```
-
-#### 4. CLI Output Snapshots
-Test command-line interface output:
-
-```typescript
-test("help output snapshot", async () => {
-	const result = await latexjs.execute(["-h"]);
-	expect(result.stdout).toMatchSnapshot("cli-help-output.txt");
-});
-```
-
-### Creating New Snapshots
-
-1. **Write the test** with expected behavior
-2. **Run the test** - it will fail initially
-3. **Review the generated snapshot** in `__snapshots__/` folder
-4. **Verify the output is correct**
-5. **Commit the snapshot** to version control
-
-### Updating Snapshots
-
-When intentional changes affect output:
-
-```bash
-# Update specific snapshot tests
-npm run test:snapshots:update
-
-# Update all snapshots in the project  
-npm run test:update-snapshots
-
-# Update snapshots for a specific file
-npx vitest test/snapshots/core-features.spec.ts -u
-```
-
-### Snapshot Best Practices
-
-#### Normalization
-Always normalize dynamic content:
-- File paths → relative paths
-- Timestamps → fixed values  
-- Random IDs → normalized values
-- Whitespace → consistent formatting
-
-#### Descriptive Names
-Use clear, descriptive snapshot names:
-```typescript
-expect(output).toMatchSnapshot("math-complex-fractions.html");
-```
-
-#### Small, Focused Snapshots
-Create focused snapshots testing specific features rather than large outputs.
-
-#### Review Changes
-Always review snapshot changes carefully:
-- **Expected changes**: Accept the update
-- **Unexpected changes**: Investigate the root cause
-
-### Snapshot File Organization
-
-Snapshots are stored in `__snapshots__/` directories:
 ```
 test/
-├── snapshots/
-│   ├── __snapshots__/
-│   │   ├── core-features.spec.ts.snap
-│   │   └── cli-output.spec.ts.snap  
-│   ├── core-features.spec.ts
-│   └── cli-output.spec.ts
-└── parsing/
-    ├── __snapshots__/
-    │   └── math-snapshots.spec.ts.snap
-    └── math-snapshots.spec.ts
+├── parsing/              # LaTeX parsing tests (144 tests) 
+│   ├── __snapshots__/   # Generated HTML snapshots
+│   ├── text.spec.ts     # Text processing
+│   ├── math.spec.ts     # Mathematics  
+│   ├── environments.spec.ts # LaTeX environments
+│   └── ...              # All LaTeX features
+├── features/            # Feature tests (27 tests)
+│   ├── __snapshots__/   # Feature snapshots
+│   ├── core-features.spec.ts # Comprehensive features
+│   └── cli-output.spec.ts    # CLI output
+├── visual/              # Screenshot tests (33 tests)
+│   └── screenshots.spec.ts   # Visual regression
+├── fixtures/            # Original .tex test files (preserved)
+├── lib/                 # Test utilities and helpers
+├── api.ts              # API tests (4 tests)
+└── cli.ts              # CLI tests (6 tests)
 ```
 
-### Integration with CI/CD
+## Snapshot Best Practices
 
-Snapshot tests work seamlessly in CI:
-- **Pass**: Output matches stored snapshots
-- **Fail**: Output differs, requiring investigation
-- **Missing snapshots**: Tests fail, preventing deployment
-
-### Troubleshooting
-
-**Test fails after valid changes?**
-```bash
-npm run test:snapshots:update
-```
-
-**Snapshot too large or unreadable?**
-- Break into smaller, focused tests
-- Add normalization for dynamic content
-
-**Tests flaky due to environment differences?**
-- Normalize file paths, timestamps, IDs
-- Use consistent test environments
-
-### Advanced Usage
-
-#### Custom Snapshot Options
+### Creating New Tests
 ```typescript
-runSnapshotFixture(fixture, "test.tex", {
-	normalizeWhitespace: true,
-	normalizeSvgIds: true,
-	nameSuffix: " (custom)"
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
+
+describe("New LaTeX feature", () => {
+	const fixtureFile = path.join(__dirname, "../fixtures/new-feature.tex");
+	migrateFixtureFile(fixtureFile, "new-feature.tex", {
+		strategy: "snapshot-only"
+	});
 });
 ```
 
-#### Inline Snapshots
-For small outputs, use inline snapshots:
-```typescript
-expect(result).toMatchInlineSnapshot(`"<p>Hello World</p>"`);
+### Updating Snapshots
+When LaTeX output intentionally changes:
+```bash
+# Update specific test snapshots
+npm run test:features:update
+
+# Update all project snapshots
+npm run test:update-snapshots
+
+# Update specific file snapshots  
+npx vitest test/parsing/math.spec.ts -u
 ```
+
+### Reviewing Changes
+1. **Run tests** - Failing tests show snapshot mismatches
+2. **Review diffs** - Visual diffs show exactly what changed
+3. **Verify changes** - Ensure changes are intentional
+4. **Update snapshots** - Accept changes with update commands
+5. **Commit snapshots** - Include snapshot updates in commits
+
+## Development Workflow
+
+### Adding New LaTeX Features
+1. **Create fixture file** - Add `.tex` file to `test/fixtures/`
+2. **Create test file** - Use snapshot testing pattern
+3. **Run tests** - Generate initial snapshots
+4. **Verify output** - Check snapshot files are correct
+5. **Commit everything** - Include tests and snapshots
+
+### Modifying LaTeX Output
+1. **Make changes** - Modify LaTeX→HTML conversion code
+2. **Run tests** - See which snapshots changed
+3. **Review diffs** - Verify changes are expected
+4. **Update snapshots** - `npm run test:update-snapshots`
+5. **Commit changes** - Include updated snapshots
+
+### Debugging Test Failures
+1. **Check diff output** - Vitest shows exact differences
+2. **Review snapshot files** - Located in `__snapshots__/`
+3. **Run specific tests** - `npx vitest path/to/test.spec.ts`
+4. **Use watch mode** - `npm run test:watch` for live feedback
+
+## CI/CD Integration
+
+Tests work seamlessly in continuous integration:
+- **Snapshot mismatches** fail the build
+- **Missing snapshots** prevent deployment
+- **Visual diffs** in PR reviews show output changes
+- **Automatic updates** can be scripted for maintenance
+
+The LaTeX.js test suite now provides **comprehensive coverage** with **modern snapshot testing**, **visual regression detection**, and **easy maintenance** for confident LaTeX→HTML conversion development.

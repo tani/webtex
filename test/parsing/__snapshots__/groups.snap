@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LaTeX.js groups > ** brackets do not need to be balanced, they are just punctuation; and in a macro a simple delimiter > groups_tex-___brackets_do_not_need_to_be_balanced__they_are_just_punctuation__and_in_a_macro_a_simple_delimiter.html 1`] = `"<div class="body"><p>test[ t]]ext​ more</p></div>"`;
+
+exports[`LaTeX.js groups > ** groups need to be balanced > groups_tex-___groups_need_to_be_balanced.html 1`] = `"<div class="body"><p>test text with another two​ groups ​ and more</p></div>"`;
+
+exports[`LaTeX.js groups > ** groups overlapping paragraphs > groups_tex-___groups_overlapping_paragraphs.html 1`] = `"<div class="body"><p>Here is some unsuspecting text in a paragraph. This paragraph ​ starts a group.</p><p>But then suddenly a new paragraph begins... ​ and misery with it.</p><p>It is also possible to have a</p><p>par command​ in a group.</p></div>"`;

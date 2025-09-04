@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../lib/load-fixtures";
-import { runFixture } from "../lib/fixture-runner";
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js spacing parsing", () => {
+describe("LaTeX.js spacing", () => {
 	const fixtureFile = path.join(__dirname, "../fixtures/spacing.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "spacing.tex");
+	migrateFixtureFile(fixtureFile, "spacing.tex", {
+		strategy: "snapshot-only"
 	});
 });

@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../lib/load-fixtures";
-import { runFixture } from "../lib/fixture-runner";
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js sectioning parsing", () => {
+describe("LaTeX.js sectioning", () => {
 	const fixtureFile = path.join(__dirname, "../fixtures/sectioning.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "sectioning.tex");
+	migrateFixtureFile(fixtureFile, "sectioning.tex", {
+		strategy: "snapshot-only"
 	});
 });

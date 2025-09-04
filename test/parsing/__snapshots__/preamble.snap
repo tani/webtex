@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LaTeX.js preamble > ** document with a preamble > preamble_tex-___document_with_a_preamble.html 1`] = `"<div class="body"></div>"`;

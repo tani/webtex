@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../lib/load-fixtures";
-import { runFixture } from "../lib/fixture-runner";
+import { migrateFixtureFile } from "../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js fonts parsing", () => {
+describe("LaTeX.js font handling", () => {
 	const fixtureFile = path.join(__dirname, "../fixtures/fonts.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "fonts.tex");
+	migrateFixtureFile(fixtureFile, "fonts.tex", {
+		strategy: "snapshot-only"
 	});
 });

@@ -1,11 +1,10 @@
 import path from "node:path";
 import { describe } from "vitest";
-import { load as loadFixture } from "../../lib/load-fixtures";
-import { runFixture } from "../../lib/fixture-runner";
+import { migrateFixtureFile } from "../../lib/fixture-snapshot-runner";
 
-describe("LaTeX.js xcolor package parsing", () => {
+describe("LaTeX.js xcolor package", () => {
 	const fixtureFile = path.join(__dirname, "../../fixtures/packages/xcolor.tex");
-	loadFixture(fixtureFile).fixtures.forEach((fixture: any) => {
-		runFixture(fixture, "packages/xcolor.tex");
+	migrateFixtureFile(fixtureFile, "packages/xcolor.tex", {
+		strategy: "snapshot-only"
 	});
 });

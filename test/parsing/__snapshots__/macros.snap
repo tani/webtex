@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LaTeX.js macros > ** brackets can be used in optional arguments when protected by a group > macros_tex-___brackets_can_be_used_in_optional_arguments_when_protected_by_a_group.html 1`] = `"<div class="body"><p>-t]t-+ext+ more</p></div>"`;
+
+exports[`LaTeX.js macros > ** custom macros with a mandatory argument > macros_tex-___custom_macros_with_a_mandatory_argument.html 1`] = `"<div class="body"><p>some text +with a macro+</p></div>"`;
+
+exports[`LaTeX.js macros > ** custom macros with an optional argument > macros_tex-___custom_macros_with_an_optional_argument.html 1`] = `"<div class="body"><p>some text -with a macro-</p></div>"`;
+
+exports[`LaTeX.js macros > ** custom macros with optional and mandatory arguments, mixed with newlines > macros_tex-___custom_macros_with_optional_and_mandatory_arguments__mixed_with_newlines.html 1`] = `"<div class="body"><p>some text +again+-<br>-</p><p>more​ in a new paragraph.</p></div>"`;
+
+exports[`LaTeX.js macros > ** custom macros with optional and mandatory arguments, mixed with space and comments > macros_tex-___custom_macros_with_optional_and_mandatory_arguments__mixed_with_space_and_comments.html 1`] = `"<div class="body"><p>some text, +mandatory arg+-, -+more mandatory+ inside.</p></div>"`;
+
+exports[`LaTeX.js macros > ** custom macros without arguments > macros_tex-___custom_macros_without_arguments.html 1`] = `"<div class="body"><p>some text ​ inside.</p></div>"`;

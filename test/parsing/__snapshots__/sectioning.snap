@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LaTeX.js sectioning > ** a chapter > sectioning_tex-___a_chapter.html 1`] = `"<div class="body"><h1 id="sec-1"><div>Chapter 1</div>A Chapter</h1><p>Then the text follows.</p><h1 id="sec-2"><div>Chapter 2</div>A Chapter</h1><p>Then the text follows.</p></div>"`;
+
+exports[`LaTeX.js sectioning > ** a chapter and a section > sectioning_tex-___a_chapter_and_a_section.html 1`] = `"<div class="body"><h1 id="sec-1"><div>Chapter 1</div>A Chapter</h1><h2 id="sec-2">1.1 Here starts a section</h2><p>Then the text follows.</p><h1 id="sec-3"><div>Chapter 2</div>A Chapter</h1><h2 id="sec-4">2.1 Here starts a section</h2><p>Then the text follows.</p></div>"`;
+
+exports[`LaTeX.js sectioning > ** section inside a macro - correct visual appearance to be done with CSS > sectioning_tex-___section_inside_a_macro___correct_visual_appearance_to_be_done_with_CSS.html 1`] = `"<div class="body"><p>Start with <span class="it">some<h2 id="sec-1">1 A Section</h2></span> text.</p><p>Then more text follows.</p></div>"`;

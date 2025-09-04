@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LaTeX.js symbols > ** LaTeX \\symbol{} > symbols_tex-___LaTeX__symbol__.html 1`] = `"<div class="body"><p>©</p></div>"`;
+
+exports[`LaTeX.js symbols > ** TeX \\char > symbols_tex-___TeX__char.html 1`] = `"<div class="body"><p>b  </p></div>"`;
+
+exports[`LaTeX.js symbols > ** TeX ^^ and ^^^^ > symbols_tex-___TeX____and_____.html 1`] = `"<div class="body"><p>20 ℃</p><p>w x vskip</p></div>"`;
+
+exports[`LaTeX.js symbols > ** predefined symbols > symbols_tex-___predefined_symbols.html 1`] = `"<div class="body"><p>…</p></div>"`;
