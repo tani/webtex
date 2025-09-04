@@ -43,6 +43,7 @@
     "build:cli": "tsc src/cli.ts --outDir bin --target ES2020 --module CommonJS --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck && mv bin/cli.js bin/latex.js && chmod +x bin/latex.js",
     "build:lib": "rollup -c",
     "build": "npm run prebuild && npm run build:assets && npm run build:packages && npm run build:cli && npm run build:lib",
+    "pretest": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
