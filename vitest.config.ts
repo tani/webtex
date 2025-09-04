@@ -9,15 +9,23 @@ export default defineConfig({
 			"**/dist/**",
 			"**/coverage/**",
 			"test/api/**/*.js",
-			"test/api/**/*.mjs",
+			"test/api/**/*.mjs", 
 			"test/api/**/*.html",
 			"test/lib/**",
 			"test/types/**",
 			"test/fixtures/**",
 			"test/screenshots/**",
 			"test/integration/**",
+			"test/html/**",
 		],
 		setupFiles: ["test/lib/setup.ts"],
+		// Test categorization via tags
+		pool: "threads",
+		poolOptions: {
+			threads: {
+				singleThread: false,
+			},
+		},
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov", "html"],
