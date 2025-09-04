@@ -1,16 +1,26 @@
 #!/usr/bin/env node
-import { createHTMLWindow } from "svgdom";
-import util from "node:util";
+import {
+	cpSync,
+	existsSync,
+	readFile as fsReadFile,
+	mkdirSync,
+	readFileSync,
+	statSync,
+	writeFileSync,
+} from "node:fs";
 import path from "node:path";
-import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, cpSync, readFile as fsReadFile } from "node:fs";
-import stdin from "stdin";
+import util from "node:util";
 import { cli } from "gunshi";
-import prettier from "prettier";
-import { he, parse as latexParse, HtmlGenerator } from "../dist/latex.js";
-import en from "hyphenation.en-us";
 import de from "hyphenation.de";
+import en from "hyphenation.en-us";
+import prettier from "prettier";
+import stdin from "stdin";
+import { createHTMLWindow } from "svgdom";
+import { HtmlGenerator, he, parse as latexParse } from "../dist/latex.js";
 
-const info = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+const info = JSON.parse(
+	readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 
 global.window = createHTMLWindow();
 global.document = window.document;
@@ -22,66 +32,74 @@ const command = {
 	usage: "[options] [files...]",
 	args: {
 		output: {
-			type: 'string' as const,
-			short: 'o',
-			description: 'specify output file, otherwise STDOUT will be used'
+			type: "string" as const,
+			short: "o",
+			description: "specify output file, otherwise STDOUT will be used",
 		},
 		assets: {
-			type: 'string' as const,
-			short: 'a',
+			type: "string" as const,
+			short: "a",
 			optional: true,
-			description: 'copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)'
+			description:
+				"copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)",
 		},
 		url: {
-			type: 'string' as const,
-			short: 'u',
-			description: 'set the base URL to use for the assets (default: use relative URLs)'
+			type: "string" as const,
+			short: "u",
+			description:
+				"set the base URL to use for the assets (default: use relative URLs)",
 		},
 		body: {
-			type: 'boolean' as const,
-			short: 'b',
-			description: "don't include HTML boilerplate and CSS, only output the contents of body"
+			type: "boolean" as const,
+			short: "b",
+			description:
+				"don't include HTML boilerplate and CSS, only output the contents of body",
 		},
 		entities: {
-			type: 'boolean' as const,
-			short: 'e',
-			description: 'encode HTML entities in the output instead of using UTF-8 characters'
+			type: "boolean" as const,
+			short: "e",
+			description:
+				"encode HTML entities in the output instead of using UTF-8 characters",
 		},
 		pretty: {
-			type: 'boolean' as const,
-			short: 'p',
-			description: 'beautify the html (this may add/remove spaces unintentionally)'
+			type: "boolean" as const,
+			short: "p",
+			description:
+				"beautify the html (this may add/remove spaces unintentionally)",
 		},
 		class: {
-			type: 'string' as const,
-			short: 'c',
-			default: 'article',
-			description: 'set a default documentclass for documents without a preamble'
+			type: "string" as const,
+			short: "c",
+			default: "article",
+			description:
+				"set a default documentclass for documents without a preamble",
 		},
 		macros: {
-			type: 'string' as const,
-			short: 'm',
-			description: 'load a JavaScript file with additional custom macros'
+			type: "string" as const,
+			short: "m",
+			description: "load a JavaScript file with additional custom macros",
 		},
 		stylesheet: {
-			type: 'string' as const,
-			short: 's',
-			description: 'specify additional style sheets to use (comma-separated for multiple)'
+			type: "string" as const,
+			short: "s",
+			description:
+				"specify additional style sheets to use (comma-separated for multiple)",
 		},
 		hyphenation: {
-			type: 'boolean' as const,
-			short: 'n',
+			type: "boolean" as const,
+			short: "n",
 			default: true,
-			description: 'insert soft hyphens (enables automatic hyphenation in the browser)'
+			description:
+				"insert soft hyphens (enables automatic hyphenation in the browser)",
 		},
 		language: {
-			type: 'string' as const,
-			short: 'l',
-			default: 'en',
-			description: 'set hyphenation language'
-		}
+			type: "string" as const,
+			short: "l",
+			default: "en",
+			description: "set hyphenation language",
+		},
 	},
-	run: main
+	run: main,
 };
 
 async function main(ctx: any) {
@@ -117,18 +135,20 @@ async function main(ctx: any) {
 		languagePatterns: getLanguagePatterns(options.language),
 		documentClass: options.class,
 		CustomMacros: CustomMacros,
-		styles: options.stylesheet ? options.stylesheet.split(',').map((s: string) => s.trim()) : [],
+		styles: options.stylesheet
+			? options.stylesheet.split(",").map((s: string) => s.trim())
+			: [],
 	};
-	
+
 	const readFile = util.promisify(fsReadFile);
 	const input = files.length
-		? Promise.all(files.map((file: string) => readFile(file, 'utf8')))
+		? Promise.all(files.map((file: string) => readFile(file, "utf8")))
 		: new Promise<string>((resolve) => {
 				stdin((str: string) => {
 					resolve(str);
 				});
 			});
-	
+
 	const processInput = async () => {
 		try {
 			let text = await input;
@@ -158,8 +178,8 @@ async function main(ctx: any) {
 
 			if (options.pretty) {
 				// Fix void element closing tags before formatting
-				html = html.replace(/<(meta|link|br)([^>]*)><\/\1>/g, '<$1$2>');
-				
+				html = html.replace(/<(meta|link|br)([^>]*)><\/\1>/g, "<$1$2>");
+
 				try {
 					html = await prettier.format(html, {
 						parser: "html",
@@ -167,8 +187,10 @@ async function main(ctx: any) {
 						htmlWhitespaceSensitivity: "ignore",
 						singleAttributePerLine: false,
 					});
-				} catch (error) {
-					console.warn("Warning: Could not format HTML with prettier, using unformatted output");
+				} catch (_error) {
+					console.warn(
+						"Warning: Could not format HTML with prettier, using unformatted output",
+					);
 				}
 			}
 
@@ -184,7 +206,7 @@ async function main(ctx: any) {
 	};
 
 	await processInput();
-	
+
 	let dir = options.assets;
 	if (options.assets === true) {
 		if (!options.output) {
@@ -218,7 +240,7 @@ async function main(ctx: any) {
 await cli(process.argv.slice(2), command, {
 	name: info.name,
 	version: info.version,
-	description: info.description
+	description: info.description,
 }).catch((error) => {
 	console.error("Error:", error);
 	process.exit(1);

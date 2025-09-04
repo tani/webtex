@@ -1,10 +1,10 @@
 // Native JavaScript replacements for lodash functions
 const assign = Object.assign;
 const assignIn = (target: any, ...sources: any[]) => {
-	sources.forEach(source => {
+	sources.forEach((source) => {
 		if (source) {
 			for (const key in source) {
-				if (Object.prototype.hasOwnProperty.call(source, key)) {
+				if (Object.hasOwn(source, key)) {
 					target[key] = source[key];
 				}
 			}
@@ -12,6 +12,7 @@ const assignIn = (target: any, ...sources: any[]) => {
 	});
 	return target;
 };
+
 import builtinDocumentclasses from "./documentclasses";
 import builtinPackages from "./packages";
 import { symbols } from "./symbols";

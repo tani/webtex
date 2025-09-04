@@ -29,13 +29,13 @@ export interface MigrationOptions {
 	 * - "verify": Use snapshots for verification but keep assertions as backup
 	 */
 	strategy?: "preserve" | "snapshot-only" | "verify";
-	
+
 	/**
 	 * Whether to normalize whitespace in snapshots
 	 * @default true
 	 */
 	normalizeWhitespace?: boolean;
-	
+
 	/**
 	 * Whether to normalize SVG IDs for consistent snapshots
 	 * @default true
@@ -59,13 +59,17 @@ export interface MigrationOptions {
  * Migrated fixture runner that combines traditional fixture testing with snapshot testing
  * Provides multiple migration strategies to gradually move from fixtures to snapshots
  */
-export function runMigratedFixture(fixture: any, name: string, options: MigrationOptions = {}) {
+export function runMigratedFixture(
+	fixture: any,
+	name: string,
+	options: MigrationOptions = {},
+) {
 	const {
 		strategy = "preserve",
 		normalizeWhitespace = true,
 		normalizeSvgIds = true,
 		nameSuffix = "",
-		useFixtureAsSnapshot = false
+		useFixtureAsSnapshot = false,
 	} = options;
 
 	let _test: any = test;
@@ -84,7 +88,7 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 	}
 
 	const testName = `${fixture.header || `fixture number ${fixture.id}`}${nameSuffix}`;
-	
+
 	_test(testName, async () => {
 		resetSvgIds();
 		let htmlOutput: string;
@@ -119,17 +123,31 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 		if (normalizeWhitespace) {
 			normalizedOutput = he.decode(normalizedOutput.replace(/\r\n|\n|\r/g, ""));
 			if (normalizedExpected) {
-				normalizedExpected = he.decode(normalizedExpected.replace(/\r\n|\n|\r/g, ""));
+				normalizedExpected = he.decode(
+					normalizedExpected.replace(/\r\n|\n|\r/g, ""),
+				);
 			}
 		}
-		
+
 		if (normalizeSvgIds) {
 			// Normalize SVG marker and clipPath IDs for consistent testing
-			normalizedOutput = normalizedOutput.replace(/SvgjsMarker\d+/g, "SvgjsMarkerNORM");
-			normalizedOutput = normalizedOutput.replace(/SvgjsClipPath\d+/g, "SvgjsClipPathNORM");
+			normalizedOutput = normalizedOutput.replace(
+				/SvgjsMarker\d+/g,
+				"SvgjsMarkerNORM",
+			);
+			normalizedOutput = normalizedOutput.replace(
+				/SvgjsClipPath\d+/g,
+				"SvgjsClipPathNORM",
+			);
 			if (normalizedExpected) {
-				normalizedExpected = normalizedExpected.replace(/SvgjsMarker\d+/g, "SvgjsMarkerNORM");
-				normalizedExpected = normalizedExpected.replace(/SvgjsClipPath\d+/g, "SvgjsClipPathNORM");
+				normalizedExpected = normalizedExpected.replace(
+					/SvgjsMarker\d+/g,
+					"SvgjsMarkerNORM",
+				);
+				normalizedExpected = normalizedExpected.replace(
+					/SvgjsClipPath\d+/g,
+					"SvgjsClipPathNORM",
+				);
 			}
 		}
 
@@ -143,7 +161,7 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 				}
 				// Add snapshot for future reference
 				expect(normalizedOutput).toMatchSnapshot(
-					`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`
+					`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`,
 				);
 				break;
 
@@ -152,12 +170,12 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 				if (useFixtureAsSnapshot && fixture.result) {
 					// Use fixture expected result as initial snapshot (migration helper)
 					expect(normalizedExpected).toMatchSnapshot(
-						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`
+						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`,
 					);
 				} else {
 					// Use actual output as snapshot
 					expect(normalizedOutput).toMatchSnapshot(
-						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`
+						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`,
 					);
 				}
 				break;
@@ -166,7 +184,7 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 				// Use snapshot as primary verification, fixture as backup
 				try {
 					expect(normalizedOutput).toMatchSnapshot(
-						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`
+						`${name.replace(/[/.]/g, "_")}-${testName.replace(/[^a-zA-Z0-9]/g, "_")}.html`,
 					);
 				} catch (snapshotError) {
 					// If snapshot fails, fall back to fixture assertion with detailed error
@@ -174,8 +192,10 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 						try {
 							expect(normalizedOutput).toBe(normalizedExpected);
 							// If fixture passes but snapshot fails, it means output changed
-							throw new Error(`Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: npm run test:update-snapshots`);
-						} catch (fixtureError) {
+							throw new Error(
+								`Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: npm run test:update-snapshots`,
+							);
+						} catch (_fixtureError) {
 							// Both failed, throw original snapshot error
 							throw snapshotError;
 						}
@@ -187,7 +207,11 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
 		}
 
 		// Legacy HTML file output (for debugging failed fixtures)
-		if (strategy === "preserve" && fixture.result && normalizedOutput !== normalizedExpected) {
+		if (
+			strategy === "preserve" &&
+			fixture.result &&
+			normalizedOutput !== normalizedExpected
+		) {
 			const filename = path.join(
 				__dirname,
 				"../html",
@@ -207,12 +231,12 @@ export function runMigratedFixture(fixture: any, name: string, options: Migratio
  * Batch migrate an entire fixture file to snapshot testing
  */
 export function migrateFixtureFile(
-	fixtureFilePath: string, 
-	name: string, 
-	options: MigrationOptions = {}
+	fixtureFilePath: string,
+	name: string,
+	options: MigrationOptions = {},
 ) {
 	const fixtures = loadFixture(fixtureFilePath).fixtures;
-	
+
 	fixtures.forEach((fixture: any) => {
 		runMigratedFixture(fixture, name, options);
 	});

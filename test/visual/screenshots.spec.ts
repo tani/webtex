@@ -4,7 +4,7 @@ import { registerWindow } from "@svgdotjs/svg.js";
 import decache from "decache";
 import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
-import { describe, expect, test } from "vitest";
+import { describe, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/latex";
 import { load as loadFixture } from "../lib/load-fixtures";
 
@@ -33,7 +33,9 @@ describe("LaTeX.js screenshot tests", () => {
 			return;
 		}
 		const fixtures = loadFixture(fixtureFile).fixtures;
-		const screenshotFixtures = fixtures.filter((f: any) => f.header?.charAt(0) === "s");
+		const screenshotFixtures = fixtures.filter(
+			(f: any) => f.header?.charAt(0) === "s",
+		);
 		if (screenshotFixtures.length > 0) {
 			describe(name, () => {
 				fixtures.forEach((fixture: any) => {
@@ -49,12 +51,14 @@ describe("LaTeX.js screenshot tests", () => {
 		fs.readdirSync(path.join(fixturesPath, dir)).forEach((name) => {
 			const fixtureFile = path.join(fixturesPath, dir, name);
 			const fixtures = loadFixture(fixtureFile).fixtures;
-			const screenshotFixtures = fixtures.filter((f: any) => f.header?.charAt(0) === "s");
+			const screenshotFixtures = fixtures.filter(
+				(f: any) => f.header?.charAt(0) === "s",
+			);
 			if (screenshotFixtures.length > 0) {
 				dirFixtures.push({ name, fixtures });
 			}
 		});
-		
+
 		if (dirFixtures.length > 0) {
 			describe(dir, () => {
 				dirFixtures.forEach(({ name, fixtures }) => {
@@ -87,25 +91,31 @@ function runScreenshotTest(fixture: any, name: string) {
 
 	// Only create screenshot tests
 	if (screenshot) {
-		_test(`${fixture.header || `fixture number ${fixture.id}`} - screenshot`, async () => {
-			resetSvgIds();
-			const htmlDoc = parse(fixture.source, {
-				generator: new HtmlGenerator({
-					hyphenate: false,
-				}),
-			}).htmlDocument();
-			const favicon = document.createElement("link");
-			favicon.rel = "icon";
-			favicon.href = "data:;base64,iVBORw0KGgo=";
-			htmlDoc.head.appendChild(favicon);
-			const filename = path.join(
-				__dirname,
-				"../screenshots",
-				slugify(`${name} ${fixture.header}`, {
-					remove: /[*+~()'"!:@,{}\\]/g,
-				}),
-			);
-			await (globalThis as any).takeScreenshot(htmlDoc.documentElement.outerHTML, filename);
-		});
+		_test(
+			`${fixture.header || `fixture number ${fixture.id}`} - screenshot`,
+			async () => {
+				resetSvgIds();
+				const htmlDoc = parse(fixture.source, {
+					generator: new HtmlGenerator({
+						hyphenate: false,
+					}),
+				}).htmlDocument();
+				const favicon = document.createElement("link");
+				favicon.rel = "icon";
+				favicon.href = "data:;base64,iVBORw0KGgo=";
+				htmlDoc.head.appendChild(favicon);
+				const filename = path.join(
+					__dirname,
+					"../screenshots",
+					slugify(`${name} ${fixture.header}`, {
+						remove: /[*+~()'"!:@,{}\\]/g,
+					}),
+				);
+				await (globalThis as any).takeScreenshot(
+					htmlDoc.documentElement.outerHTML,
+					filename,
+				);
+			},
+		);
 	}
 }

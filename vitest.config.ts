@@ -10,7 +10,7 @@ export default defineConfig({
 			"**/dist/**",
 			"**/coverage/**",
 			"test/api/**/*.js",
-			"test/api/**/*.mjs", 
+			"test/api/**/*.mjs",
 			"test/api/**/*.html",
 			"test/lib/**",
 			"test/types/**",
@@ -31,8 +31,10 @@ export default defineConfig({
 		resolveSnapshotPath: (testPath: string, snapExtension: string) => {
 			// Place snapshots in __snapshots__ folders next to test files
 			const dir = path.dirname(testPath);
-			const filename = path.basename(testPath).replace(/\.(test|spec)\.(js|ts)$/, '');
-			return path.join(dir, '__snapshots__', `${filename}${snapExtension}`);
+			const filename = path
+				.basename(testPath)
+				.replace(/\.(test|spec)\.(js|ts)$/, "");
+			return path.join(dir, "__snapshots__", `${filename}${snapExtension}`);
 		},
 		coverage: {
 			provider: "v8",

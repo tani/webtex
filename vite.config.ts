@@ -1,5 +1,11 @@
 import { exec } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+	cpSync,
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
 import { promisify } from "node:util";
 import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
@@ -12,7 +18,13 @@ import pegjs from "./lib/rollup-plugin-pegjs.mjs";
 const execAsync = promisify(exec);
 
 // Constants
-const PLACEHOLDER_PACKAGES = ["geometry", "layout", "showframe", "luatextra", "lua-visual-debug"];
+const PLACEHOLDER_PACKAGES = [
+	"geometry",
+	"layout",
+	"showframe",
+	"luatextra",
+	"lua-visual-debug",
+];
 const STATIC_ASSETS = [
 	{ src: "src/css", dest: "dist/css", name: "CSS" },
 	{ src: "src/fonts", dest: "dist/fonts", name: "font" },
@@ -30,7 +42,7 @@ function assetCopyPlugin() {
 		},
 		writeBundle() {
 			console.log("Copying static assets...");
-			
+
 			// Copy standard assets
 			for (const asset of STATIC_ASSETS) {
 				if (existsSync(asset.src)) {
@@ -42,7 +54,6 @@ function assetCopyPlugin() {
 			// Copy KaTeX fonts
 			copyKatexFonts();
 		},
-		
 	};
 }
 
@@ -56,11 +67,8 @@ function typescriptModulesPlugin() {
 			console.log("Building TypeScript modules...");
 
 			try {
-				await Promise.all([
-					buildPackages(),
-					buildDocumentClasses(),
-				]);
-				
+				await Promise.all([buildPackages(), buildDocumentClasses()]);
+
 				await buildPackagePlaceholders();
 				console.log("TypeScript modules built successfully!");
 			} catch (error) {
@@ -68,7 +76,6 @@ function typescriptModulesPlugin() {
 				throw error;
 			}
 		},
-
 	};
 }
 
@@ -99,11 +106,12 @@ async function buildDocumentClasses() {
 }
 
 async function buildPackagePlaceholders() {
-			const template = readFileSync("lib/package-placeholder-template.js", "utf8");
-			mkdirSync("dist/packages", { recursive: true });
-			
+	const template = readFileSync("lib/package-placeholder-template.js", "utf8");
+	mkdirSync("dist/packages", { recursive: true });
+
 	for (const pkg of PLACEHOLDER_PACKAGES) {
-		const className = pkg.charAt(0).toUpperCase() + 
+		const className =
+			pkg.charAt(0).toUpperCase() +
 			pkg.slice(1).replace(/-(.)/g, (_m, c) => c.toUpperCase());
 		writeFileSync(
 			`dist/packages/${pkg}.js`,
@@ -123,7 +131,7 @@ function cliPlugin() {
 
 			try {
 				await execAsync(
-					`tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node`
+					`tsc src/cli.ts --outDir bin --target ES2022 --module ESNext --moduleResolution bundler --allowSyntheticDefaultImports --skipLibCheck --resolveJsonModule --types node`,
 				);
 
 				cpSync("bin/cli.js", "bin/latex.js");
@@ -153,9 +161,9 @@ export default defineConfig(({ mode }) => {
 			},
 			rollupOptions: {
 				plugins: [
-					resolve({ 
-						extensions: [".ts", ".js", ".mjs"], 
-						preferBuiltins: true 
+					resolve({
+						extensions: [".ts", ".js", ".mjs"],
+						preferBuiltins: true,
 					}),
 					pegjs({
 						plugins: [ignoreInfiniteLoop],
@@ -165,9 +173,9 @@ export default defineConfig(({ mode }) => {
 						trace: false,
 					}),
 					commonjs({ ignoreDynamicRequires: true }),
-					visualizer({ 
-						filename: "dist/latex.stats.html", 
-						sourcemap: isProd 
+					visualizer({
+						filename: "dist/latex.stats.html",
+						sourcemap: isProd,
 					}),
 				],
 				output: {

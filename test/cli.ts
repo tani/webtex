@@ -1,7 +1,7 @@
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { EOL, tmpdir } from "node:os";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
 import { describe, expect, test } from "vitest";
 import pkg from "../package.json";
 import { create as cmd } from "./lib/cmd";
@@ -10,7 +10,10 @@ const binFile = path.resolve(pkg.bin[pkg.name]);
 const latexjs = cmd(binFile);
 
 // Helper function to create temporary files
-function createTempFile(postfix: string = ""): { name: string; removeCallback: () => void } {
+function createTempFile(postfix: string = ""): {
+	name: string;
+	removeCallback: () => void;
+} {
 	const fileName = path.join(tmpdir(), `test-${randomUUID()}${postfix}`);
 	return {
 		name: fileName,
@@ -19,10 +22,10 @@ function createTempFile(postfix: string = ""): { name: string; removeCallback: (
 				if (fs.existsSync(fileName)) {
 					fs.unlinkSync(fileName);
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Ignore cleanup errors
 			}
-		}
+		},
 	};
 }
 

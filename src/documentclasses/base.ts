@@ -282,7 +282,7 @@ export class Base {
 		(this.g as any).startlist();
 		return [(this.g as any).create((this.g as any).quotation)];
 	}
-	
+
 	endquotation(): void {
 		(this.g as any).endlist();
 	}

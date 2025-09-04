@@ -1,59 +1,62 @@
 import { describe } from "vitest";
-import { createLatexSnapshot, createDocumentSnapshot } from "../lib/snapshot-runner";
+import {
+	createDocumentSnapshot,
+	createLatexSnapshot,
+} from "../lib/snapshot-runner";
 
 describe("LaTeX.js Core Features Snapshots", () => {
 	describe("Basic Text Processing", () => {
 		createLatexSnapshot(
 			"simple paragraph",
-			"This is a simple paragraph with some text."
+			"This is a simple paragraph with some text.",
 		);
 
 		createLatexSnapshot(
-			"multiple paragraphs", 
+			"multiple paragraphs",
 			`First paragraph with text.
 
 Second paragraph after blank line.
 
-Third paragraph here.`
+Third paragraph here.`,
 		);
 
 		createLatexSnapshot(
 			"line breaks",
-			"First line\\\\Second line\\newline Third line\\par Fourth paragraph."
+			"First line\\\\Second line\\newline Third line\\par Fourth paragraph.",
 		);
 	});
 
 	describe("Text Formatting", () => {
 		createLatexSnapshot(
 			"font commands",
-			"\\textbf{Bold text} and \\textit{italic text} and \\texttt{monospace}."
+			"\\textbf{Bold text} and \\textit{italic text} and \\texttt{monospace}.",
 		);
 
 		createLatexSnapshot(
 			"emphasis nesting",
-			"Normal \\emph{emphasized \\emph{double emphasized} text} here."
+			"Normal \\emph{emphasized \\emph{double emphasized} text} here.",
 		);
 
 		createLatexSnapshot(
 			"font sizes",
-			"\\tiny{tiny} \\small{small} \\normalsize{normal} \\large{large} \\Large{Large} \\huge{huge}"
+			"\\tiny{tiny} \\small{small} \\normalsize{normal} \\large{large} \\Large{Large} \\huge{huge}",
 		);
 	});
 
 	describe("Mathematical Expressions", () => {
 		createLatexSnapshot(
 			"inline math",
-			"The equation $E = mc^2$ is famous, and so is $\\pi \\approx 3.14$."
+			"The equation $E = mc^2$ is famous, and so is $\\pi \\approx 3.14$.",
 		);
 
 		createLatexSnapshot(
 			"display math",
-			"$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$"
+			"$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$",
 		);
 
 		createLatexSnapshot(
 			"math symbols",
-			"$\\alpha + \\beta = \\gamma$, $\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$"
+			"$\\alpha + \\beta = \\gamma$, $\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$",
 		);
 	});
 
@@ -64,7 +67,7 @@ Third paragraph here.`
 \\item First item
 \\item Second item with \\textbf{bold}
 \\item Third item
-\\end{itemize}`
+\\end{itemize}`,
 		);
 
 		createLatexSnapshot(
@@ -73,7 +76,7 @@ Third paragraph here.`
 \\item Numbered item
 \\item Another numbered item
 \\item Final numbered item
-\\end{enumerate}`
+\\end{enumerate}`,
 		);
 
 		createLatexSnapshot(
@@ -85,7 +88,7 @@ Third paragraph here.`
 \\item Inner numbered 2
 \\end{enumerate}
 \\item Outer item 2
-\\end{itemize}`
+\\end{itemize}`,
 		);
 
 		createLatexSnapshot(
@@ -94,24 +97,24 @@ Third paragraph here.`
 \\item[Term 1] Definition of first term
 \\item[Term 2] Definition of second term  
 \\item[\\textbf{Bold Term}] Definition with formatting
-\\end{description}`
+\\end{description}`,
 		);
 	});
 
 	describe("Special Characters and Symbols", () => {
 		createLatexSnapshot(
 			"special chars",
-			"Special: \\$ \\& \\% \\# \\{ \\} \\_ \\textbackslash"
+			"Special: \\$ \\& \\% \\# \\{ \\} \\_ \\textbackslash",
 		);
 
 		createLatexSnapshot(
 			"accents and international",
-			"Caf\\'e, na\\\"ive, Sch\\\"on, r\\'esum\\'e"
+			"Caf\\'e, na\\\"ive, Sch\\\"on, r\\'esum\\'e",
 		);
 
 		createLatexSnapshot(
-			"tex symbols", 
-			"\\LaTeX{} and \\TeX{} symbols, also \\copyright{} and \\textregistered{}"
+			"tex symbols",
+			"\\LaTeX{} and \\TeX{} symbols, also \\copyright{} and \\textregistered{}",
 		);
 	});
 
@@ -125,14 +128,14 @@ Some content here.
 More content here.
 
 \\subsubsection{Sub-subsection}
-Final content.`
+Final content.`,
 		);
 
 		createLatexSnapshot(
-			"quotes", 
+			"quotes",
 			`\\begin{quote}
 This is a block quote with some text.
-\\end{quote}`
+\\end{quote}`,
 		);
 	});
 
@@ -150,7 +153,7 @@ This is a complete document with \\textbf{formatting} and $math = equations$.
 \\item List item 2  
 \\end{itemize}
 
-\\end{document}`
+\\end{document}`,
 		);
 
 		createDocumentSnapshot(
@@ -165,7 +168,7 @@ Display math:
 $$\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}$$
 
 More equations: $E = mc^2$ and $F = ma$.
-\\end{document}`
+\\end{document}`,
 		);
 	});
 });

@@ -3,9 +3,17 @@ import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
 import katex from "katex/dist/katex.mjs";
+
 // Native JavaScript replacements for lodash functions
-const compact = <T>(array: T[]): NonNullable<T>[] => array.filter((item): item is NonNullable<T> => item != null);
-const flattenDeep = (arr: any[]): any[] => arr.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
+const compact = <T>(array: T[]): NonNullable<T>[] =>
+	array.filter((item): item is NonNullable<T> => item != null);
+const flattenDeep = (arr: any[]): any[] =>
+	arr.reduce(
+		(acc, val) =>
+			Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
+		[],
+	);
+
 import { Generator } from "./generator";
 import { diacritics, ligatures } from "./symbols";
 
