@@ -5,9 +5,9 @@
  *   Andrés Zorro <zorrodg@gmail.com>
  *   Michael Brade <brade@kde.org>
  */
-const { existsSync } = require("node:fs");
-const { constants } = require("node:os");
-const { spawn: spawnCmd } = require("node:child_process");
+import { existsSync } from "node:fs";
+import { constants } from "node:os";
+import { spawn as spawnCmd } from "node:child_process";
 
 const PATH = process.env.PATH;
 

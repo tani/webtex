@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const { parse, HtmlGenerator } = require("../../dist/latex.js");
-const { createHTMLWindow } = require("svgdom");
+import { parse, HtmlGenerator } from "../../dist/latex.js";
+import { createHTMLWindow } from "svgdom";
 
 global.window = createHTMLWindow();
 global.document = window.document;

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { registerWindow } from "@svgdotjs/svg.js";
+import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import decache from "decache";
 import he from "he";
 import slugify from "slugify";
@@ -17,7 +17,7 @@ const window = createHTMLWindow();
 function resetSvgIds() {
 	decache("@svgdotjs/svg.js");
 	delete (HtmlGenerator.prototype as any).SVG;
-	(HtmlGenerator.prototype as any).SVG = require("@svgdotjs/svg.js").SVG;
+	(HtmlGenerator.prototype as any).SVG = SVG;
 	return registerWindow(window as any, document as any);
 }
 
