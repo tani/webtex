@@ -241,6 +241,7 @@ await cli(process.argv.slice(2), command, {
 	name: info.name,
 	version: info.version,
 	description: info.description,
+	renderHeader: null, // Suppress automatic header printing
 }).catch((error) => {
 	console.error("Error:", error);
 	process.exit(1);

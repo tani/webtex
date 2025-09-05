@@ -38,7 +38,8 @@ describe("LaTeX.js CLI test", () => {
 	test("get help", async () => {
 		const result = await latexjs.execute(["-h"]);
 		expect(result).toBeDefined();
-		expect(result.stdout).toContain(pkg.description);
+		expect(result.stdout).toContain("USAGE:");
+		expect(result.stdout).toContain("OPTIONS:");
 	});
 
 	test("compile without output", async () => {
