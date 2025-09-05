@@ -27,10 +27,33 @@ jobs:
     - name: Install dependencies
       run: npm ci
     
-    - name: Install Playwright browsers
+    - name: Cache Playwright system dependencies
+      uses: actions/cache@v4
+      id: playwright-deps-cache
+      with:
+        path: |
+          /var/cache/apt
+          /var/lib/apt/lists
+        key: ${{ runner.os }}-playwright-deps-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-deps-
+    
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      id: playwright-cache
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-playwright-
+    
+    - name: Install Playwright system dependencies
+      if: steps.playwright-deps-cache.outputs.cache-hit != 'true'
       run: npx playwright install-deps
     
-    - name: Install Playwright
+    - name: Install Playwright browsers
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
       run: npx playwright install
     
     - name: Run linting
@@ -41,6 +64,16 @@ jobs:
     
     - name: Type check
       run: npm run typecheck
+    
+    - name: Cache build output
+      uses: actions/cache@v4
+      with:
+        path: |
+          dist
+          .vite
+        key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json', 'src/**/*', 'vite.config.ts') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
     
     - name: Build project
       run: npm run build

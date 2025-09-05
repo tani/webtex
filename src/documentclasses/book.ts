@@ -1,5 +1,5 @@
-import { Report } from "./report";
 import type { DocumentClassGenerator } from "../interfaces";
+import { Report } from "./report";
 
 export class Book extends Report {
 	static displayName = "Book";

@@ -61,7 +61,7 @@ export interface StixGenerator extends PackageGenerator {
 			type: string,
 			symbol: string,
 			command: string,
-			replace?: boolean
+			replace?: boolean,
 		): void;
 	};
 }

@@ -31,7 +31,7 @@ const makeLengthClass = (generator: LengthGenerator) => {
 			}
 			this._value = value;
 			this._unit = unit;
-			
+
 			// Convert to scaled points if possible
 			const unitValue = unitsSp.get(unit);
 			if (unitValue !== undefined) {
@@ -53,13 +53,15 @@ const makeLengthClass = (generator: LengthGenerator) => {
 
 		public assertCompatible(other: Length, operation: string): void {
 			if (this._unit !== other._unit) {
-				g.error(`Length.${operation}: incompatible lengths! (${this._unit} and ${other._unit})`);
+				g.error(
+					`Length.${operation}: incompatible lengths! (${this._unit} and ${other._unit})`,
+				);
 			}
 		}
 
 		get value(): string {
-			return this._unit === "sp" 
-				? `${this.toPx()}px` 
+			return this._unit === "sp"
+				? `${this.toPx()}px`
 				: `${g.round(this._value)}${this._unit}`;
 		}
 
@@ -68,8 +70,8 @@ const makeLengthClass = (generator: LengthGenerator) => {
 		}
 
 		get pxpct(): string | number {
-			return this._unit === "sp" 
-				? this.toPx() 
+			return this._unit === "sp"
+				? this.toPx()
 				: `${g.round(this._value)}${this._unit}`;
 		}
 
@@ -130,7 +132,7 @@ const makeLengthClass = (generator: LengthGenerator) => {
 	return Length;
 };
 
-type ShiftDirection = 'start' | 'end';
+type ShiftDirection = "start" | "end";
 
 interface ShiftCalc {
 	x: number;
@@ -173,7 +175,7 @@ class Vector {
 	private assertCompatibleUnits(operation: string): void {
 		if (this._x.unit !== this._y.unit) {
 			throw new Error(
-				`Vector.${operation}: incompatible lengths! (${this._x.unit} and ${this._y.unit})`
+				`Vector.${operation}: incompatible lengths! (${this._x.unit} and ${this._y.unit})`,
 			);
 		}
 	}
@@ -181,7 +183,7 @@ class Vector {
 	private calculateShift(): ShiftCalc {
 		const x = this._x._value;
 		const y = this._y._value;
-		
+
 		return {
 			x,
 			y,
@@ -194,13 +196,13 @@ class Vector {
 
 	private performShift(l: any, direction: ShiftDirection): Vector {
 		this.assertCompatibleUnits(`shift_${direction}`);
-		
+
 		const calc = this.calculateShift();
 		const { x, y, msq, imsq, dir_x, dir_y } = calc;
-		
-		const isStart = direction === 'start';
+
+		const isStart = direction === "start";
 		const multiplier = isStart ? -1 : 1;
-		
+
 		let newX: any;
 		let newY: any;
 
@@ -223,11 +225,11 @@ class Vector {
 	}
 
 	shift_start(l: any): Vector {
-		return this.performShift(l, 'start');
+		return this.performShift(l, "start");
 	}
 
 	shift_end(l: any): Vector {
-		return this.performShift(l, 'end');
+		return this.performShift(l, "end");
 	}
 
 	norm(): any {
