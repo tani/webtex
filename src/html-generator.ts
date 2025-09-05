@@ -382,15 +382,24 @@ export class HtmlGenerator extends Generator {
 			return script;
 		};
 
-		// Add MathJax stylesheet using the proper method
+		// Add MathJax stylesheet using the proper method with fallback
 		try {
 			const jax = MathJax.startup.document.outputJax;
 			const mathJaxStyleElement = jax.styleSheet();
 			if (mathJaxStyleElement) {
 				el.appendChild(mathJaxStyleElement.cloneNode(true));
+			} else {
+				// No stylesheet available, fallback to static CSS
+				if (baseURL) {
+					el.appendChild(
+						createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
+					);
+				} else {
+					el.appendChild(createStyleSheet("css/mathjax.css"));
+				}
 			}
 		} catch (e) {
-			// Fallback to static CSS if MathJax stylesheet is not available
+			// MathJax stylesheet method failed, fallback to static CSS
 			if (baseURL) {
 				el.appendChild(
 					createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
