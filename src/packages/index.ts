@@ -1,3 +1,4 @@
+import { Amsthm } from "./amsthm";
 import { Bussproofs } from "./bussproofs";
 import { Color } from "./color";
 import { Echo } from "./echo";
@@ -13,6 +14,7 @@ import { Textgreek } from "./textgreek";
 import { XColor } from "./xcolor";
 
 export default {
+	amsthm: Amsthm,
 	bussproofs: Bussproofs,
 	color: Color,
 	xcolor: XColor,

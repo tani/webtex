@@ -54,3 +54,12 @@ export interface HyperrefGenerator extends PackageGenerator {
 }
 
 export interface StixGenerator extends PackageGenerator {}
+
+export interface AmsthrmGenerator extends PackageGenerator {
+	create(element: any, content?: any, className?: string): any;
+	createText(text: string): any;
+	setCounter(name: string, value: number): void;
+	counter(name: string): number;
+	newCounter(name: string, resetBy?: string): void;
+	arabic(value: number): string;
+}

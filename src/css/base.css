@@ -761,3 +761,60 @@ span.latex > .e {
 	position: relative;
 	top: 0.45ex;
 }
+
+/* amsthm theorem environments */
+
+.amsthm-environment {
+	margin: 1rem 0;
+	display: block;
+}
+
+/* Plain style (theorems, lemmas, corollaries) */
+.amsthm-plain .amsthm-plain-header {
+	font-weight: bold;
+	font-style: normal;
+}
+
+.amsthm-plain .amsthm-plain-body {
+	font-style: italic;
+}
+
+/* Definition style (definitions, examples, problems) */
+.amsthm-definition .amsthm-definition-header {
+	font-weight: bold;
+	font-style: normal;
+}
+
+.amsthm-definition .amsthm-definition-body {
+	font-style: normal;
+}
+
+/* Remark style (remarks, notes, cases) */
+.amsthm-remark .amsthm-remark-header {
+	font-style: italic;
+	font-weight: normal;
+}
+
+.amsthm-remark .amsthm-remark-body {
+	font-style: normal;
+}
+
+/* Proof environment */
+.amsthm-proof {
+	margin: 1rem 0;
+	display: block;
+}
+
+.amsthm-proof-header {
+	font-style: italic;
+	font-weight: normal;
+	margin-right: 0.5em;
+}
+
+/* QED symbol */
+.amsthm-qed {
+	float: right;
+	font-size: 1rem;
+	font-weight: bold;
+	margin-left: 0.5em;
+}

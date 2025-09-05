@@ -1,0 +1,142 @@
+** basic theorem with plain style
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\begin{theorem}
+This is a theorem statement.
+\end{theorem}
+\end{document}
+.
+
+
+** theorem with proof
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\begin{theorem}[Pythagorean Theorem]
+For a right triangle with legs $a$ and $b$, and hypotenuse $c$: $a^2 + b^2 = c^2$.
+\end{theorem}
+
+\begin{proof}
+This follows from the law of cosines.
+\end{proof}
+\end{document}
+.
+
+
+** multiple theorem styles
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\begin{theorem}
+This is a theorem in plain style.
+\end{theorem}
+
+\begin{lemma}
+This is a lemma sharing the theorem counter.
+\end{lemma}
+
+\begin{definition}
+This is a definition in definition style.
+\end{definition}
+
+\begin{example}
+This is an example in definition style.
+\end{example}
+
+\begin{remark}
+This is a remark in remark style.
+\end{remark}
+\end{document}
+.
+
+
+** unnumbered theorem
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\newtheorem*{observation}{Observation}
+
+\begin{document}
+\begin{observation}
+This theorem is unnumbered.
+\end{observation}
+\end{document}
+.
+
+
+** sectioned numbering
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}[section]
+
+\begin{document}
+\section{Introduction}
+\begin{theorem}
+First theorem in section 1.
+\end{theorem}
+
+\begin{theorem}
+Second theorem in section 1.
+\end{theorem}
+
+\section{Main Results}
+\begin{theorem}
+First theorem in section 2.
+\end{theorem}
+\end{document}
+.
+
+
+** proof with custom label
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\begin{document}
+\begin{proof}[Proof Sketch]
+This is just a sketch of the proof.
+\end{proof}
+
+\begin{proof}[Solution]
+This is the solution to the problem.
+\end{proof}
+\end{document}
+.
+
+
+** qed command
+.
+\documentclass{article}
+\usepackage{amsthm}
+
+\begin{document}
+This completes the argument. \qed
+
+Manual QED placement in the middle of text.
+\end{document}
+.
