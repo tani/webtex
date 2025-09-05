@@ -5,10 +5,14 @@ import Hypher from "hypher";
 import mathjax from "mathjax";
 
 const MathJax = await mathjax.init({
-	loader: { load: ["input/tex", "output/svg"] },
+	loader: { load: ["input/tex", "output/svg", "[tex]/bussproofs"] },
 	startup: { typeset: false },
 	svg: { fontCache: "none" },
+	tex: {
+		packages: { "[+]": ["bussproofs"] },
+	},
 });
+
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -378,10 +382,25 @@ export class HtmlGenerator extends Generator {
 			return script;
 		};
 
+		// Add MathJax stylesheet using the proper method
+		try {
+			const jax = MathJax.startup.document.outputJax;
+			const mathJaxStyleElement = jax.styleSheet();
+			if (mathJaxStyleElement) {
+				el.appendChild(mathJaxStyleElement.cloneNode(true));
+			}
+		} catch (e) {
+			// Fallback to static CSS if MathJax stylesheet is not available
+			if (baseURL) {
+				el.appendChild(
+					createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
+				);
+			} else {
+				el.appendChild(createStyleSheet("css/mathjax.css"));
+			}
+		}
+
 		if (baseURL) {
-			el.appendChild(
-				createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
-			);
 			el.appendChild(
 				createStyleSheet(
 					new URL(
@@ -395,7 +414,6 @@ export class HtmlGenerator extends Generator {
 			}
 			el.appendChild(createScript(new URL("js/base.js", baseURL).toString()));
 		} else {
-			el.appendChild(createStyleSheet("css/mathjax.css"));
 			el.appendChild(
 				createStyleSheet((this as any).documentClass.constructor.css),
 			);

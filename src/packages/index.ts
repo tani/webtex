@@ -1,3 +1,4 @@
+import { Bussproofs } from "./bussproofs";
 import { Color } from "./color";
 import { Echo } from "./echo";
 import { Gensymb } from "./gensymb";
@@ -12,6 +13,7 @@ import { Textgreek } from "./textgreek";
 import { XColor } from "./xcolor";
 
 export default {
+	bussproofs: Bussproofs,
 	color: Color,
 	xcolor: XColor,
 	echo: Echo,

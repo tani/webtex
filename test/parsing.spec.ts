@@ -134,5 +134,15 @@ describe("LaTeX.js Parsing Tests", () => {
 				strategy: "snapshot-only",
 			});
 		});
+
+		describe("Bussproofs", () => {
+			const fixtureFile = path.join(
+				__dirname,
+				"fixtures/packages/bussproofs.tex",
+			);
+			migrateFixtureFile(fixtureFile, "packages/bussproofs.tex", {
+				strategy: "snapshot-only",
+			});
+		});
 	});
 });

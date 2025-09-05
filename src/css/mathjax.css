@@ -23,3 +23,25 @@ mjx-container[jax="SVG"] mjx-assistive-mml {
 mjx-container[jax="SVG"] mjx-assistive-mml[display="block"] {
 	display: block;
 }
+
+/* Bussproofs line styles */
+mjx-container[jax="SVG"] .mjx-solid {
+	stroke: currentColor;
+	stroke-width: 1;
+	fill: none;
+}
+
+mjx-container[jax="SVG"] .mjx-dashed {
+	stroke: currentColor;
+	stroke-width: 1;
+	stroke-dasharray: 4,2;
+	fill: none;
+}
+
+mjx-container[jax="SVG"] .mjx-dotted {
+	stroke: currentColor;
+	stroke-width: 1;
+	stroke-dasharray: 1,2;
+	fill: none;
+}
+

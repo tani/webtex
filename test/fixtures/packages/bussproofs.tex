@@ -1,0 +1,88 @@
+** simple axiom with unary inference
+.
+\documentclass{article}
+\usepackage{bussproofs}
+
+\begin{document}
+\begin{prooftree}
+\AxiomC{$A$}
+\UnaryInfC{$B$}
+\end{prooftree}
+\end{document}
+.
+
+
+** binary inference with labels
+.
+\documentclass{article}
+\usepackage{bussproofs}
+
+\begin{document}
+\begin{prooftree}
+\AxiomC{$A$}
+\AxiomC{$A \to B$}
+\RightLabel{MP}
+\BinaryInfC{$B$}
+\end{prooftree}
+\end{document}
+.
+
+
+** complex proof tree with multiple inferences
+.
+\documentclass{article}
+\usepackage{bussproofs}
+
+\begin{document}
+\begin{prooftree}
+\AxiomC{}
+\RightLabel{Hyp$^{1}$}
+\UnaryInfC{$P$}
+\AXC{$P\to Q$}
+\RL{$\to_E$}
+\BIC{$Q^2$}
+\AXC{$Q\to R$}
+\RL{$\to_E$}
+\BIC{$R$}
+\AXC{$Q$}
+\RL{Rit$^2$}
+\UIC{$Q$}
+\RL{$\wedge_I$}
+\BIC{$Q\wedge R$}
+\RL{$\to_I$$^1$}
+\UIC{$P\to Q\wedge R$}
+\end{prooftree}
+\end{document}
+.
+
+
+** abbreviated commands
+.
+\documentclass{article}
+\usepackage{bussproofs}
+
+\begin{document}
+\begin{prooftree}
+\AXC{$\Gamma, A \vdash B$}
+\AXC{$\Delta \vdash A$}
+\LL{Cut}
+\BIC{$\Gamma, \Delta \vdash B$}
+\end{prooftree}
+\end{document}
+.
+
+
+** trinary inference
+.
+\documentclass{article}
+\usepackage{bussproofs}
+
+\begin{document}
+\begin{prooftree}
+\AxiomC{$A$}
+\AxiomC{$B$}  
+\AxiomC{$C$}
+\TrinaryInfC{$A \wedge B \wedge C$}
+\end{prooftree}
+\end{document}
+.
