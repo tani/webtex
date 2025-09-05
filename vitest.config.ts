@@ -8,7 +8,6 @@ export default defineConfig({
 		exclude: [
 			"**/node_modules/**",
 			"**/dist/**",
-			"**/coverage/**",
 			"test/api/**/*.js",
 			"test/api/**/*.mjs",
 			"test/api/**/*.html",
@@ -35,13 +34,6 @@ export default defineConfig({
 				.basename(testPath)
 				.replace(/\.(test|spec)\.(js|ts)$/, "");
 			return path.join(dir, "__snapshots__", `${filename}${snapExtension}`);
-		},
-		coverage: {
-			provider: "v8",
-			reporter: ["text", "lcov", "html"],
-			reportsDirectory: "./test/coverage",
-			include: ["src/**/*.ts", "src/**/*.js"],
-			exclude: ["src/**/*.d.ts", "src/**/*.test.ts", "src/**/*.spec.ts"],
 		},
 	},
 });

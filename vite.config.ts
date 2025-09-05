@@ -7,13 +7,10 @@ import {
 	writeFileSync,
 } from "node:fs";
 import { promisify } from "node:util";
-import commonjs from "@rollup/plugin-commonjs";
-import resolve from "@rollup/plugin-node-resolve";
-import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
-import pegjs from "./lib/rollup-plugin-pegjs.mjs";
+import pegjs from "./lib/vite-plugin-pegjs.mjs";
 
 const execAsync = promisify(exec);
 
@@ -131,24 +128,6 @@ export default defineConfig(({ mode }) => {
 				formats: ["es"],
 			},
 			rollupOptions: {
-				plugins: [
-					resolve({
-						extensions: [".ts", ".js", ".mjs"],
-						preferBuiltins: true,
-					}),
-					pegjs({
-						plugins: [ignoreInfiniteLoop],
-						target: "es",
-						exportVar: "parser",
-						format: "bare",
-						trace: false,
-					}),
-					commonjs({}),
-					visualizer({
-						filename: "dist/latex.stats.html",
-						sourcemap: isProd,
-					}),
-				],
 				output: {
 					format: "es",
 					entryFileNames: "latex.js",
@@ -156,6 +135,13 @@ export default defineConfig(({ mode }) => {
 			},
 		},
 		plugins: [
+			pegjs({
+				plugins: [ignoreInfiniteLoop],
+				target: "es",
+				exportVar: "parser",
+				format: "bare",
+				trace: false,
+			}),
 			assetCopyPlugin(),
 			typescriptModulesPlugin(),
 			dts({
