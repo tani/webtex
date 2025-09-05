@@ -13,19 +13,34 @@ interface TheoremEnvironment {
 	parentCounter?: string;
 	numbered: boolean;
 	style: TheoremStyle;
+	sharedWith?: string; // If sharing counter with another theorem environment
 }
 
 export class Amsthm {
 	static displayName = "Amsthm";
 	static args: Record<string, any[]> = {
-		newtheorem: ["V", "g", "g", "o?", "o?"],
+		newtheorem: ["V", "g", "o?", "g", "o?"],
 		theoremstyle: ["V", "g"],
 		qed: ["H"],
+		// Environment arguments - required for parser to handle optional arguments
+		proof: ["HV", "o?"],
+		theorem: ["HV", "o?"],
+		lemma: ["HV", "o?"],
+		corollary: ["HV", "o?"],
+		proposition: ["HV", "o?"],
+		definition: ["HV", "o?"],
+		example: ["HV", "o?"],
+		remark: ["HV", "o?"],
+		note: ["HV", "o?"],
+		observation: ["HV", "o?"],
+		claim: ["HV", "o?"],
+		fact: ["HV", "o?"],
+		conjecture: ["HV", "o?"],
 	};
 
 	static environments: Record<string, any[]> = {
 		proof: ["HV", "o?"],
-		// Pre-define common theorem environments that users typically create
+		// Theorem environments with optional argument support
 		theorem: ["HV", "o?"],
 		lemma: ["HV", "o?"],
 		corollary: ["HV", "o?"],
@@ -77,59 +92,116 @@ export class Amsthm {
 		return [];
 	}
 
-	// Define a new theorem environment
-	newtheorem(envName: string, displayName: string, parentOrCounter?: string, resetBy?: string): any[] {
-		const isStarred = envName.endsWith('*');
-		const actualEnvName = isStarred ? envName.slice(0, -1) : envName;
+	/**
+	 * Define a new theorem environment using \newtheorem
+	 * 
+	 * IMPORTANT LIMITATION: Due to LaTeX.js architecture, environments must be statically declared.
+	 * This means \newtheorem can only configure pre-defined environments, not create new ones.
+	 * 
+	 * Supported syntax:
+	 * - \newtheorem{name}{display}                    - Simple numbered theorem
+	 * - \newtheorem{name}{display}[parent]            - Numbered by parent counter (like section)  
+	 * - \newtheorem{name}[counter]{display}           - Share counter with existing theorem
+	 * - \newtheorem*{name}{display}                   - Unnumbered theorem
+	 * 
+	 * Pre-defined environments that work with \newtheorem:
+	 * theorem, lemma, corollary, proposition, definition, example, remark, note, 
+	 * observation, claim, fact, conjecture
+	 * 
+	 * For other environment names, \newtheorem will issue a warning and the environment
+	 * will not be available for use.
+	 * 
+	 * @param envName - Name of the theorem environment (may include *)
+	 * @param sharedCounter - Optional counter to share with existing theorem
+	 * @param displayName - Display name for the theorem (e.g., "Theorem", "Lemma")
+	 * @param parentCounter - Optional parent counter for hierarchical numbering
+	 */
+	newtheorem(envName: string, sharedCounter: string | undefined, displayName: string, parentCounter?: string): any[] {
+		// Handle starred version for unnumbered theorems
+		const isStarred = envName.includes('*');
+		const actualEnvName = isStarred ? envName.replace('*', '') : envName;
+		const numbered = !isStarred;
+
+		// Parse the arguments to understand the syntax variants:
+		// \newtheorem{name}{display}                    - Simple numbered theorem
+		// \newtheorem{name}{display}[parent]            - Numbered by parent counter (like section)  
+		// \newtheorem{name}[counter]{display}           - Share counter with existing theorem
+		// \newtheorem*{name}{display}                   - Unnumbered theorem
 		
 		let counterName: string;
-		let parentCounter: string | undefined;
-		let numbered = !isStarred;
+		let parentResetBy: string | undefined;
+		let sharedWith: string | undefined;
 
-		if (parentOrCounter) {
-			// Check if parentOrCounter is an existing theorem environment (shared counter)
-			if (this.theoremEnvironments[parentOrCounter]) {
-				counterName = this.theoremEnvironments[parentOrCounter].counter || parentOrCounter;
+		if (sharedCounter) {
+			// Syntax: \newtheorem{lemma}[theorem]{Lemma}
+			// This means lemma shares the counter with theorem
+			sharedWith = sharedCounter;
+			if (this.theoremEnvironments[sharedCounter]) {
+				counterName = this.theoremEnvironments[sharedCounter].counter || sharedCounter;
 			} else {
-				// It's a parent counter (like 'section')
-				counterName = actualEnvName;
-				parentCounter = parentOrCounter;
+				counterName = sharedCounter;
 			}
 		} else {
+			// Syntax: \newtheorem{theorem}{Theorem}[section] or \newtheorem{theorem}{Theorem}
 			counterName = actualEnvName;
+			parentResetBy = parentCounter;
+		}
+
+		// Check if this environment is already pre-defined in static environments
+		const isPredefined = Object.keys(Amsthm.environments).includes(actualEnvName);
+		
+		// Issue warning if environment is not pre-defined
+		if (!isPredefined) {
+			console.warn(
+				`amsthm warning: Environment '${actualEnvName}' created by \\newtheorem is not pre-defined in LaTeX.js.\n` +
+				`This environment will not be available for use. LaTeX.js requires environments to be statically declared.\n` +
+				`Consider using one of the pre-defined environments: ${Object.keys(Amsthm.environments).filter(e => e !== 'proof').join(', ')}\n` +
+				`Or add '${actualEnvName}' to the static environments list in the amsthm package.`
+			);
 		}
 
 		const environment: TheoremEnvironment = {
 			name: actualEnvName,
 			displayName: displayName,
 			counter: numbered ? counterName : undefined,
-			parentCounter: parentCounter,
+			parentCounter: parentResetBy,
 			numbered: numbered,
-			style: this.theoremStyles[this.currentStyle]
+			style: this.theoremStyles[this.currentStyle],
+			sharedWith: sharedWith
 		};
 
+		// Store the theorem environment configuration
 		this.theoremEnvironments[actualEnvName] = environment;
 
-		// Initialize counter if needed
-		if (numbered && !this.counters[counterName]) {
+		// Initialize counter if needed and not sharing
+		if (numbered && !sharedWith && !this.counters[counterName]) {
 			this.counters[counterName] = 0;
 			try {
-				this.g.newCounter(counterName, parentCounter);
-			} catch {
+				this.g.newCounter(counterName, parentResetBy);
+			} catch (e) {
 				// Fallback if generator doesn't support newCounter
+				console.warn(`amsthm warning: Could not create counter '${counterName}': ${e}`);
 			}
 		}
 
-		// Create dynamic method for this theorem environment
-		(this as any)[actualEnvName] = (content: any) => {
-			return this.createTheoremEnvironment(actualEnvName, content);
-		};
+		// For pre-defined environments, the method already exists
+		// For non-pre-defined environments, we can't create a usable method due to LaTeX.js limitations
+		if (!isPredefined) {
+			// Store a placeholder method that explains the limitation
+			(this as any)[actualEnvName] = (content: any) => {
+				return [this.g.error(
+					`Environment '${actualEnvName}' was defined with \\newtheorem but is not available. ` +
+					`LaTeX.js requires environments to be pre-declared. Use a pre-defined environment instead.`
+				)];
+			};
+		}
 
 		return [];
 	}
 
 	// Create a theorem environment instance
-	private createTheoremEnvironment(envName: string, content: any, optionalTitle?: string): any[] {
+	private createTheoremEnvironment(envName: string, content: any, title?: any): any[] {
+		console.log('createTheoremEnvironment called with:', envName, 'content:', content, 'title:', title);
 		const env = this.theoremEnvironments[envName];
 		if (!env) {
 			return [this.g.error(`Unknown theorem environment: ${envName}`)];
@@ -138,62 +210,84 @@ export class Amsthm {
 		let headerText = env.displayName;
 		
 		if (env.numbered && env.counter) {
-			// Increment counter
+			// Handle parent counter resets (like section numbering)
+			if (env.parentCounter) {
+				try {
+					const parentValue = this.g.counter(env.parentCounter);
+					// Reset counter when parent counter changes
+					const parentKey = `${env.counter}_parent`;
+					const lastParentValue = this.counters[parentKey] || 0;
+					if (parentValue !== lastParentValue) {
+						this.counters[env.counter] = 0;
+						this.counters[parentKey] = parentValue;
+					}
+				} catch {
+					// Parent counter not available, continue with normal numbering
+				}
+			}
+
+			// Increment the counter
 			this.counters[env.counter] = (this.counters[env.counter] || 0) + 1;
 			
+			// Format the number with parent counter if applicable
+			let formattedNumber: string;
 			try {
 				this.g.setCounter(env.counter, this.counters[env.counter]);
 				const counterValue = this.g.counter(env.counter);
-				const formattedNumber = this.g.arabic(counterValue);
-				headerText += ` ${formattedNumber}`;
+				
+				if (env.parentCounter) {
+					const parentValue = this.g.counter(env.parentCounter);
+					formattedNumber = `${this.g.arabic(parentValue)}.${this.g.arabic(counterValue)}`;
+				} else {
+					formattedNumber = this.g.arabic(counterValue);
+				}
 			} catch {
-				// Fallback if generator methods fail
-				headerText += ` ${this.counters[env.counter]}`;
+				// Fallback formatting
+				if (env.parentCounter) {
+					try {
+						const parentValue = this.g.counter(env.parentCounter);
+						formattedNumber = `${parentValue}.${this.counters[env.counter]}`;
+					} catch {
+						formattedNumber = `${this.counters[env.counter]}`;
+					}
+				} else {
+					formattedNumber = `${this.counters[env.counter]}`;
+				}
 			}
+			
+			headerText += ` ${formattedNumber}`;
 		}
 
-		// Add optional title if provided
-		if (optionalTitle) {
-			headerText += ` (${optionalTitle})`;
+		// Create theorem header with optional title
+		let headerContent: any;
+		if (title) {
+			headerContent = [this.g.createText(headerText + ' ('), title, this.g.createText('). ')];
+		} else {
+			headerContent = this.g.createText(headerText + '. ');
 		}
-
-		// Create theorem header
-		const header = this.g.create('span', this.g.createText(headerText), env.style.headerFormat);
+		const header = this.g.create('span', headerContent, env.style.headerFormat);
 		
-		// Create theorem body
-		const body = this.g.create('div', content, env.style.bodyFormat);
-		
-		// Wrap in theorem container
-		const theorem = this.g.create('div', [header, body], `amsthm-environment amsthm-${env.style.name}`);
+		// Create the theorem container with header and content
+		const theorem = this.g.create('div', [header, content], `amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`);
 		
 		return [theorem];
 	}
 
-	// Proof environment
-	proof(content: any, label?: string): any[] {
-		const proofLabel = label || 'Proof';
-		
-		// Create proof header
-		const header = this.g.create('em', this.g.createText(proofLabel + '.'), 'amsthm-proof-header');
-		
-		// Create QED symbol
-		const qedSymbol = this.g.create('span', this.g.createText('◻'), 'amsthm-qed');
-		
-		// Create proof body - handle content properly
-		let bodyElements: any[] = [];
-		if (content) {
-			if (Array.isArray(content)) {
-				bodyElements = [...content];
-			} else {
-				bodyElements = [content];
-			}
+	// Proof environment with optional argument support  
+	proof(label?: any): any[] {
+		// Create proof header with optional label
+		let headerContent: any;
+		if (label) {
+			headerContent = [label, this.g.createText('. ')];
+		} else {
+			headerContent = this.g.createText('Proof. ');
 		}
-		bodyElements.push(qedSymbol);
+		const header = this.g.create('em', headerContent, 'amsthm-proof-header');
 		
-		// Wrap in proof container
-		const proofEnv = this.g.create('div', [header, ...bodyElements], 'amsthm-proof');
+		// Create proof container with header - QED symbol will be added via CSS
+		const proofContainer = this.g.create('div', [header], 'amsthm-proof amsthm-proof-with-qed');
 		
-		return [proofEnv];
+		return [proofContainer];
 	}
 
 	// QED symbol command
@@ -202,60 +296,132 @@ export class Amsthm {
 		return [qedSymbol];
 	}
 
-	// Pre-defined theorem environment methods
-	theorem(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('theorem', content, optionalTitle);
+	// Pre-defined theorem environment methods with optional argument support
+	theorem(title?: any): any[] {
+		return this.createTheoremContainer('theorem', title);
 	}
 
-	lemma(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('lemma', content, optionalTitle);
+	lemma(title?: any): any[] {
+		return this.createTheoremContainer('lemma', title);
 	}
 
-	corollary(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('corollary', content, optionalTitle);
+	corollary(title?: any): any[] {
+		return this.createTheoremContainer('corollary', title);
 	}
 
-	proposition(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('proposition', content, optionalTitle);
+	proposition(title?: any): any[] {
+		return this.createTheoremContainer('proposition', title);
 	}
 
-	definition(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('definition', content, optionalTitle);
+	definition(title?: any): any[] {
+		return this.createTheoremContainer('definition', title);
 	}
 
-	example(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('example', content, optionalTitle);
+	example(title?: any): any[] {
+		return this.createTheoremContainer('example', title);
 	}
 
-	remark(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('remark', content, optionalTitle);
+	remark(title?: any): any[] {
+		return this.createTheoremContainer('remark', title);
 	}
 
-	note(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('note', content, optionalTitle);
+	note(title?: any): any[] {
+		return this.createTheoremContainer('note', title);
 	}
 
-	observation(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('observation', content, optionalTitle);
+	observation(title?: any): any[] {
+		return this.createTheoremContainer('observation', title);
 	}
 
-	claim(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('claim', content, optionalTitle);
+	claim(title?: any): any[] {
+		return this.createTheoremContainer('claim', title);
 	}
 
-	fact(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('fact', content, optionalTitle);
+	fact(title?: any): any[] {
+		return this.createTheoremContainer('fact', title);
 	}
 
-	conjecture(content: any, optionalTitle?: string): any[] {
-		return this.handleEnvironment('conjecture', content, optionalTitle);
+	conjecture(title?: any): any[] {
+		return this.createTheoremContainer('conjecture', title);
+	}
+
+	// Create theorem container with header - parser will append content
+	private createTheoremContainer(envName: string, title?: any): any[] {
+		
+		// Get or create environment configuration
+		if (!this.theoremEnvironments[envName]) {
+			const defaultStyle = this.getDefaultStyle(envName);
+			const environment: TheoremEnvironment = {
+				name: envName,
+				displayName: this.capitalizeFirst(envName),
+				numbered: true,
+				counter: envName,
+				style: this.theoremStyles[defaultStyle]
+			};
+			this.theoremEnvironments[envName] = environment;
+			
+			// Initialize counter
+			if (!this.counters[envName]) {
+				this.counters[envName] = 0;
+			}
+		}
+		
+		const env = this.theoremEnvironments[envName];
+		let headerText = env.displayName;
+		
+		if (env.numbered && env.counter) {
+			// Handle parent counter resets (like section numbering)
+			if (env.parentCounter) {
+				try {
+					const parentValue = this.g.counter(env.parentCounter);
+					// Reset counter when parent counter changes
+					const parentKey = `${env.counter}_parent`;
+					const lastParentValue = this.counters[parentKey] || 0;
+					if (parentValue !== lastParentValue) {
+						this.counters[env.counter] = 0;
+						this.counters[parentKey] = parentValue;
+					}
+				} catch {
+					// Parent counter doesn't exist, continue without parent numbering
+				}
+			}
+			
+			// Increment counter
+			this.counters[env.counter] = (this.counters[env.counter] || 0) + 1;
+			const counter = this.counters[env.counter];
+			
+			if (env.parentCounter) {
+				try {
+					const parentValue = this.g.counter(env.parentCounter);
+					headerText = `${headerText} ${parentValue}.${counter}`;
+				} catch {
+					headerText = `${headerText} ${counter}`;
+				}
+			} else {
+				headerText = `${headerText} ${counter}`;
+			}
+		}
+		
+		// Create theorem header with optional title
+		let headerContent: any;
+		if (title) {
+			headerContent = [this.g.createText(headerText + ' ('), title, this.g.createText('). ')];
+		} else {
+			headerContent = this.g.createText(headerText + '. ');
+		}
+		const header = this.g.create('span', headerContent, env.style.headerFormat);
+		
+		// Create container div with header - parser will append content
+		const container = this.g.create('div', [header], `amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`);
+		
+		return [container];
 	}
 
 	// Generic environment handler
-	private handleEnvironment(envName: string, content: any, optionalTitle?: string): any[] {
+	private handleEnvironment(envName: string, content: any, title?: any): any[] {
 		// If this environment has been defined by \newtheorem, use that configuration
 		if (this.theoremEnvironments[envName]) {
-			return this.createTheoremEnvironment(envName, content, optionalTitle);
+			return this.createTheoremEnvironment(envName, content, title);
 		}
 		
 		// Otherwise, use default configuration based on environment name
@@ -276,7 +442,7 @@ export class Amsthm {
 			this.counters[envName] = 0;
 		}
 
-		return this.createTheoremEnvironment(envName, content, optionalTitle);
+		return this.createTheoremEnvironment(envName, content, title);
 	}
 
 	private getDefaultStyle(envName: string): string {

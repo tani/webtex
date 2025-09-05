@@ -775,7 +775,7 @@ span.latex > .e {
 	font-style: normal;
 }
 
-.amsthm-plain .amsthm-plain-body {
+.amsthm-plain.amsthm-plain-body {
 	font-style: italic;
 }
 
@@ -785,7 +785,7 @@ span.latex > .e {
 	font-style: normal;
 }
 
-.amsthm-definition .amsthm-definition-body {
+.amsthm-definition.amsthm-definition-body {
 	font-style: normal;
 }
 
@@ -795,7 +795,7 @@ span.latex > .e {
 	font-weight: normal;
 }
 
-.amsthm-remark .amsthm-remark-body {
+.amsthm-remark.amsthm-remark-body {
 	font-style: normal;
 }
 
@@ -816,5 +816,12 @@ span.latex > .e {
 	float: right;
 	font-size: 1rem;
 	font-weight: bold;
+	margin-left: 0.5em;
+}
+
+/* Automatic QED symbol at end of proof */
+.amsthm-proof-with-qed::after {
+	content: "◻";
+	font-size: 1.2rem;
 	margin-left: 0.5em;
 }
