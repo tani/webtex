@@ -2,10 +2,6 @@
 .
 This\label{test} label is empty:~\ref{test}.
 .
-<div class="body">
-<p>This label is empty:&nbsp;<a href="#"></a>.</p>
-</div>
-.
 
 
 ** forward- and back-referencing a label
@@ -18,11 +14,6 @@ Now there is more.
 
 This \label{test} is counter c:~\ref{test}. And another~\ref{test}.
 .
-<div class="body">
-<p>Here is some text with two forward references: <a href="#c-1">1</a> and <a href="#c-1">1</a>. <a id="c-1"></a> Now there is more.</p>
-<p>This  is counter c:&nbsp;<a href="#c-1">1</a>. And another&nbsp;<a href="#c-1">1</a>.</p>
-</div>
-.
 
 
 ** forward-referencing a section
@@ -32,11 +23,6 @@ See Section~\ref{sec:test}.
 \section{Section Name}
 \label{sec:test}
 .
-<div class="body">
-<p>See Section&nbsp;<a href="#sec-1">1</a>.</p>
-<h2 id="sec-1">1 Section Name</h2>
-</div>
-.
 
 
 ** label a section inside
@@ -45,11 +31,6 @@ See Section~\ref{sec:test}.
 
 This is Section~\ref{sec:test}.
 .
-<div class="body">
-<h2 id="sec-1">1 Section Name</h2>
-<p>This is Section&nbsp;<a href="#sec-1">1</a>.</p>
-</div>
-.
 
 
 ** back-referencing a section
@@ -57,11 +38,6 @@ This is Section~\ref{sec:test}.
 \section{Section Name}
 
 This \label{sec:test} is Section~\ref{sec:test}.
-.
-<div class="body">
-<h2 id="sec-1">1 Section Name</h2>
-<p>This  is Section&nbsp;<a href="#sec-1">1</a>.</p>
-</div>
 .
 
 
@@ -78,13 +54,6 @@ See Section~\ref{sec:test}.
 This is Section~\ref{sec:test}.
 \end{document}
 .
-<div class="body">
-<h1 id="sec-1"><div>Chapter 1</div>Labels</h1>
-<p>See Section&nbsp;<a href="#sec-2">1.1</a>.</p>
-<h2 id="sec-2">1.1 Section Name</h2>
-<p>This is Section&nbsp;<a href="#sec-2">1.1</a>.</p>
-</div>
-.
 
 
 ** labelling an \\item
@@ -95,31 +64,6 @@ The most widely-used format is item number~\ref{popular}.
     \item \label{popular} \LaTeX
     \item Con\TeX t
 \end{enumerate}
-.
-<div class="body">
-<p>The most widely‐used format is item number&nbsp;<a href="#item-2">2</a>.</p>
-<ol class="list">
-<li>
-<span class="itemlabel"><span class="hbox llap"><span id="item-1">1.</span></span></span>
-<p>Plain <span class="tex">T<span class="e">e</span>X</span></p>
-</li>
-<li>
-<span class="itemlabel"><span class="hbox llap"><span id="item-2">2.</span></span></span>
-<p><span class="latex">L<span class="a">a</span>T<span class="e">e</span>X</span></p>
-</li>
-<li>
-<span class="itemlabel"><span class="hbox llap"><span id="item-3">3.</span></span></span>
-<p>Con<span class="tex">T<span class="e">e</span>X</span>t</p>
-</li>
-</ol>
-</div>
-.
-
-
-
-!** referencing subitems
-.
-.
 .
 
 
@@ -132,7 +76,6 @@ The most widely-used format is item number~\ref{popular}.
 \end{figure}
 See Figure~\ref{fig:test}.
 .
-.
 
 
 !** labelling a table
@@ -143,5 +86,4 @@ See Figure~\ref{fig:test}.
     \label{tab:test}
 \end{table}
 See Table~\ref{tab:test}.
-.
 .

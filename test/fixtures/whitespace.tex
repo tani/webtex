@@ -18,11 +18,6 @@ paragraphs
  % spaces at the end
  
 .
-<div class="body">
-<p>three</p><p>paragraphs</p><p>separated by par.</p>
-<p>this paragraph has a few words, including a comment.</p>
-</div>
-.
 
 
 ** how to force two paragraphs
@@ -31,10 +26,6 @@ text  \par
 ~
 \par
 more text
-.
-<div class="body">
-<p>text</p><p>&nbsp;</p><p>more text</p>
-</div>
 .
 
 
@@ -45,11 +36,6 @@ firstparagraph
  second
 paragraph
 .
-<div class="body">
-<p>ﬁrst paragraph</p>
-<p>second paragraph</p>
-</div>
-.
 
 
 ** \\ and \newline do not add spaces (they \unskip)
@@ -59,11 +45,6 @@ first line \\
 
 first line \newline
  second line
-.
-<div class="body">
-<p>ﬁrst line<br>second line</p>
-<p>ﬁrst line<br>second line</p>
-</div>
 .
 
 
@@ -92,22 +73,12 @@ a
 
 space at the beginning and two at the end } .
 .
-<div class="body">
-<p>x<span class="hbox"><span>​ one space, two ​ spaces, two ​ spaces, no whitespace, one space, one space, one space, xxxxx</span></span>x</p>
-<p><span class="hbox"><span> there is a space at the beginning and two at the end </span></span> .</p>
-</div>
-.
 
 
 !** \unskip breaks out of groups, \ignorespaces does not
 .
 text {\unskip} text, text {\ignorespaces} text,
 .
-<div class="body">
-<p>text text, text  text</p>
-</div>
-.
-
 
 
 !** a space is added after macros that take arguments
@@ -119,20 +90,11 @@ two \gobbleO{} spaces,
 two \echoOGO{} spaces,
 two \echoO[] spaces.
 .
-<div class="body">
-<p>one space, two ​ spaces, two ​ spaces.</p>
-</div>
-.
-
 
 
 !** space hack to prevent multiple spaces
 .
 x \pagebreak x \nopagebreak x \vspace{1mm} x \label{hi} x \marginpar{test} x \index{something} x \glossary{word} x \nocite x \enlargethispage x
-.
-<div class="body">
-<p>x x x x x x x x x x</p>
-</div>
 .
 
 
@@ -146,11 +108,6 @@ first paragraph
 
 second paragraph
 .
-<div class="body">
-<p>ﬁrst paragraph</p>
-<p>second paragraph</p>
-</div>
-.
 
 
 ** comments are disregarded and won't add a paragraph
@@ -163,11 +120,7 @@ first paragraph
 
 second paragraph
 .
-<div class="body">
-<p>ﬁrst paragraph</p>
-<p>second paragraph</p>
-</div>
-.
+
 
 ** comments are disregarded and won't prevent a paragraph
 .
@@ -176,12 +129,6 @@ first paragraph % this should not prevent the paragraph
 second paragraph% this should not prevent the paragraph
 
 third paragraph
-.
-<div class="body">
-<p>ﬁrst paragraph</p>
-<p>second paragraph</p>
-<p>third paragraph</p>
-</div>
 .
 
 
@@ -193,11 +140,6 @@ example: Supercal%
               ifragilist%
     icexpialidocious
 .
-<div class="body">
-<p>This is an example: Supercalifragilisticexpialidocious</p>
-</div>
-.
-
 
 
 ** one space inside as well as after a group is kept, the rest is compressed or skipped
@@ -212,23 +154,11 @@ text with { a group  } and more text
 
 text with {  a group  }  and more text
 .
-<div class="body">
-<p>text with empty group ​ ​ and more text</p>
-<p>text with a group​ and more text</p>
-<p>text with ​ a group ​ and more text</p>
-<p>text with ​ a group ​ and more text</p>
-<p>text with ​ a group ​ and more text</p>
-</div>
-.
 
 
 ** macros without arguments ignore spaces afterwards
 .
 some \empty  text.
-.
-<div class="body">
-<p>some text.</p>
-</div>
 .
 
 
@@ -236,19 +166,11 @@ some \empty  text.
 .
 some \empty{} text.
 .
-<div class="body">
-<p>some ​ text.</p>
-</div>
-.
 
 
 ** force a space after a macro with \
 .
 some \empty\ text.
-.
-<div class="body">
-<p>some ​ text.</p>
-</div>
 .
 
 
@@ -261,11 +183,6 @@ are spaces, but not\
 
 this.
 .
-<div class="body">
-<p>some ​ text. And​ these ​ are spaces, but not​ </p>
-<p>this.</p>
-</div>
-.
 
 
 ** escaped newlines in an empty document (or at the end of a document)
@@ -273,10 +190,6 @@ this.
 \
 
 
-.
-<div class="body">
-<p>​ </p>
-</div>
 .
 
 
@@ -286,10 +199,6 @@ this.
 x
 
 .
-<div class="body">
-<p>​ x</p>
-</div>
-.
 
 
 ** escaped newlines after an environment
@@ -298,11 +207,6 @@ x
 \end{center}
 \
 
-.
-<div class="body">
-<div class="list center"></div>
-<p class="continue">​ </p>
-</div>
 .
 
 
@@ -317,8 +221,4 @@ xx
   \end{empty}
 \end{empty}
 xx
-.
-<div class="body">
-<p>xx ​ text​ text ​ text ​ ​ xx</p>
-</div>
 .
