@@ -143,7 +143,7 @@ export default defineConfig(({ mode }) => {
 						format: "bare",
 						trace: false,
 					}),
-					commonjs({ ignoreDynamicRequires: true }),
+					commonjs({}),
 					visualizer({
 						filename: "dist/latex.stats.html",
 						sourcemap: isProd,

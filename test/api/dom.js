@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { parse, HtmlGenerator } from "../../dist/latex.js";
 import { createHTMLWindow } from "svgdom";
+import { HtmlGenerator, parse } from "../../dist/latex.js";
 
 global.window = createHTMLWindow();
 global.document = window.document;

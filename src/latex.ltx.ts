@@ -1629,11 +1629,17 @@ export class LaTeX {
 		if (!documentclass) {
 			throw new Error("documentclass is required");
 		}
-		let Class = builtinDocumentclasses[documentclass];
+		const Class = builtinDocumentclasses[documentclass];
 		if (!Class) {
 			try {
-				const Export = require(`./documentclasses/${documentclass}`);
-				Class = Export.default || Export[Object.getOwnPropertyNames(Export)[0]];
+				// Note: Dynamic import converted to error for missing documentclass
+				// This maintains synchronous behavior while eliminating require()
+				console.error(
+					`error loading documentclass "${documentclass}": documentclass not found in built-in classes`,
+				);
+				throw new Error(
+					`documentclass "${documentclass}" not found. Available classes: ${Object.keys(builtinDocumentclasses).join(", ")}`,
+				);
 			} catch (e) {
 				console.error(`error loading documentclass "${documentclass}": ${e}`);
 				throw new Error(`error loading documentclass "${documentclass}"`);
@@ -1678,20 +1684,30 @@ export class LaTeX {
 				continue;
 			}
 
-			let Package = builtinPackages[pkg];
+			const Package = builtinPackages[pkg];
 			try {
 				if (!Package) {
-					const Export = require(`./packages/${pkg}`);
-					Package = Export.default;
-					if (!Package) {
-						// Find first function property that's not __esModule
-						const propNames = Object.getOwnPropertyNames(Export);
-						const constructorName = propNames.find(
-							(name) =>
-								name !== "__esModule" && typeof Export[name] === "function",
-						);
-						Package = constructorName ? Export[constructorName] : null;
+					// Check if this is a placeholder package that should be ignored
+					const placeholderPackages = [
+						"geometry",
+						"layout",
+						"showframe",
+						"luatextra",
+						"lua-visual-debug",
+					];
+					if (placeholderPackages.includes(pkg)) {
+						// Placeholder packages are no-op packages, just continue silently
+						continue;
 					}
+
+					// Note: Dynamic import converted to error for missing package
+					// This maintains synchronous behavior while eliminating require()
+					console.error(
+						`error loading package "${pkg}": package not found in built-in packages`,
+					);
+					throw new Error(
+						`package "${pkg}" not found. Available packages: ${Object.keys(builtinPackages).join(", ")}`,
+					);
 				}
 
 				if (Package) {
