@@ -184,79 +184,6 @@ export class Amsthm {
 		return [];
 	}
 
-	// Create a theorem environment instance
-	private createTheoremEnvironment(envName: string, content: any, title?: any): any[] {
-		console.log('createTheoremEnvironment called with:', envName, 'content:', content, 'title:', title);
-		const env = this.theoremEnvironments[envName];
-		if (!env) {
-			return [this.g.error(`Unknown theorem environment: ${envName}`)];
-		}
-
-		let headerText = env.displayName;
-		
-		if (env.numbered && env.counter) {
-			// Handle parent counter resets (like section numbering)
-			if (env.parentCounter) {
-				try {
-					const parentValue = this.g.counter(env.parentCounter);
-					// Reset counter when parent counter changes
-					const parentKey = `${env.counter}_parent`;
-					const lastParentValue = this.counters[parentKey] || 0;
-					if (parentValue !== lastParentValue) {
-						this.counters[env.counter] = 0;
-						this.counters[parentKey] = parentValue;
-					}
-				} catch {
-					// Parent counter not available, continue with normal numbering
-				}
-			}
-
-			// Increment the counter
-			this.counters[env.counter] = (this.counters[env.counter] || 0) + 1;
-			
-			// Format the number with parent counter if applicable
-			let formattedNumber: string;
-			try {
-				this.g.setCounter(env.counter, this.counters[env.counter]);
-				const counterValue = this.g.counter(env.counter);
-				
-				if (env.parentCounter) {
-					const parentValue = this.g.counter(env.parentCounter);
-					formattedNumber = `${this.g.arabic(parentValue)}.${this.g.arabic(counterValue)}`;
-				} else {
-					formattedNumber = this.g.arabic(counterValue);
-				}
-			} catch {
-				// Fallback formatting
-				if (env.parentCounter) {
-					try {
-						const parentValue = this.g.counter(env.parentCounter);
-						formattedNumber = `${parentValue}.${this.counters[env.counter]}`;
-					} catch {
-						formattedNumber = `${this.counters[env.counter]}`;
-					}
-				} else {
-					formattedNumber = `${this.counters[env.counter]}`;
-				}
-			}
-			
-			headerText += ` ${formattedNumber}`;
-		}
-
-		// Create theorem header with optional title
-		let headerContent: any;
-		if (title) {
-			headerContent = [this.g.createText(headerText + ' ('), title, this.g.createText('). ')];
-		} else {
-			headerContent = this.g.createText(headerText + '. ');
-		}
-		const header = this.g.create('span', headerContent, env.style.headerFormat);
-		
-		// Create the theorem container with header and content
-		const theorem = this.g.create('div', [header, content], `amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`);
-		
-		return [theorem];
-	}
 
 	// Proof environment with optional argument support  
 	proof(label?: any): any[] {
@@ -390,9 +317,9 @@ export class Amsthm {
 		// Create theorem header with optional title
 		let headerContent: any;
 		if (title) {
-			headerContent = [this.g.createText(headerText + ' ('), title, this.g.createText('). ')];
+			headerContent = [this.g.createText(`${headerText} (`), title, this.g.createText('). ')];
 		} else {
-			headerContent = this.g.createText(headerText + '. ');
+			headerContent = this.g.createText(`${headerText}. `);
 		}
 		const header = this.g.create('span', headerContent, env.style.headerFormat);
 		
