@@ -6,6 +6,7 @@ import {
 	readFileSync,
 	writeFileSync,
 } from "node:fs";
+import path from "node:path";
 import { promisify } from "node:util";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
@@ -152,5 +153,36 @@ export default defineConfig(({ mode }) => {
 				copyDtsFiles: true,
 			}),
 		],
+		test: {
+			environment: "node",
+			include: ["test/**/*.ts", "test/**/*.js"],
+			exclude: [
+				"**/node_modules/**",
+				"**/dist/**",
+				"test/api/**/*.js",
+				"test/api/**/*.mjs",
+				"test/api/**/*.html",
+				"test/lib/**",
+				"test/types/**",
+				"test/fixtures/**",
+				"test/screenshots/**",
+				"test/html/**",
+				"test/**/__snapshots__/**",
+			],
+			setupFiles: ["test/lib/setup.ts"],
+			pool: "threads",
+			poolOptions: {
+				threads: {
+					singleThread: false,
+				},
+			},
+			resolveSnapshotPath: (testPath: string, snapExtension: string) => {
+				const dir = path.dirname(testPath);
+				const filename = path
+					.basename(testPath)
+					.replace(/\.(test|spec)\.(js|ts)$/, "");
+				return path.join(dir, "__snapshots__", `${filename}${snapExtension}`);
+			},
+		},
 	};
 });
