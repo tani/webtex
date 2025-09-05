@@ -21,8 +21,8 @@ const makeLengthClass = (generator: LengthGenerator) => {
 	]);
 
 	class Length {
-		_value: number = 0;
-		_unit: string = "";
+		public _value: number = 0;
+		public _unit: string = "";
 		static zero: Length;
 
 		constructor(value: number, unit: string) {
@@ -31,117 +31,88 @@ const makeLengthClass = (generator: LengthGenerator) => {
 			}
 			this._value = value;
 			this._unit = unit;
-			if (unitsSp.has(unit)) {
-				const unitValue = unitsSp.get(unit);
-				if (unitValue !== undefined) {
-					this._value = value * unitValue;
-					this._unit = "sp";
-				}
+			
+			// Convert to scaled points if possible
+			const unitValue = unitsSp.get(unit);
+			if (unitValue !== undefined) {
+				this._value = value * unitValue;
+				this._unit = "sp";
+			}
+		}
+
+		public toPx(): number {
+			if (this._unit !== "sp") {
+				g.error("Length.toPx() called on relative length!");
+			}
+			const pxValue = unitsSp.get("px");
+			if (pxValue === undefined) {
+				throw new Error("px unit conversion not found");
+			}
+			return g.round(this._value / pxValue);
+		}
+
+		public assertCompatible(other: Length, operation: string): void {
+			if (this._unit !== other._unit) {
+				g.error(`Length.${operation}: incompatible lengths! (${this._unit} and ${other._unit})`);
 			}
 		}
 
 		get value(): string {
-			if (this._unit === "sp") {
-				const pxValue = unitsSp.get("px");
-				if (pxValue === undefined) {
-					throw new Error("px unit conversion not found");
-				}
-				return `${g.round(this._value / pxValue)}px`;
-			} else {
-				return g.round(this._value) + this._unit;
-			}
+			return this._unit === "sp" 
+				? `${this.toPx()}px` 
+				: `${g.round(this._value)}${this._unit}`;
 		}
 
 		get px(): number {
-			if (this._unit === "sp") {
-				const pxValue = unitsSp.get("px");
-				if (pxValue === undefined) {
-					throw new Error("px unit conversion not found");
-				}
-				return g.round(this._value / pxValue);
-			} else {
-				return g.error("Length.px() called on relative length!");
-			}
+			return this.toPx();
 		}
 
 		get pxpct(): string | number {
-			if (this._unit === "sp") {
-				const pxValue = unitsSp.get("px");
-				if (pxValue === undefined) {
-					throw new Error("px unit conversion not found");
-				}
-				return g.round(this._value / pxValue);
-			} else {
-				return g.round(this._value) + this._unit;
-			}
+			return this._unit === "sp" 
+				? this.toPx() 
+				: `${g.round(this._value)}${this._unit}`;
 		}
 
 		get unit(): string {
 			return this._unit;
 		}
 
-		cmp(l: Length): number {
-			if (this._unit !== l._unit) {
-				g.error(
-					`Length.cmp(): incompatible lengths! (${this._unit} and ${l._unit})`,
-				);
-			}
-			if (this._value < l._value) {
-				return -1;
-			}
-			if (this._value === l._value) {
-				return 0;
-			}
-			return 1;
+		cmp(other: Length): number {
+			this.assertCompatible(other, "cmp");
+			return Math.sign(this._value - other._value);
 		}
 
-		add(l: Length): Length {
-			if (this._unit !== l._unit) {
-				g.error(
-					`Length.add(): incompatible lengths! (${this._unit} and ${l._unit})`,
-				);
-			}
-			return new g.Length(this._value + l._value, this._unit);
+		add(other: Length): Length {
+			this.assertCompatible(other, "add");
+			return new g.Length(this._value + other._value, this._unit);
 		}
 
-		sub(l: Length): Length {
-			if (this._unit !== l._unit) {
-				g.error(
-					`Length.sub: incompatible lengths! (${this._unit} and ${l._unit})`,
-				);
-			}
-			return new g.Length(this._value - l._value, this._unit);
+		sub(other: Length): Length {
+			this.assertCompatible(other, "sub");
+			return new g.Length(this._value - other._value, this._unit);
 		}
 
-		mul(s: number): Length {
-			return new g.Length(this._value * s, this._unit);
+		mul(scalar: number): Length {
+			return new g.Length(this._value * scalar, this._unit);
 		}
 
-		div(s: number): Length {
-			return new g.Length(this._value / s, this._unit);
+		div(scalar: number): Length {
+			return new g.Length(this._value / scalar, this._unit);
 		}
 
 		abs(): Length {
 			return new g.Length(Math.abs(this._value), this._unit);
 		}
 
-		ratio(l: Length): number {
-			if (this._unit !== l._unit) {
-				g.error(
-					`Length.ratio: incompatible lengths! (${this._unit} and ${l._unit})`,
-				);
-			}
-			return this._value / l._value;
+		ratio(other: Length): number {
+			this.assertCompatible(other, "ratio");
+			return this._value / other._value;
 		}
 
-		norm(l: Length): Length {
-			if (this._unit !== l._unit) {
-				g.error(
-					`Length.norm: incompatible lengths! (${this._unit} and ${l._unit})`,
-				);
-			}
+		norm(other: Length): Length {
+			this.assertCompatible(other, "norm");
 			return new g.Length(
-				Math.sqrt(this._value ** 2 + l._value ** 2),
+				Math.sqrt(this._value ** 2 + other._value ** 2),
 				this._unit,
 			);
 		}
@@ -158,30 +129,32 @@ const makeLengthClass = (generator: LengthGenerator) => {
 	Length.zero = new Length(0, "sp");
 	return Length;
 };
-interface VectorLength {
-	unit: string;
-	_value: number;
-	add(other: VectorLength): VectorLength;
-	sub(other: VectorLength): VectorLength;
-	mul(scalar: number): VectorLength;
-	div(scalar: number): VectorLength;
-	norm(other: VectorLength): VectorLength;
+
+type ShiftDirection = 'start' | 'end';
+
+interface ShiftCalc {
+	x: number;
+	y: number;
+	msq: number;
+	imsq: number;
+	dir_x: number;
+	dir_y: number;
 }
 
 class Vector {
-	_x: VectorLength;
-	_y: VectorLength;
+	public _x: any;
+	public _y: any;
 
-	constructor(x: VectorLength, y: VectorLength) {
+	constructor(x: any, y: any) {
 		this._x = x;
 		this._y = y;
 	}
 
-	get x(): VectorLength {
+	get x(): any {
 		return this._x;
 	}
 
-	get y(): VectorLength {
+	get y(): any {
 		return this._y;
 	}
 
@@ -193,73 +166,71 @@ class Vector {
 		return new Vector(this._x.sub(v.x), this._y.sub(v.y));
 	}
 
-	mul(s: number): Vector {
-		return new Vector(this._x.mul(s), this._y.mul(s));
+	mul(scalar: number): Vector {
+		return new Vector(this._x.mul(scalar), this._y.mul(scalar));
 	}
 
-	shift_start(l: VectorLength): Vector {
+	private assertCompatibleUnits(operation: string): void {
 		if (this._x.unit !== this._y.unit) {
 			throw new Error(
-				`Vector.shift_start: incompatible lengths! (${this._x.unit} and ${this._y.unit})`,
+				`Vector.${operation}: incompatible lengths! (${this._x.unit} and ${this._y.unit})`
 			);
 		}
-
-		const x = this._x._value;
-		const y = this._y._value;
-		const msq = Math.sqrt(1 + (y * y) / (x * x));
-		const imsq = Math.sqrt(1 + (x * x) / (y * y));
-		const dir_x = x < 0 ? -1 : 1;
-		const dir_y = y < 0 ? -1 : 1;
-
-		let sx: VectorLength;
-		let sy: VectorLength;
-
-		if (x !== 0 && y !== 0) {
-			sx = l.div(msq).mul(-dir_x);
-			sy = l.div(imsq).mul(-dir_y);
-		} else if (y === 0) {
-			sx = l.mul(-dir_x);
-			sy = this._y.mul(0);
-		} else {
-			sx = this._x.mul(0);
-			sy = l.mul(-dir_y);
-		}
-
-		return new Vector(sx, sy);
 	}
 
-	shift_end(l: VectorLength): Vector {
-		if (this._x.unit !== this._y.unit) {
-			throw new Error(
-				`Vector.shift_end: incompatible lengths! (${this._x.unit} and ${this._y.unit})`,
-			);
-		}
-
+	private calculateShift(): ShiftCalc {
 		const x = this._x._value;
 		const y = this._y._value;
-		const msq = Math.sqrt(1 + (y * y) / (x * x));
-		const imsq = Math.sqrt(1 + (x * x) / (y * y));
-		const dir_x = x < 0 ? -1 : 1;
-		const dir_y = y < 0 ? -1 : 1;
-
-		let ex: VectorLength;
-		let ey: VectorLength;
-
-		if (x !== 0 && y !== 0) {
-			ex = this._x.add(l.div(msq).mul(dir_x));
-			ey = this._y.add(l.div(imsq).mul(dir_y));
-		} else if (y === 0) {
-			ex = this._x.add(l.mul(dir_x));
-			ey = this._y;
-		} else {
-			ex = this._x;
-			ey = this._y.add(l.mul(dir_y));
-		}
-
-		return new Vector(ex, ey);
+		
+		return {
+			x,
+			y,
+			msq: Math.sqrt(1 + (y * y) / (x * x)),
+			imsq: Math.sqrt(1 + (x * x) / (y * y)),
+			dir_x: x < 0 ? -1 : 1,
+			dir_y: y < 0 ? -1 : 1,
+		};
 	}
 
-	norm(): VectorLength {
+	private performShift(l: any, direction: ShiftDirection): Vector {
+		this.assertCompatibleUnits(`shift_${direction}`);
+		
+		const calc = this.calculateShift();
+		const { x, y, msq, imsq, dir_x, dir_y } = calc;
+		
+		const isStart = direction === 'start';
+		const multiplier = isStart ? -1 : 1;
+		
+		let newX: any;
+		let newY: any;
+
+		if (x !== 0 && y !== 0) {
+			const shiftX = l.div(msq).mul(dir_x * multiplier);
+			const shiftY = l.div(imsq).mul(dir_y * multiplier);
+			newX = isStart ? shiftX : this._x.add(shiftX);
+			newY = isStart ? shiftY : this._y.add(shiftY);
+		} else if (y === 0) {
+			const shiftX = l.mul(dir_x * multiplier);
+			newX = isStart ? shiftX : this._x.add(shiftX);
+			newY = isStart ? this._y.mul(0) : this._y;
+		} else {
+			const shiftY = l.mul(dir_y * multiplier);
+			newX = isStart ? this._x.mul(0) : this._x;
+			newY = isStart ? shiftY : this._y.add(shiftY);
+		}
+
+		return new Vector(newX, newY);
+	}
+
+	shift_start(l: any): Vector {
+		return this.performShift(l, 'start');
+	}
+
+	shift_end(l: any): Vector {
+		return this.performShift(l, 'end');
+	}
+
+	norm(): any {
 		return this._x.norm(this._y);
 	}
 }
