@@ -53,15 +53,4 @@ export interface HyperrefGenerator extends PackageGenerator {
 	createText(text: string): any;
 }
 
-export interface StixGenerator extends PackageGenerator {
-	KaTeX: {
-		__defineSymbol(
-			mode: string,
-			group: string,
-			type: string,
-			symbol: string,
-			command: string,
-			replace?: boolean,
-		): void;
-	};
-}
+export interface StixGenerator extends PackageGenerator {}

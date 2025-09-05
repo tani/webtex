@@ -14,38 +14,5 @@ export class Stix {
 	constructor(generator: StixGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
-
-		generator.KaTeX.__defineSymbol(
-			"math",
-			"main",
-			"textord",
-			"\u2664",
-			"\\varspadesuit",
-			true,
-		);
-		generator.KaTeX.__defineSymbol(
-			"math",
-			"main",
-			"textord",
-			"\u2665",
-			"\\varheartsuit",
-			true,
-		);
-		generator.KaTeX.__defineSymbol(
-			"math",
-			"main",
-			"textord",
-			"\u2666",
-			"\\vardiamondsuit",
-			true,
-		);
-		generator.KaTeX.__defineSymbol(
-			"math",
-			"main",
-			"textord",
-			"\u2667",
-			"\\varclubsuit",
-			true,
-		);
 	}
 }

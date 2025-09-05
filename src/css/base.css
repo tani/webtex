@@ -188,29 +188,8 @@ html,
 	hyphens: manual;
 }
 
-.katex {
+.MathJax {
 	font-size: 1em;
-}
-
-.katex,
-.katex .mainrm,
-.katex .mathit,
-.katex .mathbf {
-	font-family: "Computer Modern Serif", serif; /* for KaTeX_Main */
-}
-
-.katex .mathdefault,
-.katex .boldsymbol {
-	font-family: "Computer Modern Serif", serif; /* for KaTeX_Math */
-}
-
-.katex .mathsf,
-.katex .textsf,
-.katex .mathboldsf,
-.katex .textboldsf,
-.katex .mathitsf,
-.katex .textitsf {
-	font-family: "Computer Modern Sans", sans-serif; /* for KaTeX_SansSerif */
 }
 
 /* family */

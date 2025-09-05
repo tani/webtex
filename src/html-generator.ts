@@ -2,7 +2,13 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import katex from "katex/dist/katex.mjs";
+import mathjax from "mathjax";
+
+const MathJax = await mathjax.init({
+	loader: { load: ["input/tex", "output/svg"] },
+	startup: { typeset: false },
+	svg: { fontCache: "none" },
+});
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -257,7 +263,7 @@ export class HtmlGenerator extends Generator {
 		return svgInstance;
 	}
 
-	public KaTeX = katex;
+	public MathJax = MathJax;
 
 	public reset(): void {
 		super.reset();
@@ -374,7 +380,7 @@ export class HtmlGenerator extends Generator {
 
 		if (baseURL) {
 			el.appendChild(
-				createStyleSheet(new URL("css/katex.css", baseURL).toString()),
+				createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
 			);
 			el.appendChild(
 				createStyleSheet(
@@ -389,7 +395,7 @@ export class HtmlGenerator extends Generator {
 			}
 			el.appendChild(createScript(new URL("js/base.js", baseURL).toString()));
 		} else {
-			el.appendChild(createStyleSheet("css/katex.css"));
+			el.appendChild(createStyleSheet("css/mathjax.css"));
 			el.appendChild(
 				createStyleSheet((this as any).documentClass.constructor.css),
 			);
@@ -601,12 +607,15 @@ export class HtmlGenerator extends Generator {
 	}
 
 	public parseMath(math: string, display?: boolean): DocumentFragment {
-		const f = document.createDocumentFragment();
-		katex.render(math, f, {
-			displayMode: !!display,
-			throwOnError: false,
-		});
-		return f;
+		const svg = MathJax.tex2svg(math, { display: !!display });
+		const html = MathJax.startup.adaptor.outerHTML(svg);
+		const div = document.createElement("div");
+		div.innerHTML = html;
+		const fragment = document.createDocumentFragment();
+		while (div.firstChild) {
+			fragment.appendChild(div.firstChild);
+		}
+		return fragment;
 	}
 
 	public addAttribute(el: Element, attrs: string): void {

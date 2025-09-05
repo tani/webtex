@@ -6,3 +6,6 @@
 /node_modules/
 /test/test-results.xml
 /test/screenshots/test-results.xml
+/css/
+/js/
+/fonts/

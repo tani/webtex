@@ -1,6 +1,6 @@
 // Global takeScreenshot function using Playwright
 
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { chromium } from "playwright";
 
@@ -20,8 +20,8 @@ import { chromium } from "playwright";
     <html>
     <head>
       <meta charset="utf-8">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
       <style>
+        ${readFileSync(new URL("../../dist/css/mathjax.css", import.meta.url), "utf8")}
         body { margin: 20px; font-family: 'Computer Modern', serif; }
       </style>
     </head>

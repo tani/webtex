@@ -1,0 +1,123 @@
+\documentclass{article}
+\usepackage{xcolor}
+
+\begin{document}
+
+\section{LaTeX.js Example Document}
+
+This is an example document demonstrating LaTeX.js capabilities. LaTeX.js is a JavaScript LaTeX to HTML5 translator that converts LaTeX documents into HTML while preserving formatting and mathematical expressions.
+
+\section{Text Formatting}
+
+Here we demonstrate various text formatting options:
+
+\begin{itemize}
+\item \textbf{Bold text} using textbf
+\item \textit{Italic text} using textit
+\item \texttt{Monospace text} using texttt
+\item \underline{Underlined text} using underline
+\end{itemize}
+
+\subsection{Font Sizes}
+
+Different font sizes available:
+
+{\tiny tiny text} {\scriptsize scriptsize} {\footnotesize footnotesize} {\small small} 
+{\normalsize normalsize} {\large large} {\Large Large} {\LARGE LARGE} {\huge huge} {\Huge Huge}
+
+\section{Mathematical Expressions}
+
+LaTeX.js supports both inline and display mathematics using MathJax:
+
+\subsection{Inline Math}
+
+The quadratic formula is $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$ and Euler's identity is $e^{i\pi} + 1 = 0$.
+
+\subsection{Display Math}
+
+The area of a triangle using Heron's formula:
+\[
+A = \sqrt{s(s-a)(s-b)(s-c)}
+\]
+where $s = \frac{a+b+c}{2}$ is the semi-perimeter.
+
+The famous integral:
+\[
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+\]
+
+A simple derivative example:
+\[
+\frac{d}{dx} x^n = nx^{n-1}
+\]
+
+\section{Lists and Environments}
+
+\subsection{Itemized List}
+\begin{itemize}
+\item First item
+\item Second item with \emph{emphasis}
+\item Third item
+    \begin{itemize}
+    \item Nested item 1
+    \item Nested item 2
+    \end{itemize}
+\end{itemize}
+
+\subsection{Enumerated List}
+\begin{enumerate}
+\item First numbered item
+\item Second numbered item
+\item Third numbered item
+\end{enumerate}
+
+\subsection{Description List}
+\begin{description}
+\item[LaTeX] A document preparation system
+\item[HTML] HyperText Markup Language
+\item[JavaScript] A programming language for web browsers
+\end{description}
+
+\section{Quotations}
+
+\begin{quote}
+This is a quote environment. It's useful for highlighting important text or citations.
+\end{quote}
+
+\begin{quotation}
+This is a quotation environment, which is similar to quote but with different spacing.
+It's typically used for longer quotations.
+\end{quotation}
+
+\section{Colors}
+
+With the xcolor package, we can use \textcolor{red}{colored text}, 
+\textcolor{blue}{different colors}, and \textcolor{green}{various shades}.
+
+\section{Code and Verbatim}
+
+Here's some code using texttt formatting:
+
+\texttt{function fibonacci(n) \{\\
+\hspace{1em}if (n <= 1) return n;\\
+\hspace{1em}return fibonacci(n-1) + fibonacci(n-2);\\
+\}}
+
+Inline code: \texttt{const result = fibonacci(10);}
+
+\section{Conclusion}
+
+This example demonstrates various LaTeX features supported by LaTeX.js, including:
+\begin{itemize}
+\item Document structure with sections
+\item Text formatting and font sizes  
+\item Mathematical expressions (inline and display)
+\item Lists (itemize, enumerate, description)
+\item Quotation environments
+\item Colored text
+\item Code formatting with texttt
+\end{itemize}
+
+All of these features are converted to HTML with proper styling and MathJax rendering for mathematics.
+
+\end{document}

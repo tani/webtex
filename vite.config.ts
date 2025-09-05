@@ -45,9 +45,6 @@ function assetCopyPlugin() {
 					console.log(`Copied ${asset.name} assets`);
 				}
 			}
-
-			// Copy KaTeX fonts
-			copyKatexFonts();
 		},
 	};
 }
@@ -72,22 +69,6 @@ function typescriptModulesPlugin() {
 			}
 		},
 	};
-}
-
-function copyKatexFonts() {
-	try {
-		const katexFonts = "node_modules/katex/dist/fonts";
-		if (existsSync(katexFonts)) {
-			mkdirSync("dist/fonts", { recursive: true });
-			cpSync(katexFonts, "dist/fonts", {
-				recursive: true,
-				filter: (src) => src.endsWith(".woff2"),
-			});
-			console.log("Copied KaTeX fonts");
-		}
-	} catch (e) {
-		console.warn("Could not copy KaTeX fonts:", (e as Error).message);
-	}
 }
 
 async function buildPackages() {
@@ -120,6 +101,7 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		build: {
+			target: "esnext",
 			outDir: "dist",
 			sourcemap: isProd,
 			minify: isProd ? "terser" : false,
@@ -129,6 +111,7 @@ export default defineConfig(({ mode }) => {
 				formats: ["es"],
 			},
 			rollupOptions: {
+				external: ["mathjax"],
 				output: {
 					format: "es",
 					entryFileNames: "latex.js",
