@@ -1,29 +1,4 @@
-interface Generator {
-	newCounter(name: string, resetBy?: string): void;
-	addToReset(counter: string, resetBy: string): void;
-	setLength(name: string, value: any): void;
-	length(name: string): any;
-	Length: any;
-	setCounter(name: string, value: number): void;
-	counter(name: string): number;
-	arabic(value: number): string;
-	Roman(value: number): string;
-	startsection(
-		type: string,
-		level: number,
-		starred: boolean,
-		toc?: any,
-		title?: any,
-	): any;
-	setTitle(title: any): void;
-	create(element: any, content: any, className?: string): any;
-	createVSpace(length: any): any;
-	macro(name: string): any;
-	title: any;
-	author: any;
-	date: any;
-	list: any;
-}
+import type { DocumentClassGenerator } from "../interfaces";
 
 export class Base {
 	static displayName = "Base";
@@ -38,14 +13,14 @@ export class Base {
 		quotation: ["V"],
 	};
 
-	protected g: Generator;
+	protected g: DocumentClassGenerator;
 	public options: Map<string, any> = new Map();
 	protected _title: any = null;
 	protected _author: any = null;
 	protected _date: any = null;
 	protected _thanks: any = null;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: DocumentClassGenerator, options?: any) {
 		this.g = generator;
 		if (options) {
 			this.options = options;

@@ -1,17 +1,6 @@
 import he from "he";
 
-interface Generator {
-	KaTeX: {
-		__defineSymbol(
-			mode: string,
-			group: string,
-			type: string,
-			symbol: string,
-			command: string,
-			replace?: boolean,
-		): void;
-	};
-}
+import type { StixGenerator } from "../interfaces";
 
 export class Stix {
 	static displayName = "Stix";
@@ -19,10 +8,10 @@ export class Stix {
 
 	static symbols = new Map([["checkmark", he.decode("&check;")]]);
 
-	g: Generator;
+	g: StixGenerator;
 	options?: any;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: StixGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
 

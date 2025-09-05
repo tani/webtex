@@ -1,37 +1,5 @@
 import { Base } from "./base";
-
-interface Generator {
-	newCounter(name: string, resetBy?: string): void;
-	addToReset(counter: string, resetBy: string): void;
-	setLength(name: string, value: any): void;
-	length(name: string): any;
-	Length: any;
-	setCounter(name: string, value: number): void;
-	counter(name: string): number;
-	arabic(value: number): string;
-	Roman(value: number): string;
-	Alph(value: number): string;
-	startsection(
-		type: string,
-		level: number,
-		starred: boolean,
-		toc?: any,
-		title?: any,
-	): any;
-	setTitle(title: any): void;
-	create(element: any, content: any, className?: string): any;
-	createVSpace(length: any): any;
-	macro(name: string): any;
-	title: any;
-	author: any;
-	date: any;
-	list: any;
-	_toc: any;
-	setFontSize(size: string): void;
-	enterGroup(): void;
-	exitGroup(): void;
-	setFontWeight(weight: string): void;
-}
+import type { DocumentClassGenerator } from "../interfaces";
 
 export class Report extends Base {
 	static displayName = "Report";
@@ -45,9 +13,9 @@ export class Report extends Base {
 		appendix: ["V"],
 	};
 
-	protected declare g: Generator;
+	protected declare g: DocumentClassGenerator;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: DocumentClassGenerator, options?: any) {
 		super(generator, options);
 		this.g = generator;
 		this.g.newCounter("chapter");

@@ -1,6 +1,4 @@
-interface Generator {
-	error(message: string): any;
-}
+import type { PackageGenerator } from "../interfaces";
 
 export class XColor {
 	static displayName = "XColor";
@@ -37,10 +35,10 @@ export class XColor {
 
 	static symbols = new Map<string, string>();
 
-	private g: Generator;
+	private g: PackageGenerator;
 	private options?: any;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: PackageGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
 

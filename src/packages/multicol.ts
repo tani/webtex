@@ -1,7 +1,4 @@
-interface Generator {
-	create(element: any): any;
-	multicols(cols: number): any;
-}
+import type { MulticolGenerator } from "../interfaces";
 
 export class Multicol {
 	static displayName = "Multicol";
@@ -9,10 +6,10 @@ export class Multicol {
 		multicols: ["V", "n", "o?", "o?"],
 	};
 
-	private g: Generator;
+	private g: MulticolGenerator;
 	options?: any;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: MulticolGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
 	}

@@ -1,8 +1,4 @@
-interface Generator {
-	create(element: any, content: any): any;
-	link(url?: string): any;
-	createText(text: string): any;
-}
+import type { HyperrefGenerator } from "../interfaces";
 
 export class Hyperref {
 	static displayName = "Hyperref";
@@ -12,10 +8,10 @@ export class Hyperref {
 		nolinkurl: ["H", "u"],
 	};
 
-	private g: Generator;
+	private g: HyperrefGenerator;
 	options?: any;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: HyperrefGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
 	}

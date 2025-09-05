@@ -1,6 +1,4 @@
-interface Generator {
-	createImage(width: any, height: any, file: any): any;
-}
+import type { GraphicxGenerator } from "../interfaces";
 
 export class Graphicx {
 	static displayName = "Graphicx";
@@ -13,10 +11,10 @@ export class Graphicx {
 		includegraphics: ["H", "s", "kv?", "kv?", "k"],
 	};
 
-	private g: Generator;
+	private g: GraphicxGenerator;
 	options?: any;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: GraphicxGenerator, options?: any) {
 		this.g = generator;
 		this.options = options;
 	}
