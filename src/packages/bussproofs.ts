@@ -57,7 +57,7 @@ export class Bussproofs {
 	}
 
 	// Helper to extract math content
-	private extractMathContent(content: unknown): string {
+	private extractMathContent(_content: unknown): string {
 		// For the simplified implementation, just return empty string
 		// This bypasses any content extraction issues
 		return "";
@@ -188,7 +188,7 @@ export class Bussproofs {
 	}
 
 	// Environment handling
-	prooftree(content: unknown): unknown[] {
+	prooftree(_content: unknown): unknown[] {
 		// For now, create a simple test proof tree to see if MathJax integration works
 		// This bypasses the command collection issue for now
 		const simpleProof = `\\begin{prooftree}\\AxiomC{$A$}\\UnaryInfC{$B$}\\end{prooftree}`;

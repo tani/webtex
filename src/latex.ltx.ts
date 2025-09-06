@@ -511,14 +511,14 @@ export class LaTeX {
 		return this.g.macro("quad");
 	}
 
-	public thanks(text: unknown): unknown {
+	public thanks(_text: unknown): unknown {
 		// TODO: Implement footnote functionality
 		return [];
 	}
 
 	// Font commands
 	public textrm(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("rm");
 		} else {
@@ -529,7 +529,7 @@ export class LaTeX {
 	}
 
 	public textsf(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("sf");
 		} else {
@@ -540,7 +540,7 @@ export class LaTeX {
 	}
 
 	public texttt(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("tt");
 		} else {
@@ -551,7 +551,7 @@ export class LaTeX {
 	}
 
 	public textmd(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontWeight("md");
 		} else {
@@ -562,7 +562,7 @@ export class LaTeX {
 	}
 
 	public textbf(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontWeight("bf");
 		} else {
@@ -573,7 +573,7 @@ export class LaTeX {
 	}
 
 	public textup(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontShape("up");
 		} else {
@@ -584,7 +584,7 @@ export class LaTeX {
 	}
 
 	public textit(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontShape("it");
 		} else {
@@ -595,7 +595,7 @@ export class LaTeX {
 	}
 
 	public textsl(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontShape("sl");
 		} else {
@@ -606,7 +606,7 @@ export class LaTeX {
 	}
 
 	public textsc(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontShape("sc");
 		} else {
@@ -617,7 +617,7 @@ export class LaTeX {
 	}
 
 	public textnormal(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			this.g.setFontFamily("rm");
 			this.g.setFontWeight("md");
@@ -630,7 +630,7 @@ export class LaTeX {
 	}
 
 	public emph(arg?: unknown): unknown {
-		if (arguments.length === 0) {
+		if (arg === undefined) {
 			this.g.enterGroup();
 			return this.g.setFontShape("em");
 		} else {
@@ -859,7 +859,7 @@ export class LaTeX {
 
 	// List environments
 	public itemize(items?: { label: unknown; text: unknown }[]): unknown {
-		if (arguments.length === 0) {
+		if (items === undefined) {
 			this.g.startlist();
 			this.g.stepCounter("@itemdepth");
 			if (this.g.counter("@itemdepth") > 4) {
@@ -893,7 +893,7 @@ export class LaTeX {
 	public enumerate(
 		items?: { label: { node: Element; id?: string }; text: unknown }[],
 	): unknown {
-		if (arguments.length === 0) {
+		if (items === undefined) {
 			this.g.startlist();
 			this.g.stepCounter("@enumdepth");
 			if (this.g.counter("@enumdepth") > 4) {
@@ -925,7 +925,7 @@ export class LaTeX {
 	}
 
 	public description(items?: { label: unknown; text: unknown }[]): unknown {
-		if (arguments.length === 0) {
+		if (items === undefined) {
 			this.g.startlist();
 			return;
 		}
@@ -1755,7 +1755,7 @@ export class LaTeX {
 
 		// Copy prototype methods (for ES6 classes) - walk the entire prototype chain
 		// Collect all methods, starting from most specific to least specific
-		const methods: Record<string, Function> = {};
+		const methods: Record<string, (...args: unknown[]) => unknown> = {};
 		let proto = Object.getPrototypeOf(this.g.documentClass);
 		while (proto && proto.constructor !== Object) {
 			const methodNames = Object.getOwnPropertyNames(proto).filter(

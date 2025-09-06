@@ -16,18 +16,8 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-			"suspicious": {
-				"noExplicitAny": "off"
-			},
 			"style": {
 				"noDescendingSpecificity": "off"
-			},
-			"complexity": {
-				"noArguments": "off",
-				"noBannedTypes": "off"
-			},
-			"correctness": {
-				"noUnusedFunctionParameters": "off"
 			}
 		}
 	},
