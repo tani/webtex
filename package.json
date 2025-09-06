@@ -1,7 +1,7 @@
 {
 	"name": "webtex",
 	"description": "JavaScript LaTeX to HTML5 translator - WebTeX fork with enhanced features",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"author": {
 		"name": "tani",
 		"email": "ta2gch@gmail.com"
@@ -26,14 +26,8 @@
 	},
 	"browser": "./dist/webtex.js",
 	"files": [
-		"bin/webtex.js",
-		"dist/webtex.js",
-		"dist/webtex.js.map",
-		"dist/css/",
-		"dist/fonts/",
-		"dist/js/",
-		"dist/packages/",
-		"dist/documentclasses/"
+		"bin/",
+		"dist/"
 	],
 	"scripts": {
 		"clean": "rimraf dist test/test-results.xml",
