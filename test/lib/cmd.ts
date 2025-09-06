@@ -6,7 +6,10 @@
  *   Michael Brade <brade@kde.org>
  */
 
-import { spawn as spawnCmd } from "node:child_process";
+import {
+	type ChildProcessWithoutNullStreams,
+	spawn as spawnCmd,
+} from "node:child_process";
 import { existsSync } from "node:fs";
 import { constants } from "node:os";
 
@@ -18,7 +21,11 @@ const PATH = process.env.PATH;
  * @param {Array} args Arguments to the command
  * @param {Object} env (optional) Environment variables
  */
-function createProcess(processPath, args = [], env = null) {
+function createProcess(
+	processPath: string,
+	args: string[] = [],
+	env: NodeJS.ProcessEnv | null = null,
+) {
 	// ensure that path exists
 	if (!processPath || !existsSync(processPath)) {
 		throw new Error("Invalid process path");
@@ -42,24 +49,34 @@ function createProcess(processPath, args = [], env = null) {
 /**
  * Creates a command and executes inputs (user responses) to stdin.
  * Returns a promise that resolves when all inputs are sent.
- * Rejects the promise if any error.
+ * Rejects the promise if an error occurs.
  * @param {string} processPath Path of the process to execute
  * @param {Array} args Arguments to the command
  * @param {Array} inputs (Optional) Array of inputs (user responses)
  * @param {Object} opts (optional) Environment variables
  */
+interface ExecuteOptions {
+	env?: NodeJS.ProcessEnv | null;
+	timeout?: number;
+	maxTimeout?: number;
+}
+
+interface ExecuteResult {
+	stdout: string;
+	stderr: string;
+}
+
+interface AttachedProcessPromise<T> extends Promise<T> {
+	attachedProcess?: ChildProcessWithoutNullStreams;
+}
+
 function executeWithInput(
 	processPath: string,
 	args: string[] = [],
 	inputs: string[] = [],
-	opts: any = {},
+	opts: ExecuteOptions = {},
 ): Promise<ExecuteResult> {
-	if (!Array.isArray(inputs)) {
-		opts = inputs;
-		inputs = [];
-	}
-
-	const { env = null, timeout = 100, maxTimeout = 10000 } = opts as any;
+	const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
 	const childProcess = createProcess(processPath, args, env);
 	childProcess.stdin.setEncoding("utf-8");
 
@@ -100,88 +117,88 @@ function executeWithInput(
 		}, timeout);
 	};
 
-	const promise = new Promise<ExecuteResult>((resolve, reject) => {
-		let stdout = "";
-		let stderr = "";
+	const promise: AttachedProcessPromise<ExecuteResult> = new Promise(
+		(resolve, reject) => {
+			let stdout = "";
+			let stderr = "";
 
-		// get output from CLI
-		childProcess.stdout.on("data", (data) => {
-			stdout += data.toString();
+			// get output from CLI
+			childProcess.stdout.on("data", (data) => {
+				stdout += data.toString();
 
-			if (killIOTimeout) {
-				clearTimeout(killIOTimeout);
-			}
+				if (killIOTimeout) {
+					clearTimeout(killIOTimeout);
+				}
 
-			// Log debug I/O statements on tests
-			if (env?.DEBUG) {
-				console.log("stdout:", data.toString());
-			}
-		});
+				// Log debug I/O statements on tests
+				if (env?.DEBUG) {
+					console.log("stdout:", data.toString());
+				}
+			});
 
-		// get errors from CLI
-		childProcess.stderr.on("data", (data) => {
-			stderr += data.toString();
+			// get errors from CLI
+			childProcess.stderr.on("data", (data) => {
+				stderr += data.toString();
 
-			if (killIOTimeout) {
-				clearTimeout(killIOTimeout);
-			}
+				if (killIOTimeout) {
+					clearTimeout(killIOTimeout);
+				}
 
-			// Log debug I/O statements on tests
-			if (env?.DEBUG) {
-				console.log("stderr:", data.toString());
-			}
-		});
+				// Log debug I/O statements on tests
+				if (env?.DEBUG) {
+					console.log("stderr:", data.toString());
+				}
+			});
 
-		childProcess.on("exit", (code, signal) => {
-			if (currentInputTimeout) {
-				clearTimeout(currentInputTimeout);
-			}
+			childProcess.on("exit", (code, signal) => {
+				if (currentInputTimeout) {
+					clearTimeout(currentInputTimeout);
+				}
 
-			if (code === 0) {
-				resolve({
-					stdout: stdout,
-					stderr: stderr,
-				});
-			} else {
-				reject({
-					code: code,
-					signal: signal,
-					stdout: stdout,
-					stderr: stderr,
-				});
-			}
-		});
+				if (code === 0) {
+					resolve({
+						stdout: stdout,
+						stderr: stderr,
+					});
+				} else {
+					reject({
+						code: code,
+						signal: signal,
+						stdout: stdout,
+						stderr: stderr,
+					});
+				}
+			});
 
-		childProcess.on("error", (err) => {
-			childProcess.removeAllListeners("exit"); // don't call any other listeners after error
-			reject(err);
-		});
+			childProcess.on("error", (err) => {
+				childProcess.removeAllListeners("exit"); // don't call other listeners after error
+				reject(err);
+			});
 
-		// kick off the process
-		loop(inputs);
-	});
+			// kick off the process
+			loop(inputs);
+		},
+	);
 
 	// Appending the process to the promise, in order to add additional parameters or behavior
 	// (such as IPC communication)
-	(promise as any).attachedProcess = childProcess;
+	promise.attachedProcess = childProcess;
 
 	return promise;
 }
 
 export { createProcess };
 
-interface ExecuteResult {
-	stdout: string;
-	stderr: string;
-}
-
 export function create(processPath: string) {
-	const fn = (...args: any[]): Promise<ExecuteResult> =>
-		executeWithInput(processPath, ...args);
+	function execute(
+		args: string[] = [],
+		inputs: string[] = [],
+		opts: ExecuteOptions = {},
+	): Promise<ExecuteResult> {
+		return executeWithInput(processPath, args, inputs, opts);
+	}
 
-	return {
-		execute: fn,
-	};
+	return { execute };
 }
 
 export const DOWN = "\x1B\x5B\x42";

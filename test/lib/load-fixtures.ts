@@ -1,13 +1,13 @@
 import fs from "node:fs";
 
-interface FixtureItem {
+export interface FixtureItem {
 	id: number;
 	header: string;
 	source: string;
 	result: string;
 }
 
-interface FixturesResult {
+export interface FixturesResult {
 	file?: string;
 	fixtures: FixtureItem[];
 }

@@ -4,7 +4,13 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { chromium } from "playwright";
 
-(globalThis as any).takeScreenshot = async (html: string, filename: string) => {
+interface ScreenshotGlobal {
+	takeScreenshot?: (html: string, filename: string) => Promise<void>;
+}
+
+const screenshotGlobal = globalThis as ScreenshotGlobal;
+
+screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
 	// Add .png extension if not present
 	const screenshotPath = filename.endsWith(".png")
 		? filename

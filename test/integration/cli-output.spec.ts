@@ -156,9 +156,10 @@ This demonstrates \\LaTeX{} compilation to HTML.
 			try {
 				await latexjs.execute([tmpFile.name]);
 				expect.fail("Should have thrown an error");
-			} catch (result: any) {
+			} catch (result: unknown) {
 				// Normalize file paths in error messages
-				const normalizedError = result.stderr
+				const err = result as { stderr: string };
+				const normalizedError = err.stderr
 					.replace(/\/[^\s]+\/([^/]+\.tex)/g, "/$1") // Remove full paths, keep filename
 					.replace(/\d+ms/g, "Xms") // Normalize timing
 					.trim();
@@ -173,8 +174,9 @@ This demonstrates \\LaTeX{} compilation to HTML.
 			try {
 				await latexjs.execute([tmpFile.name]);
 				expect.fail("Should have thrown an error");
-			} catch (result: any) {
-				const normalizedError = result.stderr
+			} catch (result: unknown) {
+				const err = result as { stderr: string };
+				const normalizedError = err.stderr
 					.replace(/\/[^\s]+\/([^/]+\.tex)/g, "/$1")
 					.replace(/\d+ms/g, "Xms")
 					.trim();

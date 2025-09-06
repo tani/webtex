@@ -54,8 +54,9 @@ describe("LaTeX.js CLI test", () => {
 		try {
 			await latexjs.execute([tmpFile.name]);
 			expect.fail("Should have thrown an error");
-		} catch (result: any) {
-			expect(result.stderr).toContain("unknown macro");
+		} catch (result: unknown) {
+			const err = result as { stderr: string };
+			expect(err.stderr).toContain("unknown macro");
 		} finally {
 			tmpFile.removeCallback();
 		}
@@ -68,8 +69,9 @@ describe("LaTeX.js CLI test", () => {
 		try {
 			await latexjs.execute([tmpFile.name]);
 			expect.fail("Should have thrown an error");
-		} catch (result: any) {
-			expect(result.stderr).toContain("groups need to be balanced");
+		} catch (result: unknown) {
+			const err = result as { stderr: string };
+			expect(err.stderr).toContain("groups need to be balanced");
 		} finally {
 			tmpFile.removeCallback();
 		}

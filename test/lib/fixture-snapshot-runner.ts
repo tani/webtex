@@ -7,18 +7,25 @@ import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
 import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/latex";
-import { load as loadFixture } from "./load-fixtures";
+import { type FixtureItem, load as loadFixture } from "./load-fixtures";
 
 // Set up DOM for Node.js environment
-const window = createHTMLWindow();
-(global as any).window = window;
-(global as any).document = window.document;
+const window = createHTMLWindow() as Window & typeof globalThis;
+const globalWithDom = globalThis as typeof globalThis & {
+	window: Window & typeof globalThis;
+	document: Document;
+};
+globalWithDom.window = window;
+globalWithDom.document = window.document;
 
 function resetSvgIds() {
 	decache("@svgdotjs/svg.js");
-	delete (HtmlGenerator.prototype as any).SVG;
-	(HtmlGenerator.prototype as any).SVG = SVG;
-	return registerWindow(window as any, document as any);
+	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
+		SVG?: typeof SVG;
+	};
+	delete proto.SVG;
+	proto.SVG = SVG;
+	return registerWindow(window, document);
 }
 
 export interface MigrationOptions {
@@ -60,7 +67,7 @@ export interface MigrationOptions {
  * Provides multiple migration strategies to gradually move from fixtures to snapshots
  */
 export function runMigratedFixture(
-	fixture: any,
+	fixture: FixtureItem,
 	name: string,
 	options: MigrationOptions = {},
 ) {
@@ -72,7 +79,7 @@ export function runMigratedFixture(
 		useFixtureAsSnapshot = false,
 	} = options;
 
-	let _test: any = test;
+	let _test: typeof test = test;
 
 	// Handle test modifiers
 	if (fixture.header?.charAt(0) === "!") {
@@ -102,18 +109,21 @@ export function runMigratedFixture(
 			const div = document.createElement("div");
 			div.appendChild(generator.domFragment().cloneNode(true));
 			htmlOutput = div.innerHTML;
-		} catch (e: any) {
-			if (e.location) {
-				e.message =
-					e.message +
+		} catch (e: unknown) {
+			const err = e as Error & {
+				location?: { start: { line: number; column: number } };
+			};
+			if (err.location) {
+				err.message =
+					err.message +
 					" at line " +
-					e.location.start.line +
+					err.location.start.line +
 					" (column " +
-					e.location.start.column +
+					err.location.start.column +
 					"): " +
-					fixture.source.split(/\r\n|\n|\r/)[e.location.start.line - 1];
+					fixture.source.split(/\r\n|\n|\r/)[err.location.start.line - 1];
 			}
-			throw e;
+			throw err;
 		}
 
 		// Normalize outputs for consistent comparisons
@@ -237,7 +247,7 @@ export function migrateFixtureFile(
 ) {
 	const fixtures = loadFixture(fixtureFilePath).fixtures;
 
-	fixtures.forEach((fixture: any) => {
+	fixtures.forEach((fixture) => {
 		runMigratedFixture(fixture, name, options);
 	});
 }

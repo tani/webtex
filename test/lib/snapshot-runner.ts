@@ -5,15 +5,22 @@ import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/latex";
 
 // Set up DOM for Node.js environment
-const window = createHTMLWindow();
-(global as any).window = window;
-(global as any).document = window.document;
+const window = createHTMLWindow() as Window & typeof globalThis;
+const globalWithDom = globalThis as typeof globalThis & {
+	window: Window & typeof globalThis;
+	document: Document;
+};
+globalWithDom.window = window;
+globalWithDom.document = window.document;
 
 function resetSvgIds() {
 	decache("@svgdotjs/svg.js");
-	delete (HtmlGenerator.prototype as any).SVG;
-	(HtmlGenerator.prototype as any).SVG = SVG;
-	return registerWindow(window as any, document as any);
+	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
+		SVG?: typeof SVG;
+	};
+	delete proto.SVG;
+	proto.SVG = SVG;
+	return registerWindow(window, document);
 }
 
 /**

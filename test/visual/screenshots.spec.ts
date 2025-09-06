@@ -6,18 +6,25 @@ import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
 import { describe, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/latex";
-import { load as loadFixture } from "../lib/load-fixtures";
+import { type FixtureItem, load as loadFixture } from "../lib/load-fixtures";
 
 // Set up DOM for Node.js environment
-const window = createHTMLWindow();
-(global as any).window = window;
-(global as any).document = window.document;
+const window = createHTMLWindow() as Window & typeof globalThis;
+const globalWithDom = globalThis as typeof globalThis & {
+	window: Window & typeof globalThis;
+	document: Document;
+};
+globalWithDom.window = window;
+globalWithDom.document = window.document;
 
 function resetSvgIds() {
 	decache("@svgdotjs/svg.js");
-	delete (HtmlGenerator.prototype as any).SVG;
-	(HtmlGenerator.prototype as any).SVG = SVG;
-	return registerWindow(window as any, document as any);
+	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
+		SVG?: typeof SVG;
+	};
+	delete proto.SVG;
+	proto.SVG = SVG;
+	return registerWindow(window, document);
 }
 
 describe("LaTeX.js screenshot tests", () => {
@@ -34,11 +41,11 @@ describe("LaTeX.js screenshot tests", () => {
 		}
 		const fixtures = loadFixture(fixtureFile).fixtures;
 		const screenshotFixtures = fixtures.filter(
-			(f: any) => f.header?.charAt(0) === "s",
+			(f) => f.header?.charAt(0) === "s",
 		);
 		if (screenshotFixtures.length > 0) {
 			describe(name, () => {
-				fixtures.forEach((fixture: any) => {
+				fixtures.forEach((fixture) => {
 					runScreenshotTest(fixture, name);
 				});
 			});
@@ -47,12 +54,12 @@ describe("LaTeX.js screenshot tests", () => {
 
 	// Process subdirectories
 	subdirs.forEach((dir) => {
-		const dirFixtures: any[] = [];
+		const dirFixtures: Array<{ name: string; fixtures: FixtureItem[] }> = [];
 		fs.readdirSync(path.join(fixturesPath, dir)).forEach((name) => {
 			const fixtureFile = path.join(fixturesPath, dir, name);
 			const fixtures = loadFixture(fixtureFile).fixtures;
 			const screenshotFixtures = fixtures.filter(
-				(f: any) => f.header?.charAt(0) === "s",
+				(f) => f.header?.charAt(0) === "s",
 			);
 			if (screenshotFixtures.length > 0) {
 				dirFixtures.push({ name, fixtures });
@@ -63,7 +70,7 @@ describe("LaTeX.js screenshot tests", () => {
 			describe(dir, () => {
 				dirFixtures.forEach(({ name, fixtures }) => {
 					describe(name, () => {
-						fixtures.forEach((fixture: any) => {
+						fixtures.forEach((fixture) => {
 							runScreenshotTest(fixture, `${dir} - ${name}`);
 						});
 					});
@@ -73,8 +80,8 @@ describe("LaTeX.js screenshot tests", () => {
 	});
 });
 
-function runScreenshotTest(fixture: any, name: string) {
-	let _test: any = test;
+function runScreenshotTest(fixture: FixtureItem, name: string) {
+	let _test: typeof test = test;
 	let screenshot = false;
 
 	if (fixture.header?.charAt(0) === "!") {
@@ -111,10 +118,7 @@ function runScreenshotTest(fixture: any, name: string) {
 						remove: /[*+~()'"!:@,{}\\]/g,
 					}),
 				);
-				await (globalThis as any).takeScreenshot(
-					htmlDoc.documentElement.outerHTML,
-					filename,
-				);
+				await takeScreenshot(htmlDoc.documentElement.outerHTML, filename);
 			},
 		);
 	}
