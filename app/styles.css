@@ -61,30 +61,52 @@ body {
 	background: #2d3748;
 }
 
-/* Editor container */
-.editor-container {
+.btn-home {
+	background: #4a5568;
+	color: white;
+	border: 1px solid #718096;
+	padding: 0.375rem 0.75rem;
+	border-radius: 0.25rem;
+	text-decoration: none;
+	font-size: 0.875rem;
+	transition: background-color 0.2s;
+	display: inline-flex;
+	align-items: center;
+}
+
+.btn-home:hover {
+	background: #718096;
+	color: white;
+}
+
+.btn-home:active {
+	background: #2d3748;
+}
+
+/* Split container */
+.split-container {
 	display: flex;
 	flex: 1;
 	min-height: 0;
 }
 
 /* Panels */
-.panel {
+.input-panel,
+.output-panel {
 	display: flex;
 	flex-direction: column;
 	background: white;
+	flex: 1;
+	min-width: 300px;
+}
+
+.input-panel {
 	border-right: 1px solid #e2e8f0;
 }
 
-.editor-panel {
+.preview-container {
 	flex: 1;
-	min-width: 300px;
-}
-
-.preview-panel {
-	flex: 1;
-	min-width: 300px;
-	border-right: none;
+	min-height: 0;
 }
 
 .panel-header {
@@ -234,7 +256,7 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
-	.editor-container {
+	.split-container {
 		flex-direction: column;
 	}
 

@@ -39,6 +39,8 @@
 		"clean": "rimraf dist test/test-results.xml",
 		"build": "npm run clean && vite build",
 		"build:check": "test -d dist || npm run build",
+		"build:pages": "npm run build && npm run pages:prepare",
+		"pages:prepare": "mkdir -p gh-pages && cp -r app/* gh-pages/ && cp -r dist gh-pages/",
 		"pretest": "vite build --mode test",
 		"test": "vitest run",
 		"test:watch": "vitest",

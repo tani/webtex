@@ -63,8 +63,13 @@ console.log(doc.documentElement.outerHTML);
 
 ## 🎭 Live Preview App
 
-WebTeX includes a modern live preview application with real-time LaTeX compilation:
+**🌐 [Try WebTeX Online →](https://tani.github.io/webtex/)**
 
+WebTeX includes a modern live preview application with real-time LaTeX compilation. You can use it online or run it locally:
+
+**Online Demo**: Visit [https://tani.github.io/webtex/](https://tani.github.io/webtex/) to try WebTeX directly in your browser.
+
+**Local Development**:
 ```bash
 cd app
 python3 -m http.server 8080
