@@ -12,8 +12,8 @@ interface GeneratorOptions {
 }
 
 interface Location {
-	start: { offset: number };
-	end: { offset: number };
+	start: { line: number; column: number; offset: number };
+	end: { line: number; column: number; offset: number };
 }
 
 declare global {

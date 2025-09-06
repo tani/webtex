@@ -585,6 +585,14 @@ export class HtmlGenerator extends Generator {
 			el.setAttribute("class", classes.replace(/\s+/g, " ").trim());
 		}
 
+		try {
+			const loc = this.location();
+			el.setAttribute("data-line", String(loc.start.line));
+			el.setAttribute("data-column", String(loc.start.column));
+		} catch {
+			// location not available outside parser context
+		}
+
 		return appendChildren(el, children) as Element;
 	}
 
