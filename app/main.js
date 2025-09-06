@@ -71,48 +71,12 @@ class WebTeXLivePreview {
 	}
 
 	setupSplitter() {
-		const splitter = document.querySelector(".splitter");
+		// Simple 50/50 split without mouse interaction
 		const editorPanel = document.querySelector(".editor-panel");
 		const previewPanel = document.querySelector(".preview-panel");
-		const container = document.querySelector(".editor-container");
-
-		let isResizing = false;
-		let startX = 0;
-		let startWidth = 0;
-
-		splitter.addEventListener("mousedown", (e) => {
-			isResizing = true;
-			startX = e.clientX;
-			startWidth = editorPanel.offsetWidth;
-
-			document.body.style.cursor = "col-resize";
-			document.body.style.userSelect = "none";
-
-			e.preventDefault();
-		});
-
-		document.addEventListener("mousemove", (e) => {
-			if (!isResizing) return;
-
-			const containerWidth = container.offsetWidth;
-			const splitterWidth = splitter.offsetWidth;
-			const newWidth = startWidth + (e.clientX - startX);
-			const minWidth = 300;
-			const maxWidth = containerWidth - minWidth - splitterWidth;
-
-			if (newWidth >= minWidth && newWidth <= maxWidth) {
-				editorPanel.style.flex = `0 0 ${newWidth}px`;
-				previewPanel.style.flex = `1`;
-			}
-		});
-
-		document.addEventListener("mouseup", () => {
-			if (isResizing) {
-				isResizing = false;
-				document.body.style.cursor = "";
-				document.body.style.userSelect = "";
-			}
-		});
+		
+		editorPanel.style.flex = "1";
+		previewPanel.style.flex = "1";
 	}
 
 	handleEditorKeydown(e) {
