@@ -25,6 +25,7 @@ const PLACEHOLDER_PACKAGES = [
 ];
 const STATIC_ASSETS = [
 	{ src: "src/css", dest: "dist/css", name: "CSS" },
+	{ src: "src/fonts", dest: "dist/fonts", name: "font" },
 	{ src: "src/js", dest: "dist/js", name: "JS" },
 ];
 
