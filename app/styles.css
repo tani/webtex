@@ -216,8 +216,7 @@ body {
 	padding: 1rem;
 	min-height: 100%;
 	background: white;
-	color: #2d3748;
-	line-height: 1.6;
+	/* Remove color and line-height to let LaTeX.js handle typography */
 }
 
 #preview-content.error {
@@ -225,54 +224,6 @@ body {
 	color: #c53030;
 	font-family: monospace;
 	white-space: pre-wrap;
-}
-
-/* LaTeX content styling */
-#preview-content h1,
-#preview-content h2,
-#preview-content h3,
-#preview-content h4,
-#preview-content h5,
-#preview-content h6 {
-	margin: 1.5em 0 0.5em 0;
-	color: #1a202c;
-	font-weight: 600;
-}
-
-#preview-content h1 {
-	font-size: 2em;
-	text-align: center;
-	margin-bottom: 1em;
-}
-
-#preview-content h2 {
-	font-size: 1.5em;
-}
-
-#preview-content h3 {
-	font-size: 1.25em;
-}
-
-#preview-content p {
-	margin: 0.75em 0;
-	text-align: justify;
-}
-
-#preview-content .abstract {
-	margin: 2em 0;
-	padding: 1em;
-	background: #f7fafc;
-	border-left: 4px solid #3182ce;
-}
-
-#preview-content .abstract h2 {
-	text-align: center;
-	margin-bottom: 0.5em;
-}
-
-/* Math content */
-#preview-content .math {
-	margin: 1em 0;
 }
 
 /* Status bar */

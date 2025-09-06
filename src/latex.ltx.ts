@@ -258,11 +258,8 @@ export class LaTeX {
 		args.addvspace = ["V", "l"];
 		args.marginpar = ["H", "g"];
 
-		// Document structure
-		args.title = ["HV", "g"];
-		args.author = ["HV", "g"];
+		// Document structure - title/author/date handled by document class
 		args.and = ["H"];
-		args.date = ["HV", "g"];
 		args.thanks = ["HV", "g"];
 
 		// Font commands
@@ -491,21 +488,7 @@ export class LaTeX {
 		return ["Abstract"];
 	}
 
-	// Document structure
-	public title(t: unknown): void {
-		// Store title in generator context or handle appropriately
-		(this as Record<string, unknown>)._title = t;
-	}
-
-	public author(a: unknown): void {
-		// Store author in generator context or handle appropriately
-		(this as Record<string, unknown>)._author = a;
-	}
-
-	public date(d: unknown): void {
-		// Store date in generator context or handle appropriately
-		(this as Record<string, unknown>)._date = d;
-	}
+	// Document structure methods are handled by document classes
 
 	public and(): unknown[] {
 		return this.g.macro("quad");

@@ -9,6 +9,9 @@ export class Base {
 		subsubsection: ["V", "s", "X", "o?", "g"],
 		paragraph: ["V", "s", "X", "o?", "g"],
 		subparagraph: ["V", "s", "X", "o?", "g"],
+		title: ["HV", "g"],
+		author: ["HV", "g"],
+		date: ["HV", "g"],
 		maketitle: ["V"],
 		quotation: ["V"],
 	};
@@ -121,6 +124,18 @@ export class Base {
 		}
 		this.g.setLength("oddsidemargin", oddsidemargin);
 		this.g.setLength("marginparwidth", marginparwidth);
+	}
+
+	title(t: unknown): void {
+		this._title = t;
+	}
+
+	author(a: unknown): void {
+		this._author = a;
+	}
+
+	date(d: unknown): void {
+		this._date = d;
 	}
 
 	contentsname(): string[] {

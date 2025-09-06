@@ -10,3 +10,5 @@
 /css/
 /js/
 /fonts/
+/example/
+!/example/example.tex

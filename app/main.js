@@ -426,6 +426,7 @@ G & H & I \\\\
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LaTeX Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.js@0.12.6/dist/css/article.css">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
@@ -441,32 +442,9 @@ G & H & I \\\\
     </script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
             max-width: 800px;
             margin: 0 auto;
             padding: 2rem;
-            color: #2d3748;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            margin: 1.5em 0 0.5em 0;
-            color: #1a202c;
-            font-weight: 600;
-        }
-        h1 {
-            font-size: 2em;
-            text-align: center;
-            margin-bottom: 1em;
-        }
-        p {
-            margin: 0.75em 0;
-            text-align: justify;
-        }
-        .abstract {
-            margin: 2em 0;
-            padding: 1em;
-            background: #f7fafc;
-            border-left: 4px solid #3182ce;
         }
     </style>
 </head>
