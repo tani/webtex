@@ -1,10 +1,10 @@
-const getVariable = (el: Element, propertyName: string): string => {
+const getVariable = (el, propertyName) => {
 	return String(
 		getComputedStyle(el).getPropertyValue(`--${propertyName}`),
 	).trim();
 };
 
-const processTheElements = (): void => {
+const processTheElements = () => {
 	const thes = document.querySelectorAll(".the");
 	thes.forEach((theElement) => {
 		const displayVar = theElement.getAttribute("display-var");
@@ -18,7 +18,7 @@ const processTheElements = (): void => {
 	});
 };
 
-const _vertical = (el: Element, tb: "top" | "bottom"): number => {
+const _vertical = (el, tb) => {
 	// return zero for disconnected and hidden (display: none) elements, IE <= 11 only
 	// running getBoundingClientRect() on a disconnected node in IE throws an error
 	if (!el.getClientRects().length) {
@@ -37,35 +37,35 @@ const _vertical = (el: Element, tb: "top" | "bottom"): number => {
 	return rect[tb] + win.pageYOffset - docEl.clientTop;
 };
 
-const offsetTop = (el: Element): number => {
+const offsetTop = (el) => {
 	return _vertical(el, "top");
 };
 
-const offsetBottom = (el: Element): number => {
+const offsetBottom = (el) => {
 	return _vertical(el, "bottom");
 };
 
-const offsetBaseline = (el: Element): number => {
+const offsetBaseline = (el) => {
 	const mpbaseline = el.querySelector(".mpbaseline");
 	return mpbaseline ? offsetBottom(mpbaseline) : 0;
 };
 
-const heightAboveBaseline = (el: Element): number => {
+const heightAboveBaseline = (el) => {
 	const baseline = offsetBaseline(el);
 	const top = offsetTop(el);
 	return baseline - top;
 };
 
-const positionMarginpars = (): void => {
+const positionMarginpars = () => {
 	const mpars = document.querySelectorAll(
 		".marginpar > div",
-	) as NodeListOf<HTMLElement>;
+	);
 	let prevBottom = 0;
 
 	mpars.forEach((mpar) => {
 		const mpref = document.querySelector(
 			`.body #marginref-${mpar.id}`,
-		) as Element;
+		);
 
 		if (!mpref) {
 			return;
@@ -91,11 +91,11 @@ const positionMarginpars = (): void => {
 
 // don't call resize event handlers too often
 const optimizedResize = (() => {
-	const callbacks: Array<() => void> = [];
+	const callbacks = [];
 	let running = false;
 
 	// fired on resize event
-	const resize = (): void => {
+	const resize = () => {
 		if (!running) {
 			running = true;
 
@@ -108,7 +108,7 @@ const optimizedResize = (() => {
 	};
 
 	// run the actual callbacks
-	const runCallbacks = (): void => {
+	const runCallbacks = () => {
 		callbacks.forEach((callback) => {
 			callback();
 		});
@@ -116,7 +116,7 @@ const optimizedResize = (() => {
 	};
 
 	// adds callback to loop
-	const addCallback = (callback: () => void): void => {
+	const addCallback = (callback) => {
 		if (callback) {
 			callbacks.push(callback);
 		}
@@ -124,7 +124,7 @@ const optimizedResize = (() => {
 
 	return {
 		// public method to add additional callback
-		add: (callback: () => void): void => {
+		add: (callback) => {
 			if (!callbacks.length) {
 				window.addEventListener("resize", resize);
 			}
@@ -135,7 +135,7 @@ const optimizedResize = (() => {
 
 // setup event listeners
 
-const completed = (): void => {
+const completed = () => {
 	document.removeEventListener("DOMContentLoaded", completed);
 	window.removeEventListener("load", completed);
 

@@ -237,32 +237,7 @@ ${error.message || error.toString()}</div>`,
 				metaTags += meta.outerHTML;
 			});
 
-			// Get link elements
-			const linkElements = head.querySelectorAll("link");
-			let linkTags = "";
-			linkElements.forEach((link) => {
-				linkTags += link.outerHTML;
-			});
-
-			// Get script elements
-			const scriptElements = head.querySelectorAll("script");
-			let scriptTags = "";
-			scriptElements.forEach((script) => {
-				scriptTags += script.outerHTML;
-			});
-
-			// Get style elements
-			const styleElements = head.querySelectorAll("style");
-			let styleTags = "";
-			styleElements.forEach((style) => {
-				styleTags += style.outerHTML;
-			});
-
-			headContent = `<title>${title}</title>
-${metaTags}
-${linkTags}
-${styleTags}
-${scriptTags}`;
+			headContent = `<title>${title}</title>${metaTags}`;
 		} else {
 			headContent = '<title>LaTeX Document</title><meta charset="UTF-8">';
 		}
@@ -271,8 +246,9 @@ ${scriptTags}`;
 <html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;">
 <head>
 ${headContent}
-<link type="text/css" rel="stylesheet" href="../dist/css/mathjax.css">
-<link type="text/css" rel="stylesheet" href="../dist/css/article.css">
+<link type="text/css" rel="stylesheet" href="/dist/css/mathjax.css">
+<link type="text/css" rel="stylesheet" href="/dist/css/article.css">
+<script src="/dist/js/base.js"></script>
 </head>
 <body>
 <div class="body">

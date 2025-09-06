@@ -32,6 +32,7 @@ const STATIC_ASSETS = [
 	{ src: "src/js", dest: "dist/js", name: "JS" },
 ];
 
+
 /**
  * Plugin to copy static assets during build
  */

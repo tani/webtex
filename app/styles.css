@@ -83,16 +83,17 @@ body {
 	background: #2d3748;
 }
 
-/* Split container */
-.split-container {
+/* Editor container */
+.editor-container {
 	display: flex;
 	flex: 1;
 	min-height: 0;
 }
 
 /* Panels */
-.input-panel,
-.output-panel {
+.panel,
+.editor-panel,
+.preview-panel {
 	display: flex;
 	flex-direction: column;
 	background: white;
@@ -100,7 +101,7 @@ body {
 	min-width: 300px;
 }
 
-.input-panel {
+.editor-panel {
 	border-right: 1px solid #e2e8f0;
 }
 
