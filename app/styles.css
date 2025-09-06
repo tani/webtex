@@ -212,18 +212,11 @@ body {
 	min-height: 0;
 }
 
-#preview-content {
-	padding: 1rem;
+#preview-iframe {
 	min-height: 100%;
 	background: white;
-	/* Remove color and line-height to let LaTeX.js handle typography */
-}
-
-#preview-content.error {
-	background: #fed7d7;
-	color: #c53030;
-	font-family: monospace;
-	white-space: pre-wrap;
+	border: none;
+	border-radius: 0;
 }
 
 /* Status bar */

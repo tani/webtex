@@ -4,7 +4,7 @@ import { HtmlGenerator, parse as latexParse } from "../dist/latex.js";
 class LaTeXLivePreview {
 	constructor() {
 		this.editor = document.getElementById("latex-editor");
-		this.preview = document.getElementById("preview-content");
+		this.preview = document.getElementById("preview-iframe");
 		this.compileStatus = document.getElementById("compile-status");
 		this.editorStats = document.getElementById("editor-stats");
 		this.lastCompile = document.getElementById("last-compile");
@@ -178,8 +178,10 @@ class LaTeXLivePreview {
 		const latexCode = this.editor.value.trim();
 
 		if (!latexCode) {
-			this.preview.innerHTML =
-				'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
+			const emptyHTML = this.createCompleteHTML(
+				'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>'
+			);
+			this.preview.srcdoc = emptyHTML;
 			this.compileStatus.textContent = "Ready";
 			this.compileStatus.className = "";
 			return;
@@ -194,15 +196,9 @@ class LaTeXLivePreview {
 			});
 
 			const htmlDoc = generator.htmlDocument();
-			const bodyContent = htmlDoc.body.innerHTML;
+			const fullHTML = this.createCompleteHTML(htmlDoc.body.innerHTML, htmlDoc.head);
 
-			this.preview.innerHTML = bodyContent;
-			this.preview.className = "";
-
-			// Re-render MathJax if present
-			if (window.MathJax?.typesetPromise) {
-				await window.MathJax.typesetPromise([this.preview]);
-			}
+			this.preview.srcdoc = fullHTML;
 
 			this.compileStatus.textContent = "Success";
 			this.compileStatus.className = "success";
@@ -210,13 +206,77 @@ class LaTeXLivePreview {
 		} catch (error) {
 			console.error("LaTeX compilation error:", error);
 
-			this.preview.innerHTML = `Compilation Error:\n\n${error.message || error.toString()}`;
-			this.preview.className = "error";
+			const errorHTML = this.createCompleteHTML(
+				`<div style="color: #e53e3e; padding: 20px; white-space: pre-wrap; font-family: monospace; background: #fed7d7; border-radius: 4px; margin: 20px;">Compilation Error:
+
+${error.message || error.toString()}</div>`
+			);
+			this.preview.srcdoc = errorHTML;
 
 			this.compileStatus.textContent = "Error";
 			this.compileStatus.className = "error";
 			this.lastCompile.textContent = `Error: ${new Date().toLocaleTimeString()}`;
 		}
+	}
+
+	createCompleteHTML(bodyContent, head = null) {
+		// Extract head content from generated head element if provided
+		let headContent = '';
+		if (head) {
+			// Get title
+			const titleEl = head.querySelector('title');
+			const title = titleEl ? titleEl.textContent : 'LaTeX Document';
+			
+			// Get meta elements
+			const metaElements = head.querySelectorAll('meta');
+			let metaTags = '';
+			metaElements.forEach(meta => {
+				metaTags += meta.outerHTML;
+			});
+
+			// Get link elements
+			const linkElements = head.querySelectorAll('link');
+			let linkTags = '';
+			linkElements.forEach(link => {
+				linkTags += link.outerHTML;
+			});
+
+			// Get script elements
+			const scriptElements = head.querySelectorAll('script');
+			let scriptTags = '';
+			scriptElements.forEach(script => {
+				scriptTags += script.outerHTML;
+			});
+
+			// Get style elements  
+			const styleElements = head.querySelectorAll('style');
+			let styleTags = '';
+			styleElements.forEach(style => {
+				styleTags += style.outerHTML;
+			});
+
+			headContent = `<title>${title}</title>
+${metaTags}
+${linkTags}
+${styleTags}
+${scriptTags}`;
+		} else {
+			headContent = '<title>LaTeX Document</title><meta charset="UTF-8">';
+		}
+
+		return `<!DOCTYPE html>
+<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;">
+<head>
+${headContent}
+<link type="text/css" rel="stylesheet" href="../dist/css/mathjax.css">
+<link type="text/css" rel="stylesheet" href="../dist/css/article.css">
+</head>
+<body>
+<div class="body">
+${bodyContent}
+</div>
+</body>
+</html>`;
 	}
 
 	loadExample(type) {
@@ -379,8 +439,10 @@ G & H & I \\\\
 		}
 
 		this.editor.value = "";
-		this.preview.innerHTML =
-			'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
+		const emptyHTML = this.createCompleteHTML(
+			'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>'
+		);
+		this.preview.srcdoc = emptyHTML;
 		this.updateEditorStats();
 		this.compileStatus.textContent = "Ready";
 		this.compileStatus.className = "";
@@ -420,38 +482,7 @@ G & H & I \\\\
 			});
 
 			const htmlDoc = generator.htmlDocument();
-			const fullHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LaTeX Document</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latex.js@0.12.6/dist/css/article.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\\\(', '\\\\)']],
-                displayMath: [['$$', '$$'], ['\\\\[', '\\\\]']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
-    <style>
-        body {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-    </style>
-</head>
-<body>
-${htmlDoc.body.innerHTML}
-</body>
-</html>`;
+			const fullHTML = this.createCompleteHTML(htmlDoc.body.innerHTML, htmlDoc.head);
 
 			const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
 			const url = URL.createObjectURL(blob);
