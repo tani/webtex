@@ -23,6 +23,13 @@ All test commands automatically check and build the project if needed via pretes
 - Use `build:check` for efficient rebuilds (only when needed)
 - The main build process handles TypeScript compilation, asset copying, and PegJS grammar generation
 
+## Important Notes
+
+- Must avoid using `any` type. Use `unknown` type
+- Intensively use `interface` rather than class
+- Consider to use `<T>` type parameter for similar types
+- Before commit, run `npm typecheck`, `npm run build`, `npm test`, and `npm lint`
+
 ## Playwright Setup
 
 For visual regression tests and screenshot testing:
