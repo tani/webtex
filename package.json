@@ -64,7 +64,6 @@
     "mathjax": "^4.0.0",
     "prettier": "^3.6.2",
     "slugify": "^1.6.6",
-    "stdin": "*",
     "svgdom": "^0.1.8"
   },
   "devDependencies": {

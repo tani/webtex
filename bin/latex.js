@@ -14,7 +14,6 @@ import { cli } from "gunshi";
 import de from "hyphenation.de";
 import en from "hyphenation.en-us";
 import prettier from "prettier";
-import stdin from "stdin";
 import { createHTMLWindow } from "svgdom";
 import { HtmlGenerator, he, parse as latexParse } from "../dist/latex.js";
 
@@ -144,9 +143,15 @@ async function main(ctx) {
 	const input = files.length
 		? Promise.all(files.map((file) => readFile(file, "utf8")))
 		: new Promise((resolve) => {
-				stdin((str) => {
-					resolve(str);
+				let data = '';
+				process.stdin.setEncoding('utf8');
+				process.stdin.on('data', (chunk) => {
+					data += chunk;
 				});
+				process.stdin.on('end', () => {
+					resolve(data);
+				});
+				process.stdin.resume();
 			});
 
 	const processInput = async () => {
