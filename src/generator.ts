@@ -293,8 +293,11 @@ export abstract class Generator<TNode extends Node = Node> {
 		}
 
 		const result = this._macros[name]?.apply(this._macros, args);
+		if (!Array.isArray(result)) {
+			return undefined;
+		}
 		return result
-			?.filter((x: unknown): x is string | TNode => x !== undefined)
+			.filter((x: unknown): x is string | TNode => x !== undefined)
 			.map((x: string | TNode) => {
 				if (typeof x === "string" || x instanceof String) {
 					return this.createText(x.toString());
