@@ -394,6 +394,15 @@ export class HtmlGenerator extends Generator {
 	}
 
 	/**
+	 * @return the complete HTML string with DOCTYPE declaration
+	 * @param baseURL the base URL to use to build an absolute URL
+	 */
+	public htmlDocumentString(baseURL?: string): string {
+		const doc = this.htmlDocument(baseURL);
+		return `<!DOCTYPE html>\n${doc.documentElement.outerHTML}`;
+	}
+
+	/**
 	 * @return a DocumentFragment consisting of stylesheets and scripts
 	 */
 	public stylesAndScripts(baseURL?: string): DocumentFragment {

@@ -172,7 +172,7 @@ async function main(ctx) {
 				div.appendChild(generator.domFragment().cloneNode(true));
 				html = div.innerHTML;
 			} else {
-				html = generator.htmlDocument(options.url).documentElement.outerHTML;
+				html = generator.htmlDocumentString(options.url);
 			}
 
 			if (options.entities) {
