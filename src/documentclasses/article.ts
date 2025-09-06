@@ -13,7 +13,10 @@ export class Article extends Base {
 
 	protected declare g: DocumentClassGenerator;
 
-	constructor(generator: DocumentClassGenerator, options?: any) {
+	constructor(
+		generator: DocumentClassGenerator,
+		options?: Map<string, unknown>,
+	) {
 		super(generator, options);
 		this.g = generator;
 		this.g.setCounter("secnumdepth", 3);
@@ -24,13 +27,13 @@ export class Article extends Base {
 		return ["References"];
 	}
 
-	tableofcontents(): any[] {
-		return this.section(true, undefined, this.g.macro("contentsname")).concat([
-			this.g._toc,
-		]);
+	tableofcontents(): Element[] {
+		return (
+			this.section(true, undefined, this.g.macro("contentsname")) as Element[]
+		).concat([this.g._toc]);
 	}
 
-	abstract(): any[] {
+	abstract(): Element[] {
 		this.g.setFontSize("small");
 		this.g.enterGroup();
 		this.g.setFontWeight("bf");
@@ -61,7 +64,11 @@ export class Article extends Base {
 	}
 
 	// Methods inherited from Base or provided via macros; type-only declarations
-	declare section: (starred?: boolean, toc?: any, title?: any) => any[];
-	declare quotation: () => any[];
+	declare section: (
+		starred?: boolean,
+		toc?: unknown,
+		title?: unknown,
+	) => Element[];
+	declare quotation: () => Element[];
 	declare endquotation: () => void;
 }

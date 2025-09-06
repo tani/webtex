@@ -54,6 +54,9 @@ export interface DocumentClassGenerator {
 	author: () => HTMLElement;
 	date: () => HTMLElement;
 	list: () => HTMLElement;
+	startlist(): boolean;
+	endlist(): void;
+	quotation: () => HTMLElement;
 	_toc?: HTMLElement; // Optional for base class
 	setFontSize?(size: string): void; // Optional for base class
 	enterGroup?(): void; // Optional for base class

@@ -14,12 +14,15 @@ export class Book extends Report {
 	};
 	protected declare g: DocumentClassGenerator;
 
-	constructor(generator: DocumentClassGenerator, options?: any) {
+	constructor(
+		generator: DocumentClassGenerator,
+		options?: Map<string, unknown>,
+	) {
 		super(generator, options);
 		this["@mainmatter"] = true;
 	}
 
-	chapter(s: boolean, toc?: any, ttl?: any): any[] {
+	chapter(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [
 			this.g.startsection("chapter", 0, s || !this["@mainmatter"], toc, ttl),
 		];

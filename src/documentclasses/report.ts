@@ -15,7 +15,10 @@ export class Report extends Base {
 
 	protected declare g: DocumentClassGenerator;
 
-	constructor(generator: DocumentClassGenerator, options?: any) {
+	constructor(
+		generator: DocumentClassGenerator,
+		options?: Map<string, unknown>,
+	) {
 		super(generator, options);
 		this.g = generator;
 		this.g.newCounter("chapter");
@@ -35,11 +38,11 @@ export class Report extends Base {
 		return ["Bibliography"];
 	}
 
-	part(s: boolean, toc?: any, ttl?: any): any[] {
+	part(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("part", -1, s, toc, ttl)];
 	}
 
-	chapter(s: boolean, toc?: any, ttl?: any): any[] {
+	chapter(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("chapter", 0, s, toc, ttl)];
 	}
 
@@ -66,13 +69,13 @@ export class Report extends Base {
 			: [this.g.arabic(this.g.counter("table"))];
 	}
 
-	tableofcontents(): any[] {
-		return this.chapter(true, undefined, this.g.macro("contentsname")).concat([
-			this.g._toc,
-		]);
+	tableofcontents(): Element[] {
+		return (
+			this.chapter(true, undefined, this.g.macro("contentsname")) as Element[]
+		).concat([this.g._toc]);
 	}
 
-	abstract(): any[] {
+	abstract(): Element[] {
 		this.g.setFontSize("small");
 		this.g.enterGroup();
 		this.g.setFontWeight("bf");
@@ -99,7 +102,7 @@ export class Report extends Base {
 	}
 
 	// Methods inherited from Base or provided via macros; type-only declarations
-	declare quotation: () => any[];
+	declare quotation: () => Element[];
 	declare endquotation: () => void;
 	declare appendixname: () => string[];
 }

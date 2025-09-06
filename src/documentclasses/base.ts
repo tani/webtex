@@ -1,8 +1,8 @@
-import type { DocumentClassGenerator } from "../interfaces";
+import type { DocumentClassGenerator, Length } from "../interfaces";
 
 export class Base {
 	static displayName = "Base";
-	static args: Record<string, any[]> = {
+	static args: Record<string, string[]> = {
 		part: ["V", "s", "X", "o?", "g"],
 		section: ["V", "s", "X", "o?", "g"],
 		subsection: ["V", "s", "X", "o?", "g"],
@@ -14,13 +14,16 @@ export class Base {
 	};
 
 	protected g: DocumentClassGenerator;
-	public options: Map<string, any> = new Map();
-	protected _title: any = null;
-	protected _author: any = null;
-	protected _date: any = null;
-	protected _thanks: any = null;
+	public options: Map<string, unknown> = new Map();
+	protected _title: unknown = null;
+	protected _author: unknown = null;
+	protected _date: unknown = null;
+	protected _thanks: unknown = null;
 
-	constructor(generator: DocumentClassGenerator, options?: any) {
+	constructor(
+		generator: DocumentClassGenerator,
+		options?: Map<string, unknown>,
+	) {
 		this.g = generator;
 		if (options) {
 			this.options = options;
@@ -38,8 +41,8 @@ export class Base {
 		this.g.setLength("paperwidth", new this.g.Length(8.5, "in"));
 		this.g.setLength("@@size", new this.g.Length(10, "pt"));
 
-		this.options.forEach((_v, k) => {
-			let tmp: any, value: any;
+		this.options.forEach((_v: unknown, k) => {
+			let tmp: Length, value: number;
 			switch (k) {
 				case "oneside":
 					break;
@@ -152,27 +155,27 @@ export class Base {
 		return ["Index"];
 	}
 
-	part(s: boolean, toc?: any, ttl?: any): any[] {
+	part(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("part", 0, s, toc, ttl)];
 	}
 
-	section(s: boolean, toc?: any, ttl?: any): any[] {
+	section(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("section", 1, s, toc, ttl)];
 	}
 
-	subsection(s: boolean, toc?: any, ttl?: any): any[] {
+	subsection(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("subsection", 2, s, toc, ttl)];
 	}
 
-	subsubsection(s: boolean, toc?: any, ttl?: any): any[] {
+	subsubsection(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("subsubsection", 3, s, toc, ttl)];
 	}
 
-	paragraph(s: boolean, toc?: any, ttl?: any): any[] {
+	paragraph(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("paragraph", 4, s, toc, ttl)];
 	}
 
-	subparagraph(s: boolean, toc?: any, ttl?: any): any[] {
+	subparagraph(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
 		return [this.g.startsection("subparagraph", 5, s, toc, ttl)];
 	}
 
@@ -212,7 +215,7 @@ export class Base {
 		);
 	}
 
-	maketitle(): any[] {
+	maketitle(): Element[] {
 		this.g.setTitle(this._title);
 		const title = this.g.create(this.g.title, this._title);
 		const author = this.g.create(this.g.author, this._author);
@@ -241,24 +244,26 @@ export class Base {
 		this._thanks = null;
 
 		// Clear methods after use
-		(this as any).title =
-			(this as any).author =
-			(this as any).date =
-			(this as any).thanks =
-			(this as any).and =
-			(this as any).maketitle =
-				() => {};
+		const self = this as unknown as Record<string, unknown>;
+		const noop = () => {};
+		self.title =
+			self.author =
+			self.date =
+			self.thanks =
+			self.and =
+			self.maketitle =
+				noop;
 
 		return [maketitle];
 	}
 
 	// Methods that might be inherited and called by other document classes
-	quotation(): any[] {
-		(this.g as any).startlist();
-		return [(this.g as any).create((this.g as any).quotation)];
+	quotation(): Element[] {
+		this.g.startlist();
+		return [this.g.create(this.g.quotation)];
 	}
 
 	endquotation(): void {
-		(this.g as any).endlist();
+		this.g.endlist();
 	}
 }
