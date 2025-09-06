@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import { createHTMLWindow } from "svgdom";
 // #region code
 import { HtmlGenerator, parse } from "webtex";
-import { createHTMLWindow } from "svgdom";
 
 global.window = createHTMLWindow();
 global.document = window.document;

@@ -74,7 +74,7 @@ class WebTeXLivePreview {
 		// Simple 50/50 split without mouse interaction
 		const editorPanel = document.querySelector(".editor-panel");
 		const previewPanel = document.querySelector(".preview-panel");
-		
+
 		editorPanel.style.flex = "1";
 		previewPanel.style.flex = "1";
 	}

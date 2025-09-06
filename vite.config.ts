@@ -1,37 +1,15 @@
-import {
-	cpSync,
-	existsSync,
-	mkdirSync,
-	readFileSync,
-	writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync } from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 import pegjs from "./lib/vite-plugin-pegjs.mjs";
 
-// Constants
-const PLACEHOLDER_PACKAGES = [
-	"geometry",
-	"layout",
-	"showframe",
-	"luatextra",
-	"lua-visual-debug",
-	"amsmath",
-	"amssymb",
-	"amsfonts",
-	"mathtools",
-	"mhchem",
-	"physics",
-	"siunitx",
-];
 const STATIC_ASSETS = [
 	{ src: "src/css", dest: "dist/css", name: "CSS" },
 	{ src: "src/fonts", dest: "dist/fonts", name: "font" },
 	{ src: "src/js", dest: "dist/js", name: "JS" },
 ];
-
 
 /**
  * Plugin to copy static assets during build
@@ -51,41 +29,6 @@ function assetCopyPlugin() {
 			}
 		},
 	};
-}
-
-/**
- * Plugin to generate package placeholders
- */
-function packagePlaceholdersPlugin() {
-	return {
-		name: "package-placeholders",
-		async writeBundle() {
-			console.log("Building package placeholders...");
-
-			try {
-				await buildPackagePlaceholders();
-				console.log("Package placeholders built successfully!");
-			} catch (error) {
-				console.error("Error building package placeholders:", error);
-				throw error;
-			}
-		},
-	};
-}
-
-async function buildPackagePlaceholders() {
-	const template = readFileSync("lib/package-placeholder-template.js", "utf8");
-	mkdirSync("dist/packages", { recursive: true });
-
-	for (const pkg of PLACEHOLDER_PACKAGES) {
-		const className =
-			pkg.charAt(0).toUpperCase() +
-			pkg.slice(1).replace(/-(.)/g, (_m, c) => c.toUpperCase());
-		writeFileSync(
-			`dist/packages/${pkg}.js`,
-			template.replace(/PACKAGE_NAME/g, className),
-		);
-	}
 }
 
 export default defineConfig(({ mode }) => {
@@ -119,7 +62,6 @@ export default defineConfig(({ mode }) => {
 				trace: false,
 			}),
 			assetCopyPlugin(),
-			packagePlaceholdersPlugin(),
 			dts({
 				tsconfigPath: "./tsconfig.json",
 				include: ["src"],

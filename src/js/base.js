@@ -57,15 +57,11 @@ const heightAboveBaseline = (el) => {
 };
 
 const positionMarginpars = () => {
-	const mpars = document.querySelectorAll(
-		".marginpar > div",
-	);
+	const mpars = document.querySelectorAll(".marginpar > div");
 	let prevBottom = 0;
 
 	mpars.forEach((mpar) => {
-		const mpref = document.querySelector(
-			`.body #marginref-${mpar.id}`,
-		);
+		const mpref = document.querySelector(`.body #marginref-${mpar.id}`);
 
 		if (!mpref) {
 			return;

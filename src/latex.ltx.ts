@@ -1809,68 +1809,42 @@ export class LaTeX {
 					}
 				>
 			)[pkg];
-			try {
-				if (!Package) {
-					// Check if this is a placeholder package that should be ignored
-					const placeholderPackages = [
-						"geometry",
-						"layout",
-						"showframe",
-						"luatextra",
-						"lua-visual-debug",
-						"amsmath",
-						"amssymb",
-						"amsfonts",
-						"mathtools",
-						"mhchem",
-						"physics",
-						"siunitx",
-					];
-					if (placeholderPackages.includes(pkg)) {
-						// Placeholder packages are no-op packages, just continue silently
-						continue;
-					}
 
-					// Note: Dynamic import converted to error for missing package
-					// This maintains synchronous behavior while eliminating require()
-					console.error(
-						`error loading package "${pkg}": package not found in built-in packages`,
-					);
-					throw new Error(
-						`package "${pkg}" not found. Available packages: ${Object.keys(builtinPackages).join(", ")}`,
-					);
+			if (!Package) {
+				console.warn(
+					`package "${pkg}" not found. Available packages: ${Object.keys(builtinPackages).join(", ")}`,
+				);
+				continue;
+			}
+
+			try {
+				const packageInstance = new Package(this.g, options);
+
+				// Copy instance properties
+				assignIn(this, packageInstance as object);
+
+				// Copy prototype methods (for ES6 classes)
+				const proto = Object.getPrototypeOf(packageInstance);
+				const methodNames = Object.getOwnPropertyNames(proto).filter(
+					(name) => name !== "constructor" && typeof proto[name] === "function",
+				);
+
+				for (const methodName of methodNames) {
+					if (!(methodName in this)) {
+						const self = this as unknown as Record<string, unknown>;
+						self[methodName] = (
+							(packageInstance as unknown as Record<string, unknown>)[
+								methodName
+							] as (...a: unknown[]) => unknown
+						).bind(packageInstance);
+					}
 				}
 
-				if (Package) {
-					const packageInstance = new Package(this.g, options);
-
-					// Copy instance properties
-					assignIn(this, packageInstance as object);
-
-					// Copy prototype methods (for ES6 classes)
-					const proto = Object.getPrototypeOf(packageInstance);
-					const methodNames = Object.getOwnPropertyNames(proto).filter(
-						(name) =>
-							name !== "constructor" && typeof proto[name] === "function",
-					);
-
-					for (const methodName of methodNames) {
-						if (!(methodName in this)) {
-							const self = this as unknown as Record<string, unknown>;
-							self[methodName] = (
-								(packageInstance as unknown as Record<string, unknown>)[
-									methodName
-								] as (...a: unknown[]) => unknown
-							).bind(packageInstance);
-						}
-					}
-
-					assign(LaTeX.args, Package.args);
-					if (Package.symbols) {
-						Package.symbols.forEach((value: string, key: string) => {
-							symbols.set(key, value);
-						});
-					}
+				assign(LaTeX.args, Package.args);
+				if (Package.symbols) {
+					Package.symbols.forEach((value: string, key: string) => {
+						symbols.set(key, value);
+					});
 				}
 			} catch (e) {
 				console.error(`error loading package "${pkg}": ${e}`);
