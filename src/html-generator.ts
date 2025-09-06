@@ -13,7 +13,6 @@ const MathJax = await mathjax.init({
 	},
 });
 
-
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
 	array.filter((item): item is NonNullable<T> => item != null);
@@ -398,7 +397,7 @@ export class HtmlGenerator extends Generator {
 					el.appendChild(createStyleSheet("css/mathjax.css"));
 				}
 			}
-		} catch (e) {
+		} catch (_e) {
 			// MathJax stylesheet method failed, fallback to static CSS
 			if (baseURL) {
 				el.appendChild(

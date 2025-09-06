@@ -20,11 +20,12 @@ const parse = (input: string, separator: string): FixturesResult => {
 	const lines: string[] = input.split(separatorRegex);
 	const result: FixturesResult = { fixtures: [] };
 	let fid = 1;
-	
+
 	// Check if this is the old 3-part format or new 2-part format
-	const isOldFormat = lines.length >= 3 && lines[2] && lines[2].trim().startsWith('<');
+	const isOldFormat =
+		lines.length >= 3 && lines[2] && lines[2].trim().startsWith("<");
 	const step = isOldFormat ? 3 : 2;
-	
+
 	for (let i = 0; i < lines.length; i += step) {
 		const fixture: FixtureItem = {
 			id: fid++,

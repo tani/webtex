@@ -47,7 +47,6 @@ export class Bussproofs {
 
 	private g: BussproofsGenerator;
 	private proofCommands: string[] = [];
-	private inProoftree: boolean = false;
 
 	constructor(generator: BussproofsGenerator, options?: any) {
 		this.g = generator;
@@ -61,7 +60,7 @@ export class Bussproofs {
 	private extractMathContent(content: any): string {
 		// For the simplified implementation, just return empty string
 		// This bypasses any content extraction issues
-		return '';
+		return "";
 	}
 
 	// Axiom commands
@@ -193,7 +192,7 @@ export class Bussproofs {
 		// For now, create a simple test proof tree to see if MathJax integration works
 		// This bypasses the command collection issue for now
 		const simpleProof = `\\begin{prooftree}\\AxiomC{$A$}\\UnaryInfC{$B$}\\end{prooftree}`;
-		
+
 		// Parse as math and return
 		const mathContent = this.g.parseMath(simpleProof, true);
 		return [mathContent];

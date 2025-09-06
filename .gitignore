@@ -1,5 +1,6 @@
 .uuid
 .vscode
+.lsmcp/
 *.stats.html
 /dist/
 /website/

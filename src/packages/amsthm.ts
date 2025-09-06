@@ -3,7 +3,7 @@ import type { AmsthrmGenerator } from "../interfaces";
 interface TheoremStyle {
 	name: string;
 	headerFormat: string; // CSS class for header formatting
-	bodyFormat: string;   // CSS class for body formatting
+	bodyFormat: string; // CSS class for body formatting
 }
 
 interface TheoremEnvironment {
@@ -63,24 +63,24 @@ export class Amsthm {
 
 	constructor(generator: AmsthrmGenerator, options?: any) {
 		this.g = generator;
-		
+
 		// Define the three standard theorem styles
 		this.theoremStyles = {
 			plain: {
 				name: "plain",
 				headerFormat: "amsthm-plain-header",
-				bodyFormat: "amsthm-plain-body"
+				bodyFormat: "amsthm-plain-body",
 			},
 			definition: {
-				name: "definition", 
+				name: "definition",
 				headerFormat: "amsthm-definition-header",
-				bodyFormat: "amsthm-definition-body"
+				bodyFormat: "amsthm-definition-body",
 			},
 			remark: {
 				name: "remark",
-				headerFormat: "amsthm-remark-header", 
-				bodyFormat: "amsthm-remark-body"
-			}
+				headerFormat: "amsthm-remark-header",
+				bodyFormat: "amsthm-remark-body",
+			},
 		};
 	}
 
@@ -94,23 +94,23 @@ export class Amsthm {
 
 	/**
 	 * Define a new theorem environment using \newtheorem
-	 * 
+	 *
 	 * IMPORTANT LIMITATION: Due to LaTeX.js architecture, environments must be statically declared.
 	 * This means \newtheorem can only configure pre-defined environments, not create new ones.
-	 * 
+	 *
 	 * Supported syntax:
 	 * - \newtheorem{name}{display}                    - Simple numbered theorem
-	 * - \newtheorem{name}{display}[parent]            - Numbered by parent counter (like section)  
+	 * - \newtheorem{name}{display}[parent]            - Numbered by parent counter (like section)
 	 * - \newtheorem{name}[counter]{display}           - Share counter with existing theorem
 	 * - \newtheorem*{name}{display}                   - Unnumbered theorem
-	 * 
+	 *
 	 * Pre-defined environments that work with \newtheorem:
-	 * theorem, lemma, corollary, proposition, definition, example, remark, note, 
+	 * theorem, lemma, corollary, proposition, definition, example, remark, note,
 	 * observation, claim, fact, conjecture
-	 * 
+	 *
 	 * For other environment names, \newtheorem will issue a warning and the environment
 	 * will not be available for use.
-	 * 
+	 *
 	 * @param envName - Name of the theorem environment (may include *)
 	 * @param sharedCounter - Optional counter to share with existing theorem
 	 * @param displayName - Display name for the theorem (e.g., "Theorem", "Lemma")
@@ -118,12 +118,18 @@ export class Amsthm {
 	 */
 	newtheorem(envName: any, displayName: any): any[] {
 		// Extract text content from DOM nodes
-		const envNameStr = typeof envName === 'string' ? envName : envName.nodeValue || envName.textContent || '';
-		const displayNameStr = typeof displayName === 'string' ? displayName : displayName.nodeValue || displayName.textContent || '';
-		
+		const envNameStr =
+			typeof envName === "string"
+				? envName
+				: envName.nodeValue || envName.textContent || "";
+		const displayNameStr =
+			typeof displayName === "string"
+				? displayName
+				: displayName.nodeValue || displayName.textContent || "";
+
 		// Handle starred version for unnumbered theorems
-		const isStarred = envNameStr.includes('*');
-		const actualEnvName = isStarred ? envNameStr.replace('*', '') : envNameStr;
+		const isStarred = envNameStr.includes("*");
+		const actualEnvName = isStarred ? envNameStr.replace("*", "") : envNameStr;
 		const numbered = !isStarred;
 
 		// Simple version: \newtheorem{name}{display} - Simple numbered theorem
@@ -132,8 +138,10 @@ export class Amsthm {
 		const sharedWith = undefined;
 
 		// Check if this environment is already pre-defined in static environments
-		const isPredefined = Object.keys(Amsthm.environments).includes(actualEnvName);
-		
+		const isPredefined = Object.keys(Amsthm.environments).includes(
+			actualEnvName,
+		);
+
 		if (isPredefined) {
 			// Customize existing pre-defined environment
 			const environment: TheoremEnvironment = {
@@ -143,7 +151,7 @@ export class Amsthm {
 				parentCounter: parentResetBy,
 				numbered: numbered,
 				style: this.theoremStyles[this.currentStyle],
-				sharedWith: sharedWith
+				sharedWith: sharedWith,
 			};
 
 			// Update the environment configuration
@@ -152,20 +160,31 @@ export class Amsthm {
 			// Issue warning if environment is not pre-defined
 			console.warn(
 				`amsthm warning: Environment '${actualEnvName}' created by \\newtheorem is not pre-defined in LaTeX.js.\n` +
-				`This environment will not be available for use. LaTeX.js requires environments to be statically declared.\n` +
-				`Consider using one of the pre-defined environments: ${Object.keys(Amsthm.environments).filter(e => e !== 'proof').join(', ')}\n` +
-				`Or add '${actualEnvName}' to the static environments list in the amsthm package.`
+					`This environment will not be available for use. LaTeX.js requires environments to be statically declared.\n` +
+					`Consider using one of the pre-defined environments: ${Object.keys(
+						Amsthm.environments,
+					)
+						.filter((e) => e !== "proof")
+						.join(", ")}\n` +
+					`Or add '${actualEnvName}' to the static environments list in the amsthm package.`,
 			);
 		}
 
 		// Initialize counter if needed and not sharing (only for predefined environments)
-		if (isPredefined && numbered && !sharedWith && !this.counters[counterName]) {
+		if (
+			isPredefined &&
+			numbered &&
+			!sharedWith &&
+			!this.counters[counterName]
+		) {
 			this.counters[counterName] = 0;
 			try {
 				this.g.newCounter(counterName, parentResetBy);
 			} catch (e) {
 				// Fallback if generator doesn't support newCounter
-				console.warn(`amsthm warning: Could not create counter '${counterName}': ${e}`);
+				console.warn(
+					`amsthm warning: Could not create counter '${counterName}': ${e}`,
+				);
 			}
 		}
 
@@ -174,92 +193,100 @@ export class Amsthm {
 		if (!isPredefined) {
 			// Store a placeholder method that explains the limitation
 			(this as any)[actualEnvName] = () => {
-				return [this.g.error(
-					`Environment '${actualEnvName}' was defined with \\newtheorem but is not available. ` +
-					`LaTeX.js requires environments to be pre-declared. Use a pre-defined environment instead.`
-				)];
+				return [
+					this.g.error(
+						`Environment '${actualEnvName}' was defined with \\newtheorem but is not available. ` +
+							`LaTeX.js requires environments to be pre-declared. Use a pre-defined environment instead.`,
+					),
+				];
 			};
 		}
 
 		return [];
 	}
 
-
-	// Proof environment with optional argument support  
+	// Proof environment with optional argument support
 	proof(label?: any): any[] {
 		// Create proof header with optional label
 		let headerContent: any;
 		if (label) {
-			headerContent = [label, this.g.createText('. ')];
+			headerContent = [label, this.g.createText(". ")];
 		} else {
-			headerContent = this.g.createText('Proof. ');
+			headerContent = this.g.createText("Proof. ");
 		}
-		const header = this.g.create('em', headerContent, 'amsthm-proof-header');
-		
+		const header = this.g.create("em", headerContent, "amsthm-proof-header");
+
 		// Create proof container with header - QED symbol will be added via CSS
-		const proofContainer = this.g.create('div', [header], 'amsthm-proof amsthm-proof-with-qed');
-		
+		const proofContainer = this.g.create(
+			"div",
+			[header],
+			"amsthm-proof amsthm-proof-with-qed",
+		);
+
 		return [proofContainer];
 	}
 
 	// QED symbol command
 	qed(): any[] {
-		const qedSymbol = this.g.create('span', this.g.createText('◻'), 'amsthm-qed');
+		const qedSymbol = this.g.create(
+			"span",
+			this.g.createText("◻"),
+			"amsthm-qed",
+		);
 		return [qedSymbol];
 	}
 
 	// Pre-defined theorem environment methods with optional argument support
 	theorem(title?: any): any[] {
-		return this.createTheoremContainer('theorem', title);
+		return this.createTheoremContainer("theorem", title);
 	}
 
 	lemma(title?: any): any[] {
-		return this.createTheoremContainer('lemma', title);
+		return this.createTheoremContainer("lemma", title);
 	}
 
 	corollary(title?: any): any[] {
-		return this.createTheoremContainer('corollary', title);
+		return this.createTheoremContainer("corollary", title);
 	}
 
 	proposition(title?: any): any[] {
-		return this.createTheoremContainer('proposition', title);
+		return this.createTheoremContainer("proposition", title);
 	}
 
 	definition(title?: any): any[] {
-		return this.createTheoremContainer('definition', title);
+		return this.createTheoremContainer("definition", title);
 	}
 
 	example(title?: any): any[] {
-		return this.createTheoremContainer('example', title);
+		return this.createTheoremContainer("example", title);
 	}
 
 	remark(title?: any): any[] {
-		return this.createTheoremContainer('remark', title);
+		return this.createTheoremContainer("remark", title);
 	}
 
 	note(title?: any): any[] {
-		return this.createTheoremContainer('note', title);
+		return this.createTheoremContainer("note", title);
 	}
 
 	observation(title?: any): any[] {
-		return this.createTheoremContainer('observation', title);
+		return this.createTheoremContainer("observation", title);
 	}
 
 	claim(title?: any): any[] {
-		return this.createTheoremContainer('claim', title);
+		return this.createTheoremContainer("claim", title);
 	}
 
 	fact(title?: any): any[] {
-		return this.createTheoremContainer('fact', title);
+		return this.createTheoremContainer("fact", title);
 	}
 
 	conjecture(title?: any): any[] {
-		return this.createTheoremContainer('conjecture', title);
+		return this.createTheoremContainer("conjecture", title);
 	}
 
 	// Create theorem container with header - parser will append content
 	private createTheoremContainer(envName: string, title?: any): any[] {
-		
 		// Get or create environment configuration
 		if (!this.theoremEnvironments[envName]) {
 			const defaultStyle = this.getDefaultStyle(envName);
@@ -268,19 +295,19 @@ export class Amsthm {
 				displayName: this.capitalizeFirst(envName),
 				numbered: true,
 				counter: envName,
-				style: this.theoremStyles[defaultStyle]
+				style: this.theoremStyles[defaultStyle],
 			};
 			this.theoremEnvironments[envName] = environment;
-			
+
 			// Initialize counter
 			if (!this.counters[envName]) {
 				this.counters[envName] = 0;
 			}
 		}
-		
+
 		const env = this.theoremEnvironments[envName];
 		let headerText = env.displayName;
-		
+
 		if (env.numbered && env.counter) {
 			// Handle parent counter resets (like section numbering)
 			if (env.parentCounter) {
@@ -297,11 +324,11 @@ export class Amsthm {
 					// Parent counter doesn't exist, continue without parent numbering
 				}
 			}
-			
+
 			// Increment counter
 			this.counters[env.counter] = (this.counters[env.counter] || 0) + 1;
 			const counter = this.counters[env.counter];
-			
+
 			if (env.parentCounter) {
 				try {
 					const parentValue = this.g.counter(env.parentCounter);
@@ -313,30 +340,37 @@ export class Amsthm {
 				headerText = `${headerText} ${counter}`;
 			}
 		}
-		
+
 		// Create theorem header with optional title
 		let headerContent: any;
 		if (title) {
-			headerContent = [this.g.createText(`${headerText} (`), title, this.g.createText('). ')];
+			headerContent = [
+				this.g.createText(`${headerText} (`),
+				title,
+				this.g.createText("). "),
+			];
 		} else {
 			headerContent = this.g.createText(`${headerText}. `);
 		}
-		const header = this.g.create('span', headerContent, env.style.headerFormat);
-		
+		const header = this.g.create("span", headerContent, env.style.headerFormat);
+
 		// Create container div with header - parser will append content
-		const container = this.g.create('div', [header], `amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`);
-		
+		const container = this.g.create(
+			"div",
+			[header],
+			`amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`,
+		);
+
 		return [container];
 	}
 
-
 	private getDefaultStyle(envName: string): string {
-		const definitionStyle = ['definition', 'example', 'problem', 'exercise'];
-		const remarkStyle = ['remark', 'note', 'case', 'observation'];
-		
-		if (definitionStyle.includes(envName)) return 'definition';
-		if (remarkStyle.includes(envName)) return 'remark';
-		return 'plain'; // theorem, lemma, corollary, proposition, etc.
+		const definitionStyle = ["definition", "example", "problem", "exercise"];
+		const remarkStyle = ["remark", "note", "case", "observation"];
+
+		if (definitionStyle.includes(envName)) return "definition";
+		if (remarkStyle.includes(envName)) return "remark";
+		return "plain"; // theorem, lemma, corollary, proposition, etc.
 	}
 
 	private capitalizeFirst(str: string): string {
