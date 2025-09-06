@@ -16,8 +16,8 @@ const MathJax = await mathjax.init({
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
 	array.filter((item): item is NonNullable<T> => item != null);
-const flattenDeep = (arr: any[]): any[] =>
-	arr.reduce(
+const flattenDeep = (arr: unknown[]): unknown[] =>
+	arr.reduce<unknown[]>(
 		(acc, val) =>
 			Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
 		[],
@@ -25,6 +25,19 @@ const flattenDeep = (arr: any[]): any[] =>
 
 import { Generator } from "./generator";
 import { diacritics, ligatures } from "./symbols";
+
+interface HtmlGeneratorOptions {
+	documentClass: string;
+	styles: string[];
+	hyphenate: boolean;
+	languagePatterns: unknown;
+	precision: number;
+	[key: string]: unknown;
+}
+
+interface CssDocumentClass {
+	constructor: { css: string };
+}
 
 he.decode.options.strict = true;
 
@@ -45,17 +58,17 @@ const isBlockLevel = (el: Element): boolean => {
 
 const appendChildren = (
 	parent: Element | DocumentFragment,
-	children: any,
+	children: unknown,
 ): Element | DocumentFragment => {
 	if (children) {
 		if (Array.isArray(children)) {
-			for (let i = 0; i < children.length; i++) {
-				if (children[i] != null) {
-					parent.appendChild(children[i]);
+			for (const child of children) {
+				if (child != null) {
+					parent.appendChild(child as Node);
 				}
 			}
 		} else {
-			parent.appendChild(children);
+			parent.appendChild(children as Node);
 		}
 	}
 	return parent;
@@ -74,24 +87,27 @@ const _debugDOM = (
 	oCallback.call(oParent);
 };
 
-const debugNode = (n: any): void => {
+const debugNode = (n: unknown): void => {
 	if (!n) {
 		return;
 	}
-	if (typeof n.nodeName !== "undefined") {
-		console.log(`${n.nodeName}:`, n.textContent);
+	const node = n as { nodeName?: string; textContent?: string };
+	if (typeof node.nodeName !== "undefined") {
+		console.log(`${node.nodeName}:`, node.textContent);
 	} else {
 		console.log("not a node:", n);
 	}
 };
 
-const _debugNodes = (l: any[]): void => {
+const _debugNodes = (l: unknown[]): void => {
 	for (const n of l) {
 		debugNode(n);
 	}
 };
 
-const _debugNodeContent = function (this: any): void {
+const _debugNodeContent = function (this: {
+	nodeValue?: string | null;
+}): void {
 	if (this.nodeValue) {
 		console.log(this.nodeValue);
 	}
@@ -124,11 +140,11 @@ export class HtmlGenerator extends Generator {
 	public verbatim = "pre";
 	public img = "img";
 
-	protected declare _options: any;
+	protected declare _options: HtmlGeneratorOptions;
 	private _h?: Hypher;
 	private _dom: DocumentFragment | null = null;
 
-	constructor(options?: any) {
+	constructor(options?: Partial<HtmlGeneratorOptions>) {
 		super();
 
 		this._options = Object.assign(
@@ -143,7 +159,9 @@ export class HtmlGenerator extends Generator {
 		);
 
 		if (this._options.hyphenate) {
-			this._h = new Hypher(this._options.languagePatterns);
+			this._h = new Hypher(
+				this._options.languagePatterns as Hypher["patterns"],
+			);
 		}
 
 		this.reset();
@@ -337,14 +355,14 @@ export class HtmlGenerator extends Generator {
 	 */
 	public htmlDocument(baseURL?: string): Document {
 		const doc = document.implementation.createHTMLDocument(
-			(this as any).documentTitle,
+			this.documentTitle ?? "",
 		);
 		const charset = document.createElement("meta");
 		charset.setAttribute("charset", "UTF-8");
 		doc.head.appendChild(charset);
 
-		if (!baseURL) {
-			baseURL = (window.location as any)?.href;
+		if (!baseURL && typeof window !== "undefined") {
+			baseURL = window.location?.href;
 		}
 
 		if (baseURL) {
@@ -408,23 +426,28 @@ export class HtmlGenerator extends Generator {
 			}
 		}
 
+		const maybeDocClass: unknown = this.documentClass;
+		const docClass =
+			maybeDocClass && typeof maybeDocClass !== "string"
+				? (maybeDocClass as CssDocumentClass)
+				: null;
+
 		if (baseURL) {
-			el.appendChild(
-				createStyleSheet(
-					new URL(
-						(this as any).documentClass.constructor.css,
-						baseURL,
-					).toString(),
-				),
-			);
+			if (docClass) {
+				el.appendChild(
+					createStyleSheet(
+						new URL(docClass.constructor.css, baseURL).toString(),
+					),
+				);
+			}
 			for (const style of this._options.styles) {
 				el.appendChild(createStyleSheet(new URL(style, baseURL).toString()));
 			}
 			el.appendChild(createScript(new URL("js/base.js", baseURL).toString()));
 		} else {
-			el.appendChild(
-				createStyleSheet((this as any).documentClass.constructor.css),
-			);
+			if (docClass) {
+				el.appendChild(createStyleSheet(docClass.constructor.css));
+			}
 			for (const style of this._options.styles) {
 				el.appendChild(createStyleSheet(style));
 			}
@@ -440,11 +463,12 @@ export class HtmlGenerator extends Generator {
 	public domFragment(): DocumentFragment {
 		const el = document.createDocumentFragment();
 		el.appendChild(this.create(this.block, this._dom, "body"));
-		if ((this as any)._marginpars.length) {
+		const marginPars = this._marginpars;
+		if (marginPars.length) {
 			el.appendChild(
 				this.create(
 					this.block,
-					this.create(this.block, (this as any)._marginpars, "marginpar"),
+					this.create(this.block, marginPars, "marginpar"),
 					"margin-right",
 				),
 			);
@@ -456,47 +480,48 @@ export class HtmlGenerator extends Generator {
 	 * write the TeX lengths and page geometry to the DOM
 	 */
 	public applyLengthsAndGeometryToDom(el: HTMLElement): void {
-		el.style.setProperty("--size", (this as any).length("@@size").value);
-		const twp =
-			100 *
-			(this as any)
-				.length("textwidth")
-				.ratio((this as any).length("paperwidth"));
+		interface LengthValue {
+			value: string;
+			ratio(other: LengthValue): number;
+			add(other: LengthValue): LengthValue;
+		}
+		const lengthValue = (name: string) => this.length(name) as LengthValue;
+		const createLength = (value: number, unit: string): LengthValue => {
+			if (!this.Length) {
+				throw new Error("Length class not initialized");
+			}
+			const len: unknown = new this.Length(value, unit);
+			return len as LengthValue;
+		};
+
+		el.style.setProperty("--size", lengthValue("@@size").value);
+		const twp = 100 * lengthValue("textwidth").ratio(lengthValue("paperwidth"));
 		const mlwp =
 			100 *
-			(this as any)
-				.length("oddsidemargin")
-				.add(new (this as any).Length(1, "in"))
-				.ratio((this as any).length("paperwidth"));
+			lengthValue("oddsidemargin")
+				.add(createLength(1, "in"))
+				.ratio(lengthValue("paperwidth"));
 		const mrwp = Math.max(100 - twp - mlwp, 0);
-		el.style.setProperty("--textwidth", `${(this as any).round(twp)}%`);
-		el.style.setProperty("--marginleftwidth", `${(this as any).round(mlwp)}%`);
-		el.style.setProperty("--marginrightwidth", `${(this as any).round(mrwp)}%`);
+		el.style.setProperty("--textwidth", `${this.round(twp)}%`);
+		el.style.setProperty("--marginleftwidth", `${this.round(mlwp)}%`);
+		el.style.setProperty("--marginrightwidth", `${this.round(mrwp)}%`);
 
 		if (mrwp > 0) {
 			const mpwp =
 				(100 *
 					100 *
-					(this as any)
-						.length("marginparwidth")
-						.ratio((this as any).length("paperwidth"))) /
+					lengthValue("marginparwidth").ratio(lengthValue("paperwidth"))) /
 				mrwp;
-			el.style.setProperty("--marginparwidth", `${(this as any).round(mpwp)}%`);
+			el.style.setProperty("--marginparwidth", `${this.round(mpwp)}%`);
 		} else {
 			el.style.setProperty("--marginparwidth", "0px");
 		}
 
-		el.style.setProperty(
-			"--marginparsep",
-			(this as any).length("marginparsep").value,
-		);
-		el.style.setProperty(
-			"--marginparpush",
-			(this as any).length("marginparpush").value,
-		);
+		el.style.setProperty("--marginparsep", lengthValue("marginparsep").value);
+		el.style.setProperty("--marginparpush", lengthValue("marginparpush").value);
 	}
 
-	public createDocument(fs: any): void {
+	public createDocument(fs: unknown): void {
 		if (!this._dom) {
 			throw new Error("DOM not initialized");
 		}
@@ -504,8 +529,8 @@ export class HtmlGenerator extends Generator {
 	}
 
 	public create(
-		type: string | ((...args: any[]) => any),
-		children?: any,
+		type: string | (() => Element),
+		children?: unknown,
 		classes: string = "",
 	): Element {
 		let el: Element;
@@ -519,16 +544,16 @@ export class HtmlGenerator extends Generator {
 			el = document.createElement(type);
 		}
 
-		if ((this as any).alignment()) {
-			classes += ` ${(this as any).alignment()}`;
+		if (this.alignment()) {
+			classes += ` ${this.alignment()}`;
 		}
 
 		if (
-			(this as any)._continue &&
-			(this as any).location().end.offset > (this as any)._continue
+			typeof this._continue === "number" &&
+			this.location().end.offset > this._continue
 		) {
 			classes = `${classes} continue`;
-			(this as any).break();
+			this.break();
 		}
 
 		if (classes.trim()) {
@@ -542,7 +567,7 @@ export class HtmlGenerator extends Generator {
 		if (!t) {
 			return;
 		}
-		return (this as any).addAttributes(
+		return this.addAttributes(
 			document.createTextNode(
 				this._options.hyphenate ? this._h?.hyphenateText(t) : t,
 			),
@@ -557,15 +582,15 @@ export class HtmlGenerator extends Generator {
 	}
 
 	public createFragment(
-		...args: any[]
+		...args: unknown[]
 	): DocumentFragment | Element | undefined {
-		const children = compact(flattenDeep(args));
+		const children = compact(flattenDeep(args)) as Node[];
 		if (args.length > 0 && (!children || !children.length)) {
 			return;
 		}
 
-		if (children.length === 1 && children[0].nodeType) {
-			return children[0];
+		if (children.length === 1 && (children[0] as Node).nodeType) {
+			return children[0] as Element;
 		}
 
 		const f = document.createDocumentFragment();
@@ -576,7 +601,14 @@ export class HtmlGenerator extends Generator {
 		return this.create(this.image(width, height, url));
 	}
 
-	public createPicture(size: any, offset: any, content: any): Element {
+	public createPicture(
+		size: { x: { value: string }; y: { value: string } },
+		offset: {
+			x: { mul(n: number): { value: string } };
+			y: { mul(n: number): { value: string } };
+		} | null,
+		content: Node | Node[],
+	): Element {
 		const canvas = this.create(this.pictureCanvas);
 		appendChildren(canvas, content);
 
@@ -605,28 +637,28 @@ export class HtmlGenerator extends Generator {
 		return span;
 	}
 
-	public createVSpace(length: any): HTMLSpanElement {
+	public createVSpace(length: { value: string }): HTMLSpanElement {
 		const span = document.createElement("span");
 		span.setAttribute("class", "vspace");
 		span.setAttribute("style", `margin-bottom:${length.value}`);
 		return span;
 	}
 
-	public createVSpaceInline(length: any): HTMLSpanElement {
+	public createVSpaceInline(length: { value: string }): HTMLSpanElement {
 		const span = document.createElement("span");
 		span.setAttribute("class", "vspace-inline");
 		span.setAttribute("style", `margin-bottom:${length.value}`);
 		return span;
 	}
 
-	public createBreakSpace(length: any): Element {
+	public createBreakSpace(length: { value: string }): Element {
 		const span = document.createElement("span");
 		span.setAttribute("class", "breakspace");
 		span.setAttribute("style", `margin-bottom:${length.value}`);
-		return (this as any).addAttributes(span);
+		return this.addAttributes(span);
 	}
 
-	public createHSpace(length: any): HTMLSpanElement {
+	public createHSpace(length: { value: string }): HTMLSpanElement {
 		const span = document.createElement("span");
 		span.setAttribute("style", `margin-right:${length.value}`);
 		return span;
@@ -660,31 +692,32 @@ export class HtmlGenerator extends Generator {
 		);
 	}
 
-	public addAttributes(nodes: any): any {
-		const attrs = (this as any)._inlineAttributes();
+	public addAttributes(nodes: Element): Element;
+	public addAttributes(nodes: Text): Text;
+	public addAttributes(nodes: DocumentFragment): DocumentFragment;
+	public addAttributes(nodes: Node[]): Node[];
+	public addAttributes(nodes: Node | Node[]): Node | Node[] {
+		const attrs = this._inlineAttributes();
 		if (!attrs) {
 			return nodes;
 		}
 
 		if (nodes instanceof window.Element) {
-			if (isBlockLevel(nodes)) {
-				return this.create(this.block, nodes, attrs);
-			} else {
-				return this.create(this.inline, nodes, attrs);
-			}
-		} else if (
+			return isBlockLevel(nodes)
+				? this.create(this.block, nodes, attrs)
+				: this.create(this.inline, nodes, attrs);
+		}
+		if (
 			nodes instanceof window.Text ||
 			nodes instanceof window.DocumentFragment
 		) {
 			return this.create(this.inline, nodes, attrs);
-		} else if (Array.isArray(nodes)) {
-			return nodes.map((node: any) => {
-				return this.create(this.inline, node, attrs);
-			});
-		} else {
-			console.warn("addAttributes got an unknown/unsupported argument:", nodes);
+		}
+		if (Array.isArray(nodes)) {
+			return nodes.map((node) => this.create(this.inline, node, attrs));
 		}
 
+		console.warn("addAttributes got an unknown/unsupported argument:", nodes);
 		return nodes;
 	}
 }
