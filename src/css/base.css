@@ -1,4 +1,4 @@
-@import url("../fonts/cmu.css");
+/* System font stacks for cross-platform compatibility */
 
 /*******************/
 /* default lengths */
@@ -180,7 +180,7 @@ body,
 
 html,
 .page {
-	font-family: "Computer Modern Serif", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-size: var(--size);
 
 	text-align: justify;
@@ -194,15 +194,15 @@ html,
 
 /* family */
 .rm {
-	font-family: "Computer Modern Serif", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-variant-ligatures: normal;
 }
 .sf {
-	font-family: "Computer Modern Sans", sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Liberation Sans", "DejaVu Sans", Arial, sans-serif;
 	font-variant-ligatures: normal;
 }
 .tt {
-	font-family: "Computer Modern Typewriter", monospace;
+	font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Source Code Pro", "Cascadia Code", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
 	font-variant-ligatures: none;
 }
 
@@ -217,7 +217,7 @@ html,
 
 /* shape - LaTeX doesn't support slanted small-caps by default */
 .up {
-	font-family: "Computer Modern Serif", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-style: normal;
 	font-variant-caps: normal;
 }
@@ -228,25 +228,25 @@ html,
 }
 
 .sl {
-	font-family: "Computer Modern Serif Slanted", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-style: oblique;
 	font-variant-caps: normal;
 }
 
 .sf.sl {
-	font-family: "Computer Modern Sans", sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Liberation Sans", "DejaVu Sans", Arial, sans-serif;
 	font-style: oblique;
 	font-variant-caps: normal;
 }
 
 .tt.sl {
-	font-family: "Computer Modern Typewriter Slanted", monospace;
+	font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Source Code Pro", "Cascadia Code", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
 	font-style: oblique;
 	font-variant-caps: normal;
 }
 
 .sc {
-	font-family: "Computer Modern Serif", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-style: normal;
 	font-variant-caps: small-caps;
 }
@@ -302,7 +302,7 @@ h2,
 h3,
 h4 {
 	/* \normalfont */
-	font-family: "Computer Modern Serif", serif;
+	font-family: Georgia, "Times New Roman", "Liberation Serif", "DejaVu Serif", Times, serif;
 	font-style: normal;
 	font-variant-caps: normal;
 
