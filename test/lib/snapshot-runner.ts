@@ -2,7 +2,7 @@ import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import decache from "decache";
 import { createHTMLWindow } from "svgdom";
 import { expect, test } from "vitest";
-import { HtmlGenerator, parse } from "../../dist/latex";
+import { HtmlGenerator, parse } from "../../dist/webtex";
 
 // Set up DOM for Node.js environment
 const window = createHTMLWindow() as Window & typeof globalThis;

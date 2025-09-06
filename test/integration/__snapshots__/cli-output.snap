@@ -8,7 +8,7 @@ exports[`LaTeX.js CLI Output Snapshots > complex document compilation snapshot >
 
 exports[`LaTeX.js CLI Output Snapshots > help output snapshot > cli-help-output.txt 1`] = `
 "USAGE:
-  latex.js <OPTIONS>
+  webtex <OPTIONS>
 
 OPTIONS:
   -o, --output <output>                  specify output file, otherwise STDOUT will be used

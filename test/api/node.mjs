@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // #region code
-import { HtmlGenerator, parse } from "latex.js";
+import { HtmlGenerator, parse } from "webtex";
 import { createHTMLWindow } from "svgdom";
 
 global.window = createHTMLWindow();

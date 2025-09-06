@@ -6,7 +6,7 @@ import he from "he";
 import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
 import { expect, test } from "vitest";
-import { HtmlGenerator, parse } from "../../dist/latex";
+import { HtmlGenerator, parse } from "../../dist/webtex";
 import { type FixtureItem, load as loadFixture } from "./load-fixtures";
 
 // Set up DOM for Node.js environment

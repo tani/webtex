@@ -15,7 +15,7 @@ import de from "hyphenation.de";
 import en from "hyphenation.en-us";
 import prettier from "prettier";
 import { createHTMLWindow } from "svgdom";
-import { HtmlGenerator, he, parse as latexParse } from "../dist/latex.js";
+import { HtmlGenerator, he, parse as latexParse } from "../dist/webtex.js";
 
 const info = JSON.parse(
 	readFileSync(new URL("../package.json", import.meta.url), "utf8"),

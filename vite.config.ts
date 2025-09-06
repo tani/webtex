@@ -98,14 +98,14 @@ export default defineConfig(({ mode }) => {
 			minify: isProd ? "terser" : false,
 			lib: {
 				entry: ["src/index.ts"],
-				name: "LaTeX",
+				name: "WebTeX",
 				formats: ["es"],
 			},
 			rollupOptions: {
 				external: ["mathjax"],
 				output: {
 					format: "es",
-					entryFileNames: "latex.js",
+					entryFileNames: "webtex.js",
 				},
 			},
 		},

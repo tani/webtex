@@ -1,31 +1,34 @@
 {
-	"name": "latex.js",
-	"description": "JavaScript LaTeX to HTML5 translator",
+	"name": "webtex",
+	"description": "JavaScript LaTeX to HTML5 translator - WebTeX fork with enhanced features",
 	"version": "0.12.6",
 	"author": {
-		"name": "Michael Brade",
-		"email": "brade@kde.org"
+		"name": "tani",
+		"email": "tani@example.com"
 	},
 	"keywords": [
-		"pegjs",
+		"webtex",
 		"latex",
+		"tex",
 		"parser",
-		"html5"
+		"html5",
+		"web",
+		"javascript"
 	],
 	"bin": {
-		"latex.js": "./bin/latex.js"
+		"webtex": "./bin/webtex.js"
 	},
 	"type": "module",
-	"main": "./dist/latex.js",
+	"main": "./dist/webtex.js",
 	"exports": {
-		"import": "./dist/latex.js",
-		"default": "./dist/latex.js"
+		"import": "./dist/webtex.js",
+		"default": "./dist/webtex.js"
 	},
-	"browser": "./dist/latex.js",
+	"browser": "./dist/webtex.js",
 	"files": [
-		"bin/latex.js",
-		"dist/latex.js",
-		"dist/latex.js.map",
+		"bin/webtex.js",
+		"dist/webtex.js",
+		"dist/webtex.js.map",
 		"dist/css/",
 		"dist/fonts/",
 		"dist/js/",
@@ -82,13 +85,13 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/michael-brade/LaTeX.js.git"
+		"url": "git+https://github.com/tani/webtex.git"
 	},
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/michael-brade/LaTeX.js/issues"
+		"url": "https://github.com/tani/webtex/issues"
 	},
-	"homepage": "https://latex.js.org",
+	"homepage": "https://github.com/tani/webtex",
 	"engines": {
 		"node": ">= 14.0"
 	}

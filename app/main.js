@@ -1,7 +1,7 @@
-// LaTeX.js Live Preview App
-import { HtmlGenerator, parse as latexParse } from "../dist/latex.js";
+// WebTeX Live Preview App
+import { HtmlGenerator, parse as latexParse } from "../dist/webtex.js";
 
-class LaTeXLivePreview {
+class WebTeXLivePreview {
 	constructor() {
 		this.editor = document.getElementById("latex-editor");
 		this.preview = document.getElementById("preview-iframe");
@@ -292,7 +292,7 @@ ${bodyContent}
 \\usepackage{amsfonts}
 
 \\title{Sample Article}
-\\author{LaTeX.js Demo}
+\\author{WebTeX Demo}
 \\date{\\today}
 
 \\begin{document}
@@ -300,12 +300,12 @@ ${bodyContent}
 \\maketitle
 
 \\begin{abstract}
-This is a sample LaTeX document demonstrating the capabilities of LaTeX.js. It includes basic document structure, mathematical expressions, and formatting.
+This is a sample LaTeX document demonstrating the capabilities of WebTeX. It includes basic document structure, mathematical expressions, and formatting.
 \\end{abstract}
 
 \\section{Introduction}
 
-Welcome to LaTeX.js! This is a JavaScript implementation of LaTeX that converts LaTeX documents to HTML5.
+Welcome to WebTeX! This is a JavaScript implementation of LaTeX that converts LaTeX documents to HTML5.
 
 \\section{Mathematics}
 
@@ -328,7 +328,7 @@ Display math:
 
 \\section{Conclusion}
 
-LaTeX.js provides a powerful way to render LaTeX content in web browsers.
+WebTeX provides a powerful way to render LaTeX content in web browsers.
 
 \\end{document}`;
 				break;
@@ -509,7 +509,7 @@ G & H & I \\\\
 	loadDefaultContent() {
 		const defaultContent = `\\documentclass{article}
 
-\\title{Welcome to LaTeX.js}
+\\title{Welcome to WebTeX}
 \\author{Live Preview Demo}
 
 \\begin{document}
@@ -518,7 +518,7 @@ G & H & I \\\\
 
 \\section{Getting Started}
 
-Welcome to the LaTeX.js live preview editor! Start typing LaTeX code to see the rendered output in real-time.
+Welcome to the WebTeX live preview editor! Start typing LaTeX code to see the rendered output in real-time.
 
 Try the example buttons above to load sample documents.
 
@@ -536,5 +536,5 @@ Try the example buttons above to load sample documents.
 
 // Initialize the app when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-	new LaTeXLivePreview();
+	new WebTeXLivePreview();
 });
