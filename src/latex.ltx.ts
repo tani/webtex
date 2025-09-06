@@ -865,7 +865,7 @@ export class LaTeX {
 			if (this.g.counter("@itemdepth") > 4) {
 				this.g.error("too deeply nested");
 			}
-			return;
+			return undefined;
 		}
 
 		const label = `labelitem${this.g.roman(this.g.counter("@itemdepth"))}`;
@@ -899,7 +899,7 @@ export class LaTeX {
 			if (this.g.counter("@enumdepth") > 4) {
 				this.g.error("too deeply nested");
 			}
-			return;
+			return undefined;
 		}
 
 		const itemCounter = `enum${this.g.roman(this.g.counter("@enumdepth"))}`;
@@ -927,7 +927,7 @@ export class LaTeX {
 	public description(items?: { label: unknown; text: unknown }[]): unknown {
 		if (items === undefined) {
 			this.g.startlist();
-			return;
+			return undefined;
 		}
 
 		return [
@@ -1040,7 +1040,9 @@ export class LaTeX {
 					"expected \\framebox(width,height)[position]{text} but got two optional arguments!",
 				) as unknown[];
 			}
-		} else if (
+			return this._box(width as Length | undefined, pos, txt, "hbox frame");
+		}
+		if (
 			txt &&
 			txt.hasAttribute != null &&
 			!width &&
@@ -1049,9 +1051,8 @@ export class LaTeX {
 		) {
 			this.g.addAttribute(txt, "frame");
 			return [txt];
-		} else {
-			return this._box(width as Length | undefined, pos, txt, "hbox frame");
 		}
+		return this._box(width as Length | undefined, pos, txt, "hbox frame");
 	}
 
 	private _box(

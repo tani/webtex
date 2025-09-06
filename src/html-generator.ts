@@ -565,7 +565,7 @@ export class HtmlGenerator extends Generator {
 
 	public createText(t: string): Text | undefined {
 		if (!t) {
-			return;
+			return undefined;
 		}
 		return this.addAttributes(
 			document.createTextNode(
@@ -576,7 +576,7 @@ export class HtmlGenerator extends Generator {
 
 	public createVerbatim(t: string): Text | undefined {
 		if (!t) {
-			return;
+			return undefined;
 		}
 		return document.createTextNode(t);
 	}
@@ -586,7 +586,7 @@ export class HtmlGenerator extends Generator {
 	): DocumentFragment | Element | undefined {
 		const children = compact(flattenDeep(args)) as Node[];
 		if (args.length > 0 && (!children || !children.length)) {
-			return;
+			return undefined;
 		}
 
 		if (children.length === 1 && (children[0] as Node).nodeType) {

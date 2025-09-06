@@ -505,6 +505,7 @@ export abstract class Generator<TNode extends Node = Node> {
 				return value;
 			}
 		}
+		return undefined;
 	}
 
 	public startsection(
@@ -519,7 +520,7 @@ export abstract class Generator<TNode extends Node = Node> {
 				this.stepCounter(sec);
 				this.refCounter(sec, `sec-${this.nextId()}`);
 			}
-			return;
+			return undefined;
 		}
 
 		let el: TNode;
