@@ -1,230 +1,230 @@
 // LaTeX.js Live Preview App
-import { parse as latexParse, HtmlGenerator } from '../dist/latex.js';
+import { HtmlGenerator, parse as latexParse } from "../dist/latex.js";
 
 class LaTeXLivePreview {
-    constructor() {
-        this.editor = document.getElementById('latex-editor');
-        this.preview = document.getElementById('preview-content');
-        this.compileStatus = document.getElementById('compile-status');
-        this.editorStats = document.getElementById('editor-stats');
-        this.lastCompile = document.getElementById('last-compile');
-        
-        this.compileTimeout = null;
-        this.isResizing = false;
-        
-        this.init();
-        this.setupEventListeners();
-        this.loadDefaultContent();
-    }
+	constructor() {
+		this.editor = document.getElementById("latex-editor");
+		this.preview = document.getElementById("preview-content");
+		this.compileStatus = document.getElementById("compile-status");
+		this.editorStats = document.getElementById("editor-stats");
+		this.lastCompile = document.getElementById("last-compile");
 
-    init() {
-        // Setup splitter functionality
-        this.setupSplitter();
-        
-        // Set initial editor focus
-        this.editor.focus();
-        
-        // Update initial stats
-        this.updateEditorStats();
-    }
+		this.compileTimeout = null;
+		this.isResizing = false;
 
-    setupEventListeners() {
-        // Editor events
-        this.editor.addEventListener('input', () => {
-            this.updateEditorStats();
-            this.scheduleCompile();
-        });
+		this.init();
+		this.setupEventListeners();
+		this.loadDefaultContent();
+	}
 
-        this.editor.addEventListener('keydown', (e) => {
-            this.handleEditorKeydown(e);
-        });
+	init() {
+		// Setup splitter functionality
+		this.setupSplitter();
 
-        // Toolbar buttons
-        document.getElementById('example-article').addEventListener('click', () => {
-            this.loadExample('article');
-        });
+		// Set initial editor focus
+		this.editor.focus();
 
-        document.getElementById('example-math').addEventListener('click', () => {
-            this.loadExample('math');
-        });
+		// Update initial stats
+		this.updateEditorStats();
+	}
 
-        document.getElementById('example-table').addEventListener('click', () => {
-            this.loadExample('table');
-        });
+	setupEventListeners() {
+		// Editor events
+		this.editor.addEventListener("input", () => {
+			this.updateEditorStats();
+			this.scheduleCompile();
+		});
 
-        document.getElementById('download-html').addEventListener('click', () => {
-            this.downloadHTML();
-        });
+		this.editor.addEventListener("keydown", (e) => {
+			this.handleEditorKeydown(e);
+		});
 
-        document.getElementById('clear-editor').addEventListener('click', () => {
-            this.clearEditor();
-        });
+		// Toolbar buttons
+		document.getElementById("example-article").addEventListener("click", () => {
+			this.loadExample("article");
+		});
 
-        document.getElementById('wrap-toggle').addEventListener('click', () => {
-            this.toggleLineWrap();
-        });
+		document.getElementById("example-math").addEventListener("click", () => {
+			this.loadExample("math");
+		});
 
-        // Window resize
-        window.addEventListener('resize', () => {
-            this.handleResize();
-        });
-    }
+		document.getElementById("example-table").addEventListener("click", () => {
+			this.loadExample("table");
+		});
 
-    setupSplitter() {
-        const splitter = document.querySelector('.splitter');
-        const editorPanel = document.querySelector('.editor-panel');
-        const previewPanel = document.querySelector('.preview-panel');
-        const container = document.querySelector('.editor-container');
+		document.getElementById("download-html").addEventListener("click", () => {
+			this.downloadHTML();
+		});
 
-        let isResizing = false;
-        let startX = 0;
-        let startWidth = 0;
+		document.getElementById("clear-editor").addEventListener("click", () => {
+			this.clearEditor();
+		});
 
-        splitter.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            startX = e.clientX;
-            startWidth = editorPanel.offsetWidth;
-            
-            document.body.style.cursor = 'col-resize';
-            document.body.style.userSelect = 'none';
-            
-            e.preventDefault();
-        });
+		document.getElementById("wrap-toggle").addEventListener("click", () => {
+			this.toggleLineWrap();
+		});
 
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
+		// Window resize
+		window.addEventListener("resize", () => {
+			this.handleResize();
+		});
+	}
 
-            const containerWidth = container.offsetWidth;
-            const splitterWidth = splitter.offsetWidth;
-            const newWidth = startWidth + (e.clientX - startX);
-            const minWidth = 300;
-            const maxWidth = containerWidth - minWidth - splitterWidth;
+	setupSplitter() {
+		const splitter = document.querySelector(".splitter");
+		const editorPanel = document.querySelector(".editor-panel");
+		const previewPanel = document.querySelector(".preview-panel");
+		const container = document.querySelector(".editor-container");
 
-            if (newWidth >= minWidth && newWidth <= maxWidth) {
-                editorPanel.style.flex = `0 0 ${newWidth}px`;
-                previewPanel.style.flex = `1`;
-            }
-        });
+		let isResizing = false;
+		let startX = 0;
+		let startWidth = 0;
 
-        document.addEventListener('mouseup', () => {
-            if (isResizing) {
-                isResizing = false;
-                document.body.style.cursor = '';
-                document.body.style.userSelect = '';
-            }
-        });
-    }
+		splitter.addEventListener("mousedown", (e) => {
+			isResizing = true;
+			startX = e.clientX;
+			startWidth = editorPanel.offsetWidth;
 
-    handleEditorKeydown(e) {
-        // Handle tab key for indentation
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const start = this.editor.selectionStart;
-            const end = this.editor.selectionEnd;
-            const value = this.editor.value;
-            
-            this.editor.value = value.substring(0, start) + '  ' + value.substring(end);
-            this.editor.selectionStart = this.editor.selectionEnd = start + 2;
-        }
+			document.body.style.cursor = "col-resize";
+			document.body.style.userSelect = "none";
 
-        // Handle auto-closing brackets
-        if (e.key === '{') {
-            e.preventDefault();
-            this.insertText('{}');
-            this.editor.selectionStart = this.editor.selectionEnd -= 1;
-        } else if (e.key === '[') {
-            e.preventDefault();
-            this.insertText('[]');
-            this.editor.selectionStart = this.editor.selectionEnd -= 1;
-        } else if (e.key === '(') {
-            e.preventDefault();
-            this.insertText('()');
-            this.editor.selectionStart = this.editor.selectionEnd -= 1;
-        }
-    }
+			e.preventDefault();
+		});
 
-    insertText(text) {
-        const start = this.editor.selectionStart;
-        const end = this.editor.selectionEnd;
-        const value = this.editor.value;
-        
-        this.editor.value = value.substring(0, start) + text + value.substring(end);
-        this.updateEditorStats();
-        this.scheduleCompile();
-    }
+		document.addEventListener("mousemove", (e) => {
+			if (!isResizing) return;
 
-    updateEditorStats() {
-        const text = this.editor.value;
-        const lines = text.split('\n').length;
-        const chars = text.length;
-        
-        this.editorStats.textContent = `Lines: ${lines} | Characters: ${chars}`;
-    }
+			const containerWidth = container.offsetWidth;
+			const splitterWidth = splitter.offsetWidth;
+			const newWidth = startWidth + (e.clientX - startX);
+			const minWidth = 300;
+			const maxWidth = containerWidth - minWidth - splitterWidth;
 
-    scheduleCompile() {
-        if (this.compileTimeout) {
-            clearTimeout(this.compileTimeout);
-        }
-        
-        this.compileStatus.textContent = 'Compiling...';
-        this.compileStatus.className = 'compiling';
-        
-        this.compileTimeout = setTimeout(() => {
-            this.compileLatex();
-        }, 500);
-    }
+			if (newWidth >= minWidth && newWidth <= maxWidth) {
+				editorPanel.style.flex = `0 0 ${newWidth}px`;
+				previewPanel.style.flex = `1`;
+			}
+		});
 
-    async compileLatex() {
-        const latexCode = this.editor.value.trim();
-        
-        if (!latexCode) {
-            this.preview.innerHTML = '<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
-            this.compileStatus.textContent = 'Ready';
-            this.compileStatus.className = '';
-            return;
-        }
+		document.addEventListener("mouseup", () => {
+			if (isResizing) {
+				isResizing = false;
+				document.body.style.cursor = "";
+				document.body.style.userSelect = "";
+			}
+		});
+	}
 
-        try {
-            const generator = latexParse(latexCode, {
-                generator: new HtmlGenerator({
-                    hyphenate: false,
-                    documentClass: 'article'
-                })
-            });
+	handleEditorKeydown(e) {
+		// Handle tab key for indentation
+		if (e.key === "Tab") {
+			e.preventDefault();
+			const start = this.editor.selectionStart;
+			const end = this.editor.selectionEnd;
+			const value = this.editor.value;
 
-            const htmlDoc = generator.htmlDocument();
-            const bodyContent = htmlDoc.body.innerHTML;
-            
-            this.preview.innerHTML = bodyContent;
-            this.preview.className = '';
-            
-            // Re-render MathJax if present
-            if (window.MathJax && window.MathJax.typesetPromise) {
-                await window.MathJax.typesetPromise([this.preview]);
-            }
-            
-            this.compileStatus.textContent = 'Success';
-            this.compileStatus.className = 'success';
-            this.lastCompile.textContent = `Last compiled: ${new Date().toLocaleTimeString()}`;
-            
-        } catch (error) {
-            console.error('LaTeX compilation error:', error);
-            
-            this.preview.innerHTML = `Compilation Error:\n\n${error.message || error.toString()}`;
-            this.preview.className = 'error';
-            
-            this.compileStatus.textContent = 'Error';
-            this.compileStatus.className = 'error';
-            this.lastCompile.textContent = `Error: ${new Date().toLocaleTimeString()}`;
-        }
-    }
+			this.editor.value = `${value.substring(0, start)}  ${value.substring(end)}`;
+			this.editor.selectionStart = this.editor.selectionEnd = start + 2;
+		}
 
-    loadExample(type) {
-        let content = '';
-        
-        switch (type) {
-            case 'article':
-                content = `\\documentclass{article}
+		// Handle auto-closing brackets
+		if (e.key === "{") {
+			e.preventDefault();
+			this.insertText("{}");
+			this.editor.selectionStart = this.editor.selectionEnd -= 1;
+		} else if (e.key === "[") {
+			e.preventDefault();
+			this.insertText("[]");
+			this.editor.selectionStart = this.editor.selectionEnd -= 1;
+		} else if (e.key === "(") {
+			e.preventDefault();
+			this.insertText("()");
+			this.editor.selectionStart = this.editor.selectionEnd -= 1;
+		}
+	}
+
+	insertText(text) {
+		const start = this.editor.selectionStart;
+		const end = this.editor.selectionEnd;
+		const value = this.editor.value;
+
+		this.editor.value = value.substring(0, start) + text + value.substring(end);
+		this.updateEditorStats();
+		this.scheduleCompile();
+	}
+
+	updateEditorStats() {
+		const text = this.editor.value;
+		const lines = text.split("\n").length;
+		const chars = text.length;
+
+		this.editorStats.textContent = `Lines: ${lines} | Characters: ${chars}`;
+	}
+
+	scheduleCompile() {
+		if (this.compileTimeout) {
+			clearTimeout(this.compileTimeout);
+		}
+
+		this.compileStatus.textContent = "Compiling...";
+		this.compileStatus.className = "compiling";
+
+		this.compileTimeout = setTimeout(() => {
+			this.compileLatex();
+		}, 500);
+	}
+
+	async compileLatex() {
+		const latexCode = this.editor.value.trim();
+
+		if (!latexCode) {
+			this.preview.innerHTML =
+				'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
+			this.compileStatus.textContent = "Ready";
+			this.compileStatus.className = "";
+			return;
+		}
+
+		try {
+			const generator = latexParse(latexCode, {
+				generator: new HtmlGenerator({
+					hyphenate: false,
+					documentClass: "article",
+				}),
+			});
+
+			const htmlDoc = generator.htmlDocument();
+			const bodyContent = htmlDoc.body.innerHTML;
+
+			this.preview.innerHTML = bodyContent;
+			this.preview.className = "";
+
+			// Re-render MathJax if present
+			if (window.MathJax?.typesetPromise) {
+				await window.MathJax.typesetPromise([this.preview]);
+			}
+
+			this.compileStatus.textContent = "Success";
+			this.compileStatus.className = "success";
+			this.lastCompile.textContent = `Last compiled: ${new Date().toLocaleTimeString()}`;
+		} catch (error) {
+			console.error("LaTeX compilation error:", error);
+
+			this.preview.innerHTML = `Compilation Error:\n\n${error.message || error.toString()}`;
+			this.preview.className = "error";
+
+			this.compileStatus.textContent = "Error";
+			this.compileStatus.className = "error";
+			this.lastCompile.textContent = `Error: ${new Date().toLocaleTimeString()}`;
+		}
+	}
+
+	loadExample(type) {
+		let content = "";
+
+		switch (type) {
+			case "article":
+				content = `\\documentclass{article}
 \\usepackage{amsmath}
 \\usepackage{amsfonts}
 
@@ -268,10 +268,10 @@ Display math:
 LaTeX.js provides a powerful way to render LaTeX content in web browsers.
 
 \\end{document}`;
-                break;
-                
-            case 'math':
-                content = `\\documentclass{article}
+				break;
+
+			case "math":
+				content = `\\documentclass{article}
 \\usepackage{amsmath}
 \\usepackage{amsfonts}
 \\usepackage{amssymb}
@@ -314,10 +314,10 @@ $\\Gamma, \\Delta, \\Theta, \\Lambda, \\Xi, \\Pi, \\Sigma, \\Upsilon, \\Phi, \\P
 \\]
 
 \\end{document}`;
-                break;
-                
-            case 'table':
-                content = `\\documentclass{article}
+				break;
+
+			case "table":
+				content = `\\documentclass{article}
 
 \\title{Tables and Lists}
 
@@ -361,62 +361,66 @@ G & H & I \\\\
 \\end{description}
 
 \\end{document}`;
-                break;
-        }
-        
-        this.editor.value = content;
-        this.updateEditorStats();
-        this.scheduleCompile();
-        this.editor.focus();
-    }
+				break;
+		}
 
-    clearEditor() {
-        if (this.editor.value.trim() && !confirm('Are you sure you want to clear the editor?')) {
-            return;
-        }
-        
-        this.editor.value = '';
-        this.preview.innerHTML = '<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
-        this.updateEditorStats();
-        this.compileStatus.textContent = 'Ready';
-        this.compileStatus.className = '';
-        this.lastCompile.textContent = 'Never compiled';
-        this.editor.focus();
-    }
+		this.editor.value = content;
+		this.updateEditorStats();
+		this.scheduleCompile();
+		this.editor.focus();
+	}
 
-    toggleLineWrap() {
-        const button = document.getElementById('wrap-toggle');
-        const isWrapped = this.editor.style.whiteSpace === 'pre-wrap';
-        
-        if (isWrapped) {
-            this.editor.style.whiteSpace = 'pre';
-            this.editor.style.overflowX = 'auto';
-            button.classList.remove('active');
-        } else {
-            this.editor.style.whiteSpace = 'pre-wrap';
-            this.editor.style.overflowX = 'hidden';
-            button.classList.add('active');
-        }
-    }
+	clearEditor() {
+		if (
+			this.editor.value.trim() &&
+			!confirm("Are you sure you want to clear the editor?")
+		) {
+			return;
+		}
 
-    downloadHTML() {
-        const latexCode = this.editor.value.trim();
-        
-        if (!latexCode) {
-            alert('No content to download. Please enter some LaTeX code first.');
-            return;
-        }
+		this.editor.value = "";
+		this.preview.innerHTML =
+			'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>';
+		this.updateEditorStats();
+		this.compileStatus.textContent = "Ready";
+		this.compileStatus.className = "";
+		this.lastCompile.textContent = "Never compiled";
+		this.editor.focus();
+	}
 
-        try {
-            const generator = latexParse(latexCode, {
-                generator: new HtmlGenerator({
-                    hyphenate: false,
-                    documentClass: 'article'
-                })
-            });
+	toggleLineWrap() {
+		const button = document.getElementById("wrap-toggle");
+		const isWrapped = this.editor.style.whiteSpace === "pre-wrap";
 
-            const htmlDoc = generator.htmlDocument();
-            const fullHTML = `<!DOCTYPE html>
+		if (isWrapped) {
+			this.editor.style.whiteSpace = "pre";
+			this.editor.style.overflowX = "auto";
+			button.classList.remove("active");
+		} else {
+			this.editor.style.whiteSpace = "pre-wrap";
+			this.editor.style.overflowX = "hidden";
+			button.classList.add("active");
+		}
+	}
+
+	downloadHTML() {
+		const latexCode = this.editor.value.trim();
+
+		if (!latexCode) {
+			alert("No content to download. Please enter some LaTeX code first.");
+			return;
+		}
+
+		try {
+			const generator = latexParse(latexCode, {
+				generator: new HtmlGenerator({
+					hyphenate: false,
+					documentClass: "article",
+				}),
+			});
+
+			const htmlDoc = generator.htmlDocument();
+			const fullHTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -471,25 +475,24 @@ ${htmlDoc.body.innerHTML}
 </body>
 </html>`;
 
-            const blob = new Blob([fullHTML], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'latex-document.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            URL.revokeObjectURL(url);
-            
-        } catch (error) {
-            alert(`Failed to generate HTML: ${error.message || error.toString()}`);
-        }
-    }
+			const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
+			const url = URL.createObjectURL(blob);
 
-    loadDefaultContent() {
-        const defaultContent = `\\documentclass{article}
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = "latex-document.html";
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			alert(`Failed to generate HTML: ${error.message || error.toString()}`);
+		}
+	}
+
+	loadDefaultContent() {
+		const defaultContent = `\\documentclass{article}
 
 \\title{Welcome to LaTeX.js}
 \\author{Live Preview Demo}
@@ -506,17 +509,17 @@ Try the example buttons above to load sample documents.
 
 \\end{document}`;
 
-        this.editor.value = defaultContent;
-        this.updateEditorStats();
-        this.scheduleCompile();
-    }
+		this.editor.value = defaultContent;
+		this.updateEditorStats();
+		this.scheduleCompile();
+	}
 
-    handleResize() {
-        // Handle any resize-specific logic if needed
-    }
+	handleResize() {
+		// Handle any resize-specific logic if needed
+	}
 }
 
 // Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new LaTeXLivePreview();
+document.addEventListener("DOMContentLoaded", () => {
+	new LaTeXLivePreview();
 });
