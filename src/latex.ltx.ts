@@ -1,11 +1,13 @@
 // Native JavaScript replacements for lodash functions
 const assign = Object.assign;
-const assignIn = (target: any, ...sources: any[]) => {
+const assignIn = (target: object, ...sources: object[]): object => {
+	const tgt = target as Record<string, unknown>;
 	sources.forEach((source) => {
 		if (source) {
-			for (const key in source) {
-				if (Object.hasOwn(source, key)) {
-					target[key] = source[key];
+			const src = source as Record<string, unknown>;
+			for (const key in src) {
+				if (Object.hasOwn(src, key)) {
+					tgt[key] = src[key];
 				}
 			}
 		}
@@ -14,6 +16,7 @@ const assignIn = (target: any, ...sources: any[]) => {
 };
 
 import builtinDocumentclasses from "./documentclasses";
+import type { Length } from "./interfaces";
 import builtinPackages from "./packages";
 import { symbols } from "./symbols";
 import { Vector } from "./types";
@@ -21,11 +24,11 @@ import { Vector } from "./types";
 interface Generator {
 	newCounter(name: string, parent?: string): void;
 	newLength(name: string): void;
-	setLength(name: string, value: any): void;
+	setLength(name: string, value: Length): void;
 	stepCounter(name: string): void;
 	counter(name: string): number;
 	setCounter(name: string, value: number): void;
-	refCounter(name: string, id?: string): any;
+	refCounter(name: string, id?: string): Node;
 	enterGroup(copyAttrs?: boolean): void;
 	exitGroup(): void;
 	setFontFamily(family: string): void;
@@ -37,23 +40,28 @@ interface Generator {
 	startlist(): boolean;
 	endlist(): void;
 	continue(): void;
-	error(message: string): any;
-	create(type: any, children?: any, classes?: string): any;
-	createText(text: string): any;
-	createVSpaceSkip(skip: string): any;
-	createVSpace(length: any): any;
-	createHSpace(length: any): any;
-	createPicture(size: any, offset: any, content: any): any;
-	marginpar(text: any): any;
+	error(message: string): unknown;
+	create(type: string, children?: unknown, classes?: string): HTMLElement;
+	createText(text: string): Text;
+	createVSpaceSkip(skip: string): HTMLElement;
+	createVSpace(length: Length): HTMLElement;
+	createHSpace(length: Length): HTMLElement;
+	createPicture(size: unknown, offset: unknown, content: unknown): HTMLElement;
+	marginpar(text: unknown): unknown;
 	setLabel(label: string): void;
-	ref(label: string): any;
-	addAttributes(node: any): any;
-	createFragment(children?: any[]): any;
-	hasAttribute(node: any, attr: string): boolean;
-	addAttribute(node: any, attr: string, value?: any): void;
-	SVG(): any;
-	Length: any;
-	length(name: string): any;
+	ref(label: string): Node;
+	addAttributes(node: unknown): unknown;
+	createFragment(children?: unknown[]): DocumentFragment;
+	hasAttribute(node: Element, attr: string): boolean;
+	addAttribute(node: Element, attr: string, value?: unknown): void;
+	SVG(): SvgDrawing;
+	Length: {
+		new (value: number, unit: string): Length;
+		max(...lengths: Length[]): Length;
+		min(...lengths: Length[]): Length;
+		zero: Length;
+	};
+	length(name: string): Length;
 	round(value: number): number;
 	alph(num: number): string;
 	Alph(num: number): string;
@@ -62,7 +70,7 @@ interface Generator {
 	Roman(num: number): string;
 	fnsymbol(num: number): string;
 	symbol(name: string): string;
-	macro(name: string, args?: any[]): any[];
+	macro(name: string, args?: unknown[]): unknown[];
 	inline: string;
 	block: string;
 	linebreak: string;
@@ -78,7 +86,58 @@ interface Generator {
 	quote: string;
 	quotation: string;
 	verse: string;
-	documentClass: any;
+	documentClass: { options?: Record<string, unknown> } | null;
+}
+
+interface Rect {
+	x: Length;
+	y: Length;
+	w: Length;
+	h: Length;
+}
+
+interface SvgPath {
+	stroke(opts: {
+		color?: string;
+		width?: string | number;
+		dasharray?: string;
+	}): SvgPath;
+	fill(fill: string): SvgPath;
+	length(): number;
+	bbox(): { x: number; y: number; width: number; height: number };
+}
+
+interface SvgDrawing {
+	line(x1: number, y1: number, x2: number, y2: number): SvgDrawing;
+	rect(width: number | string, height: number | string): SvgDrawing;
+	radius(r: number | string): SvgDrawing;
+	move(x: number | string, y: number | string): SvgDrawing;
+	stroke(opts: { color: string; width: string | number }): SvgDrawing;
+	fill(fill: string): SvgDrawing;
+	bbox(): { x: number; y: number; width: number; height: number };
+	size(width: string, height: string): SvgDrawing;
+	viewbox(x: number, y: number, width: number, height: number): SvgDrawing;
+	flip(axis: string, offset: number): SvgDrawing;
+	marker(
+		type: string,
+		hl: number,
+		hw: number,
+		cb: (marker: unknown) => unknown,
+	): SvgDrawing;
+	path(d: string): SvgPath;
+	addTo(el: HTMLElement): SvgDrawing;
+	circle(d: string | number): SvgDrawing;
+	cx(x: string | number): SvgDrawing;
+	cy(y: string | number): SvgDrawing;
+	clip(): SvgDrawing;
+	add(node: unknown): SvgDrawing;
+	clipWith(node: unknown): void;
+}
+
+interface CustomMacroConstructor {
+	new (g: unknown): Record<string, unknown>;
+	args?: Record<string, unknown[]>;
+	symbols?: Map<string, string>;
 }
 
 const providedPackages = [
@@ -92,11 +151,11 @@ const providedPackages = [
 
 export class LaTeX {
 	public static symbols = symbols;
-	public static args: Record<string, any[]> = {};
+	public static args: Record<string, unknown[]> = {};
 
 	protected g: Generator;
 
-	constructor(generator: Generator, CustomMacros?: any) {
+	constructor(generator: Generator, CustomMacros?: CustomMacroConstructor) {
 		if (CustomMacros) {
 			assignIn(this, new CustomMacros(generator));
 			assign(LaTeX.args, CustomMacros.args);
@@ -358,7 +417,7 @@ export class LaTeX {
 	// Basic commands
 	public empty(): void {}
 
-	public TeX(): any[] {
+	public TeX(): unknown[] {
 		this.g.enterGroup();
 		const tex = this.g.create(this.g.inline);
 		tex.setAttribute("class", "tex");
@@ -370,7 +429,7 @@ export class LaTeX {
 		return [tex];
 	}
 
-	public LaTeX(): any[] {
+	public LaTeX(): unknown[] {
 		this.g.enterGroup();
 		const latex = this.g.create(this.g.inline);
 		latex.setAttribute("class", "latex");
@@ -396,11 +455,11 @@ export class LaTeX {
 		];
 	}
 
-	public newline(): any[] {
+	public newline(): unknown[] {
 		return [this.g.create(this.g.linebreak)];
 	}
 
-	public negthinspace(): any[] {
+	public negthinspace(): unknown[] {
 		return [this.g.create(this.g.inline, undefined, "negthinspace")];
 	}
 
@@ -408,23 +467,23 @@ export class LaTeX {
 	public twocolumn(): void {}
 
 	// Break commands
-	public smallbreak(): any[] {
+	public smallbreak(): unknown[] {
 		return [this.g.createVSpaceSkip("smallskip")];
 	}
 
-	public medbreak(): any[] {
+	public medbreak(): unknown[] {
 		return [this.g.createVSpaceSkip("medskip")];
 	}
 
-	public bigbreak(): any[] {
+	public bigbreak(): unknown[] {
 		return [this.g.createVSpaceSkip("bigskip")];
 	}
 
-	public addvspace(l: any): any {
+	public addvspace(l: Length): HTMLElement {
 		return this.g.createVSpace(l);
 	}
 
-	public marginpar(txt: any): any[] {
+	public marginpar(txt: unknown): unknown[] {
 		return [this.g.marginpar(txt)];
 	}
 
@@ -433,32 +492,32 @@ export class LaTeX {
 	}
 
 	// Document structure
-	public title(t: any): void {
+	public title(t: unknown): void {
 		// Store title in generator context or handle appropriately
-		(this as any)._title = t;
+		(this as Record<string, unknown>)._title = t;
 	}
 
-	public author(a: any): void {
+	public author(a: unknown): void {
 		// Store author in generator context or handle appropriately
-		(this as any)._author = a;
+		(this as Record<string, unknown>)._author = a;
 	}
 
-	public date(d: any): void {
+	public date(d: unknown): void {
 		// Store date in generator context or handle appropriately
-		(this as any)._date = d;
+		(this as Record<string, unknown>)._date = d;
 	}
 
-	public and(): any[] {
+	public and(): unknown[] {
 		return this.g.macro("quad");
 	}
 
-	public thanks(text: any): any {
+	public thanks(text: unknown): unknown {
 		// TODO: Implement footnote functionality
 		return [];
 	}
 
 	// Font commands
-	public textrm(arg?: any): any {
+	public textrm(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("rm");
@@ -469,7 +528,7 @@ export class LaTeX {
 		}
 	}
 
-	public textsf(arg?: any): any {
+	public textsf(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("sf");
@@ -480,7 +539,7 @@ export class LaTeX {
 		}
 	}
 
-	public texttt(arg?: any): any {
+	public texttt(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontFamily("tt");
@@ -491,7 +550,7 @@ export class LaTeX {
 		}
 	}
 
-	public textmd(arg?: any): any {
+	public textmd(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontWeight("md");
@@ -502,7 +561,7 @@ export class LaTeX {
 		}
 	}
 
-	public textbf(arg?: any): any {
+	public textbf(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontWeight("bf");
@@ -513,7 +572,7 @@ export class LaTeX {
 		}
 	}
 
-	public textup(arg?: any): any {
+	public textup(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontShape("up");
@@ -524,7 +583,7 @@ export class LaTeX {
 		}
 	}
 
-	public textit(arg?: any): any {
+	public textit(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontShape("it");
@@ -535,7 +594,7 @@ export class LaTeX {
 		}
 	}
 
-	public textsl(arg?: any): any {
+	public textsl(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontShape("sl");
@@ -546,7 +605,7 @@ export class LaTeX {
 		}
 	}
 
-	public textsc(arg?: any): any {
+	public textsc(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontShape("sc");
@@ -557,7 +616,7 @@ export class LaTeX {
 		}
 	}
 
-	public textnormal(arg?: any): any {
+	public textnormal(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			this.g.setFontFamily("rm");
@@ -570,7 +629,7 @@ export class LaTeX {
 		}
 	}
 
-	public emph(arg?: any): any {
+	public emph(arg?: unknown): unknown {
 		if (arguments.length === 0) {
 			this.g.enterGroup();
 			return this.g.setFontShape("em");
@@ -679,31 +738,31 @@ export class LaTeX {
 		return [this.g.Alph(this.g.counter("enumiv"))];
 	}
 
-	public labelenumi(): any[] {
+	public labelenumi(): unknown[] {
 		return this.theenumi().concat(".");
 	}
 
-	public labelenumii(): any[] {
+	public labelenumii(): unknown[] {
 		return ["("].concat(Array.from(this.theenumii()), [")"]);
 	}
 
-	public labelenumiii(): any[] {
+	public labelenumiii(): unknown[] {
 		return this.theenumiii().concat(".");
 	}
 
-	public labelenumiv(): any[] {
+	public labelenumiv(): unknown[] {
 		return this.theenumiv().concat(".");
 	}
 
-	public "p@enumii"(): any[] {
+	public "p@enumii"(): unknown[] {
 		return this.theenumi();
 	}
 
-	public "p@enumiii"(): any[] {
+	public "p@enumiii"(): unknown[] {
 		return this.theenumi().concat("(", this.theenumii(), ")");
 	}
 
-	public "p@enumiv"(): any[] {
+	public "p@enumiv"(): unknown[] {
 		return this["p@enumiii"]().concat(this.theenumiii());
 	}
 
@@ -740,7 +799,7 @@ export class LaTeX {
 	}
 
 	// Environment commands
-	public center(): any[] {
+	public center(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.list, null, "center")];
 	}
@@ -749,7 +808,7 @@ export class LaTeX {
 		this.g.endlist();
 	}
 
-	public flushleft(): any[] {
+	public flushleft(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.list, null, "flushleft")];
 	}
@@ -758,7 +817,7 @@ export class LaTeX {
 		this.g.endlist();
 	}
 
-	public flushright(): any[] {
+	public flushright(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.list, null, "flushright")];
 	}
@@ -767,11 +826,11 @@ export class LaTeX {
 		this.g.endlist();
 	}
 
-	public titlepage(): any[] {
+	public titlepage(): unknown[] {
 		return [this.g.create(this.g.titlepage)];
 	}
 
-	public quote(): any[] {
+	public quote(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.quote)];
 	}
@@ -780,7 +839,7 @@ export class LaTeX {
 		this.g.endlist();
 	}
 
-	public quotation(): any[] {
+	public quotation(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.quotation)];
 	}
@@ -789,7 +848,7 @@ export class LaTeX {
 		this.g.endlist();
 	}
 
-	public verse(): any[] {
+	public verse(): unknown[] {
 		this.g.startlist();
 		return [this.g.create(this.g.verse)];
 	}
@@ -799,7 +858,7 @@ export class LaTeX {
 	}
 
 	// List environments
-	public itemize(items?: any[]): any {
+	public itemize(items?: { label: unknown; text: unknown }[]): unknown {
 		if (arguments.length === 0) {
 			this.g.startlist();
 			this.g.stepCounter("@itemdepth");
@@ -831,7 +890,9 @@ export class LaTeX {
 		this.g.setCounter("@itemdepth", this.g.counter("@itemdepth") - 1);
 	}
 
-	public enumerate(items?: any[]): any {
+	public enumerate(
+		items?: { label: { node: Element; id?: string }; text: unknown }[],
+	): unknown {
 		if (arguments.length === 0) {
 			this.g.startlist();
 			this.g.stepCounter("@enumdepth");
@@ -863,7 +924,7 @@ export class LaTeX {
 		this.g.setCounter("@enumdepth", this.g.counter("@enumdepth") - 1);
 	}
 
-	public description(items?: any[]): any {
+	public description(items?: { label: unknown; text: unknown }[]): unknown {
 		if (arguments.length === 0) {
 			this.g.startlist();
 			return;
@@ -886,101 +947,119 @@ export class LaTeX {
 	}
 
 	// Picture commands
-	public picture(size: any, offset?: any, content?: any): any[] {
+	public picture(
+		size: unknown,
+		offset?: unknown,
+		content?: unknown,
+	): HTMLElement[] {
 		return [this.g.createPicture(size, offset, content)];
 	}
 
-	public hspace(_s: any, l: any): any[] {
+	public hspace(_s: unknown, l: Length): HTMLElement[] {
 		return [this.g.createHSpace(l)];
 	}
 
 	// Reference commands
-	public label(label: any): void {
+	public label(label: { textContent: string }): void {
 		this.g.setLabel(label.textContent);
 	}
 
-	public ref(label: any): any[] {
+	public ref(label: { textContent: string }): Node[] {
 		return [this.g.ref(label.textContent)];
 	}
 
 	// Box commands
-	public llap(txt: any): any[] {
+	public llap(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "hbox llap")];
 	}
 
-	public rlap(txt: any): any[] {
+	public rlap(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "hbox rlap")];
 	}
 
-	public clap(txt: any): any[] {
+	public clap(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "hbox clap")];
 	}
 
-	public smash(txt: any): any[] {
+	public smash(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "hbox smash")];
 	}
 
-	public hphantom(txt: any): any[] {
+	public hphantom(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "phantom hbox smash")];
 	}
 
-	public vphantom(txt: any): any[] {
+	public vphantom(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "phantom hbox rlap")];
 	}
 
-	public phantom(txt: any): any[] {
+	public phantom(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "phantom hbox")];
 	}
 
-	public underline(txt: any): any[] {
+	public underline(txt: unknown): unknown[] {
 		return [this.g.create(this.g.inline, txt, "hbox underline")];
 	}
 
-	public mbox(txt: any): any[] {
+	public mbox(txt: unknown): unknown[] {
 		return this.makebox(undefined, undefined, undefined, txt);
 	}
 
-	public makebox(vec?: any, width?: any, pos?: any, txt?: any): any[] {
+	public makebox(
+		vec?: unknown,
+		width?: Length | string,
+		pos?: string,
+		txt?: unknown,
+	): unknown[] {
 		if (vec) {
 			if (width && pos) {
-				this.g.error(
+				return this.g.error(
 					"expected \\makebox(width,height)[position]{text} but got two optional arguments!",
-				);
+				) as unknown[];
 			}
-			pos = width;
+			pos = width as string;
 			return [txt];
 		} else {
-			return this._box(width, pos, txt, "hbox");
+			return this._box(width as Length | undefined, pos, txt, "hbox");
 		}
 	}
 
-	public fbox(txt: any): any[] {
-		return this.framebox(undefined, undefined, undefined, txt);
+	public fbox(txt: unknown): unknown[] {
+		return this.framebox(undefined, undefined, undefined, txt as Element);
 	}
 
-	public framebox(vec?: any, width?: any, pos?: any, txt?: any): any[] {
+	public framebox(
+		vec?: unknown,
+		width?: Length | string,
+		pos?: string,
+		txt?: Element,
+	): unknown[] {
 		if (vec) {
 			if (width && pos) {
 				return this.g.error(
 					"expected \\framebox(width,height)[position]{text} but got two optional arguments!",
-				);
+				) as unknown[];
 			}
+		} else if (
+			txt &&
+			txt.hasAttribute != null &&
+			!width &&
+			!pos &&
+			!this.g.hasAttribute(txt, "frame")
+		) {
+			this.g.addAttribute(txt, "frame");
+			return [txt];
 		} else {
-			if (
-				txt.hasAttribute != null &&
-				!width &&
-				!pos &&
-				!this.g.hasAttribute(txt, "frame")
-			) {
-				this.g.addAttribute(txt, "frame");
-				return [txt];
-			} else {
-				return this._box(width, pos, txt, "hbox frame");
-			}
+			return this._box(width as Length | undefined, pos, txt, "hbox frame");
 		}
 	}
 
-	private _box(width: any, pos: any, txt: any, classes: string): any[] {
+	private _box(
+		width: Length | undefined,
+		pos: string | undefined,
+		txt: unknown,
+		classes: string,
+	): unknown[] {
 		if (width) {
 			if (!pos) {
 				pos = "c";
@@ -1013,11 +1092,11 @@ export class LaTeX {
 
 	public parbox(
 		pos?: string,
-		height?: any,
+		height?: Length,
 		innerPos?: string,
-		width?: any,
-		txt?: any,
-	): any[] {
+		width?: Length,
+		txt?: unknown,
+	): unknown[] {
 		if (!pos) pos = "c";
 		if (!innerPos) innerPos = pos;
 
@@ -1075,14 +1154,14 @@ export class LaTeX {
 		this.g.setLength("@wholewidth", new this.g.Length(0.8, "pt"));
 	}
 
-	public linethickness(l: any): void {
+	public linethickness(l: Length): void {
 		if (l.unit !== "sp") {
 			this.g.error("relative units for \\linethickness not supported!");
 		}
 		this.g.setLength("@wholewidth", l);
 	}
 
-	public arrowlength(l: any): void {
+	public arrowlength(l: Length): void {
 		this.g.setLength("@arrowlength", l);
 	}
 
@@ -1094,16 +1173,16 @@ export class LaTeX {
 		return 500;
 	}
 
-	public frame(txt: any): any[] {
+	public frame(txt: unknown): unknown[] {
 		const el = this.g.create(this.g.inline, txt, "hbox pframe");
 		const w = this.g.length("@wholewidth");
 		el.setAttribute("style", `border-width:${w.value}`);
 		return [el];
 	}
 
-	public put(v: any, obj: any): any[] {
+	public put(v: Vector<Length>, obj: Element): unknown[] {
 		const wrapper = this.g.create(this.g.inline, obj, "put-obj");
-		let strut: any | undefined;
+		let strut: HTMLElement | undefined;
 
 		if (v.y.cmp(this.g.Length.zero) >= 0) {
 			wrapper.setAttribute("style", `left:${v.x.value}`);
@@ -1118,15 +1197,25 @@ export class LaTeX {
 		return this.rlap(this.g.create(this.g.inline, [wrapper, strut], "picture"));
 	}
 
-	public multiput(v: any, dv: any, n: number, obj: any): any[] {
-		const res = [];
+	public multiput(
+		v: Vector<Length>,
+		dv: Vector<Length>,
+		n: number,
+		obj: Element,
+	): unknown[] {
+		const res: unknown[] = [];
 		for (let i = 0; i < n; i++) {
-			res.push(...this.put(v.add(dv.mul(i)), obj.cloneNode(true)));
+			res.push(...this.put(v.add(dv.mul(i)), obj.cloneNode(true) as Element));
 		}
 		return res;
 	}
 
-	public qbezier(N?: number, v1?: any, v?: any, v2?: any): any[] {
+	public qbezier(
+		N: number | undefined,
+		v1: Vector<Length>,
+		v: Vector<Length>,
+		v2: Vector<Length>,
+	): unknown[] {
 		return [
 			this._path(
 				"M" +
@@ -1146,7 +1235,13 @@ export class LaTeX {
 		];
 	}
 
-	public cbezier(N?: number, v1?: any, v?: any, v2?: any, v3?: any): any[] {
+	public cbezier(
+		N: number | undefined,
+		v1: Vector<Length>,
+		v: Vector<Length>,
+		v2: Vector<Length>,
+		v3: Vector<Length>,
+	): unknown[] {
 		return [
 			this._path(
 				"M" +
@@ -1170,7 +1265,7 @@ export class LaTeX {
 		];
 	}
 
-	private _path(p: string, N?: number): any {
+	private _path(p: string, N?: number): HTMLElement {
 		const linethickness = this.g.length("@wholewidth");
 		const svg = this.g.create(this.g.inline, undefined, "picture-object");
 		const draw = this.g.SVG().addTo(svg);
@@ -1220,7 +1315,7 @@ export class LaTeX {
 		return this.g.create(this.g.inline, svg, "picture");
 	}
 
-	public circle(s: boolean, d: any): any[] {
+	public circle(s: boolean, d: Length): unknown[] {
 		d = d.abs();
 		const svg = this.g.create(this.g.inline, undefined, "picture-object");
 		const linethickness = this.g.length("@wholewidth");
@@ -1255,24 +1350,27 @@ export class LaTeX {
 		return [this.g.create(this.g.inline, svg, "picture")];
 	}
 
-	public line(v: any, l: any): any[] {
+	public line(v: Vector<Length>, l: Length): unknown[] {
 		return [this._line(...this._slopeLengthToCoords(v, l))];
 	}
 
-	public vector(v: any, l: any): any[] {
+	public vector(v: Vector<Length>, l: Length): unknown[] {
 		return [this._vector(...this._slopeLengthToCoords(v, l))];
 	}
 
-	public Line(vs: any, ve: any): any[] {
+	public Line(vs: Vector<Length>, ve: Vector<Length>): unknown[] {
 		return [this._line(vs, ve)];
 	}
 
-	public Vector(vs: any, ve: any): any[] {
+	public Vector(vs: Vector<Length>, ve: Vector<Length>): unknown[] {
 		return [this._vector(vs, ve)];
 	}
 
-	private _slopeLengthToCoords(v: any, l: any): [any, any] {
-		if (v.x.value === 0 && v.y.value === 0) {
+	private _slopeLengthToCoords(
+		v: Vector<Length>,
+		l: Length,
+	): [Vector<Length>, Vector<Length>] {
+		if (v.x.px === 0 && v.y.px === 0) {
 			this.g.error("illegal slope (0,0)");
 		}
 
@@ -1282,7 +1380,7 @@ export class LaTeX {
 
 		const _linethickness = this.g.length("@wholewidth");
 		const zero = new this.g.Length(0, l.unit);
-		let x: any, y: any;
+		let x: Length, y: Length;
 
 		if (v.x.px === 0) {
 			x = zero;
@@ -1298,7 +1396,7 @@ export class LaTeX {
 		return [new Vector(zero, zero), new Vector(x, y)];
 	}
 
-	public _line(vs: any, ve: any): any {
+	public _line(vs: Vector<Length>, ve: Vector<Length>): HTMLElement {
 		if (vs.x.unit !== vs.y.unit || vs.x.unit !== "sp") {
 			this.g.error("relative units not allowed for line");
 		}
@@ -1344,7 +1442,7 @@ export class LaTeX {
 		return this.g.create(this.g.inline, svg, "picture");
 	}
 
-	public _vector(vs: any, ve: any): any {
+	public _vector(vs: Vector<Length>, ve: Vector<Length>): HTMLElement {
 		if (vs.x.unit !== vs.y.unit || vs.x.unit !== "sp") {
 			this.g.error("relative units not allowed for vector");
 		}
@@ -1367,7 +1465,7 @@ export class LaTeX {
 
 		const hhl = linethickness.mul(hl / 2);
 		const al = ve.sub(vs).norm();
-		let s: any;
+		let s: Vector<Length>;
 
 		if (al.cmp(hhl) < 0) {
 			s = ve.shift_start(hhl);
@@ -1379,8 +1477,8 @@ export class LaTeX {
 		const bbox = draw
 			.line(s.x.px, s.y.px, ve.x.px, ve.y.px)
 			.stroke({ color: "#000", width: linethickness.value })
-			.marker("end", hl, hw, (marker: any) => {
-				return marker.path(
+			.marker("end", hl, hw, (marker: unknown) => {
+				return (marker as { path: (d: string) => unknown }).path(
 					"M0,0 Q" +
 						this.g.round((2 * hl) / 3) +
 						"," +
@@ -1431,62 +1529,68 @@ export class LaTeX {
 		return this.g.create(this.g.inline, svg, "picture");
 	}
 
-	public oval(maxrad?: any, size?: any, part?: string): any[] {
+	public oval(
+		maxrad?: Length,
+		size?: Vector<Length>,
+		part?: string,
+	): unknown[] {
 		const linethickness = this.g.length("@wholewidth");
 		if (!maxrad) maxrad = new this.g.Length(20, "px");
 		if (!part) part = "";
+		const sizeVec = size as Vector<Length>;
 
-		let rad = size.x.cmp(size.y) < 0 ? size.x.div(2) : size.y.div(2);
+		let rad =
+			sizeVec.x.cmp(sizeVec.y) < 0 ? sizeVec.x.div(2) : sizeVec.y.div(2);
 		if (maxrad.cmp(rad) < 0) rad = maxrad;
 
 		const draw = this.g.SVG();
 		const oval = draw
-			.rect(size.x.value, size.y.value)
+			.rect(sizeVec.x.value, sizeVec.y.value)
 			.radius(rad.value)
-			.move(size.x.div(-2).value, size.y.div(-2).value)
+			.move(sizeVec.x.div(-2).value, sizeVec.y.div(-2).value)
 			.stroke({ color: "#000", width: linethickness.value })
 			.fill("none");
 
-		let rect = {
-			x: size.x.div(-2).sub(linethickness),
-			y: size.y.div(-2).sub(linethickness),
-			w: size.x.add(linethickness.mul(2)),
-			h: size.y.add(linethickness.mul(2)),
+		let rect: Rect = {
+			x: sizeVec.x.div(-2).sub(linethickness),
+			y: sizeVec.y.div(-2).sub(linethickness),
+			w: sizeVec.x.add(linethickness.mul(2)),
+			h: sizeVec.y.add(linethickness.mul(2)),
 		};
 
 		if (part.includes("l")) {
 			rect = this._intersect(rect, {
-				x: size.x.div(-2).sub(linethickness),
-				y: size.y.div(-2).sub(linethickness),
-				w: size.x.div(2).add(linethickness),
-				h: size.y.add(linethickness.mul(2)),
+				x: sizeVec.x.div(-2).sub(linethickness),
+				y: sizeVec.y.div(-2).sub(linethickness),
+				w: sizeVec.x.div(2).add(linethickness),
+				h: sizeVec.y.add(linethickness.mul(2)),
 			});
 		}
 
 		if (part.includes("t")) {
 			rect = this._intersect(rect, {
-				x: size.x.div(-2).sub(linethickness),
-				y: size.y.div(-2).sub(linethickness),
-				w: size.x.add(linethickness.mul(2)),
-				h: size.y.div(2).add(linethickness),
+				x: sizeVec.x.div(-2).sub(linethickness),
+				y: sizeVec.y.div(-2).sub(linethickness),
+				w: sizeVec.x.add(linethickness.mul(2)),
+				h: sizeVec.y.div(2).add(linethickness),
 			});
 		}
 
 		if (part.includes("r")) {
 			rect = this._intersect(rect, {
 				x: this.g.Length.zero,
-				y: size.y.div(-2).sub(linethickness),
-				w: size.x.div(2).add(linethickness),
-				h: size.y.add(linethickness.mul(2)),
+				y: sizeVec.y.div(-2).sub(linethickness),
+				w: sizeVec.x.div(2).add(linethickness),
+				h: sizeVec.y.add(linethickness.mul(2)),
 			});
 		}
 
 		if (part.includes("b")) {
 			rect = this._intersect(rect, {
-				x: size.x.div(-2).sub(linethickness),
+				x: sizeVec.x.div(-2).sub(linethickness),
 				y: this.g.Length.zero,
-				w: size.x.add(linethickness.mul(2)),
-				h: size.y.div(2).add(linethickness),
+				w: sizeVec.x.add(linethickness.mul(2)),
+				h: sizeVec.y.div(2).add(linethickness),
 			});
 		}
 
@@ -1531,7 +1635,7 @@ export class LaTeX {
 		return [this.g.create(this.g.inline, svg, "picture")];
 	}
 
-	private _intersect(r1: any, r2: any): any {
+	private _intersect(r1: Rect, r2: Rect): Rect {
 		return {
 			x: this.g.Length.max(r1.x, r2.x),
 			y: this.g.Length.max(r1.y, r2.y),
@@ -1555,11 +1659,11 @@ export class LaTeX {
 		this.g.newLength(id);
 	}
 
-	public setlength(id: string, l: any): void {
+	public setlength(id: string, l: Length): void {
 		this.g.setLength(id, l);
 	}
 
-	public addtolength(id: string, l: any): void {
+	public addtolength(id: string, l: Length): void {
 		this.g.setLength(id, this.g.length(id).add(l));
 	}
 
@@ -1580,7 +1684,7 @@ export class LaTeX {
 		this.g.setCounter(c, n);
 	}
 
-	public refstepcounter(c: string): any[] {
+	public refstepcounter(c: string): Node[] {
 		this.g.stepCounter(c);
 		return [this.g.refCounter(c)];
 	}
@@ -1611,12 +1715,12 @@ export class LaTeX {
 	}
 
 	// File commands
-	public input(_file: any): void {}
-	public include(_file: any): void {}
+	public input(_file: unknown): void {}
+	public include(_file: unknown): void {}
 
 	// Document class command
 	public documentclass(
-		options?: any,
+		options?: unknown,
 		documentclass?: string,
 		_version?: string,
 	): void {
@@ -1647,7 +1751,7 @@ export class LaTeX {
 		}
 
 		this.g.documentClass = new Class(this.g, options);
-		assignIn(this, this.g.documentClass);
+		assignIn(this, this.g.documentClass as object);
 
 		// Copy prototype methods (for ES6 classes) - walk the entire prototype chain
 		// Collect all methods, starting from most specific to least specific
@@ -1676,8 +1780,12 @@ export class LaTeX {
 	}
 
 	// Package command
-	public usepackage(opts?: any, packages?: string[], _version?: string): void {
-		const options = Object.assign({}, this.g.documentClass.options, opts);
+	public usepackage(
+		opts?: Record<string, unknown>,
+		packages?: string[],
+		_version?: string,
+	): void {
+		const options = Object.assign({}, this.g.documentClass?.options, opts);
 
 		for (const pkg of packages || []) {
 			if (providedPackages.includes(pkg)) {
@@ -1760,7 +1868,7 @@ export class LaTeX {
 	public pagebreak(_o?: number): void {}
 	public nopagebreak(_o?: number): void {}
 	public samepage(): void {}
-	public enlargethispage(_s: boolean, _l: any): void {}
+	public enlargethispage(_s: boolean, _l: unknown): void {}
 	public newpage(): void {}
 	public clearpage(): void {}
 	public cleardoublepage(): void {}
