@@ -12,3 +12,5 @@
 /fonts/
 /example/
 !/example/example.tex
+/src/latex-parser.ts
+.direnv/

@@ -1,8 +1,8 @@
+import { describe, expect, test } from "bun:test";
 import { spawn as spawnProcess } from "node:child_process";
 import { promises as fs } from "node:fs";
 import { EOL } from "node:os";
 import path from "node:path";
-import { describe, expect, test } from "vitest";
 
 describe("LaTeX.js API test", () => {
 	test("node module API", async () => {

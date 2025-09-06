@@ -22,10 +22,24 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+    
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    
+    - name: Cache Bun dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.bun/install/cache
+          node_modules
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-bun-
     
     - name: Install dependencies
-      run: npm ci
+      run: bun install --frozen-lockfile
     
     - name: Cache Playwright system dependencies
       uses: actions/cache@v4
@@ -34,7 +48,7 @@ jobs:
         path: |
           /var/cache/apt
           /var/lib/apt/lists
-        key: ${{ runner.os }}-playwright-deps-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-playwright-deps-${{ hashFiles('**/bun.lock') }}
         restore-keys: |
           ${{ runner.os }}-playwright-deps-
     
@@ -44,39 +58,39 @@ jobs:
       with:
         path: |
           ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+        key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lock') }}
         restore-keys: |
           ${{ runner.os }}-playwright-
     
     - name: Install Playwright system dependencies
       if: steps.playwright-deps-cache.outputs.cache-hit != 'true'
-      run: npx playwright install-deps
+      run: bunx playwright install-deps
     
     - name: Install Playwright browsers
       if: steps.playwright-cache.outputs.cache-hit != 'true'
-      run: npx playwright install
+      run: bunx playwright install
     
     - name: Run linting
-      run: npm run lint
+      run: bun run lint
     
     - name: Check formatting
-      run: npm run format:check
+      run: bun run format:check
     
     - name: Type check
-      run: npm run typecheck
+      run: bun run typecheck
     
     - name: Cache build output
       uses: actions/cache@v4
       with:
         path: |
           dist
-          .vite
-        key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json', 'src/**/*', 'vite.config.ts') }}
+          src/latex-parser.ts
+        key: ${{ runner.os }}-build-${{ hashFiles('**/bun.lock', 'src/**/*', 'build.ts') }}
         restore-keys: |
           ${{ runner.os }}-build-
     
     - name: Build project
-      run: npm run build
+      run: bun run build
     
     - name: Run tests
-      run: npm run test
+      run: bun test

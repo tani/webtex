@@ -1,8 +1,8 @@
+import { afterEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
 import pkg from "../../package.json";
 import { create as cmd } from "../lib/cmd";
 

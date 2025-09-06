@@ -1,6 +1,6 @@
 # LaTeX.js Test Suite
 
-Simple, maintainable test suite for LaTeX.js using Vitest snapshot testing for reliable LaTeX→HTML conversion verification.
+Simple, maintainable test suite for LaTeX.js using Bun's built-in test runner with snapshot testing for reliable LaTeX→HTML conversion verification.
 
 ## Test Organization
 
@@ -28,33 +28,32 @@ High-level feature and output testing:
 
 ### All Tests
 ```bash
-npm test                    # Run all tests
-npm run test:watch         # Watch mode
-npm run test:ui            # UI mode
-npm run test:coverage      # With coverage
+bun test                    # Run all tests
+bun test --watch            # Watch mode
+bun test --coverage         # With coverage
 ```
 
 ### Granular Test Execution
 ```bash
-npm run test:api              # API tests only
-npm run test:cli              # CLI tests only  
-npm run test:parsing          # LaTeX parsing tests
-npm run test:integration      # Integration tests
-npm run test:visual           # Visual/screenshot tests
-npm run test:screenshots      # Screenshot tests only
+bun test test/api.ts                  # API tests only
+bun test test/cli.ts                  # CLI tests only
+bun test test/parsing.spec.ts         # LaTeX parsing tests
+bun test test/integration/            # Integration tests
+bun test test/visual/                 # Visual/screenshot tests
+bun test test/visual/screenshots.spec.ts  # Screenshot tests only
 ```
 
 ### Snapshot Test Management
 ```bash
-npm run test:integration:update   # Update integration snapshots
-npm run test:update-snapshots     # Update ALL snapshots in project
+bun test test/integration/ --update-snapshots   # Update integration snapshots
+bun test --update-snapshots                     # Update ALL snapshots in project
 ```
 
 ### Individual Test Categories
 ```bash
-npx vitest test/parsing.spec.ts                      # All parsing tests
-npx vitest test/integration/core-features.spec.ts    # Core feature tests
-npx vitest test/integration/cli-output.spec.ts       # CLI output tests
+bun test test/parsing.spec.ts                      # All parsing tests
+bun test test/integration/core-features.spec.ts    # Core feature tests
+bun test test/integration/cli-output.spec.ts       # CLI output tests
 ```
 
 ## Test Count
@@ -69,11 +68,11 @@ npx vitest test/integration/cli-output.spec.ts       # CLI output tests
 
 ## Migration to Snapshot Testing
 
-This project has been **fully migrated** from fixture-based testing to modern Vitest snapshot testing:
+This project has been **fully migrated** from fixture-based testing to modern Bun snapshot testing:
 
 ### Benefits Achieved
 - ✅ **Visual diff reviews** - See exactly what changed in PRs
-- ✅ **Automatic snapshot updates** - `npm run test:update-snapshots`
+- ✅ **Automatic snapshot updates** - `bun test --update-snapshots`
 - ✅ **Living documentation** - Snapshots show expected output
 - ✅ **Better regression detection** - Catch unintended HTML changes
 - ✅ **Easier maintenance** - No manual fixture updates needed
@@ -85,7 +84,7 @@ All LaTeX parsing tests now use **snapshot testing** which:
 2. **Stores snapshots** in `__snapshots__/` directories
 3. **Compares future runs** against stored snapshots  
 4. **Shows visual diffs** when output changes
-5. **Updates easily** with `npm run test:update-snapshots`
+5. **Updates easily** with `bun test --update-snapshots`
 
 ## Test Structure Overview
 
@@ -122,13 +121,13 @@ describe("New LaTeX feature", () => {
 When LaTeX output intentionally changes:
 ```bash
 # Update specific test snapshots
-npm run test:features:update
+bun test test/integration/ --update-snapshots
 
 # Update all project snapshots
-npm run test:update-snapshots
+bun test --update-snapshots
 
-# Update specific file snapshots  
-npx vitest test/parsing/math.spec.ts -u
+# Update specific file snapshots
+bun test test/parsing.spec.ts --update-snapshots
 ```
 
 ### Reviewing Changes
@@ -151,14 +150,14 @@ npx vitest test/parsing/math.spec.ts -u
 1. **Make changes** - Modify LaTeX→HTML conversion code
 2. **Run tests** - See which snapshots changed
 3. **Review diffs** - Verify changes are expected
-4. **Update snapshots** - `npm run test:update-snapshots`
+4. **Update snapshots** - `bun test --update-snapshots`
 5. **Commit changes** - Include updated snapshots
 
 ### Debugging Test Failures
-1. **Check diff output** - Vitest shows exact differences
+1. **Check diff output** - Bun's test runner shows exact differences
 2. **Review snapshot files** - Located in `__snapshots__/`
-3. **Run specific tests** - `npx vitest path/to/test.spec.ts`
-4. **Use watch mode** - `npm run test:watch` for live feedback
+3. **Run specific tests** - `bun test path/to/test.spec.ts`
+4. **Use watch mode** - `bun test --watch` for live feedback
 
 ## CI/CD Integration
 

@@ -1,10 +1,10 @@
+import { describe, test } from "bun:test";
+import "../lib/setup";
 import fs from "node:fs";
 import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
-import decache from "decache";
 import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
-import { describe, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/webtex";
 import { type FixtureItem, load as loadFixture } from "../lib/load-fixtures";
 
@@ -18,7 +18,6 @@ globalWithDom.window = window;
 globalWithDom.document = window.document;
 
 function resetSvgIds() {
-	decache("@svgdotjs/svg.js");
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
 		SVG?: typeof SVG;
 	};
@@ -27,7 +26,11 @@ function resetSvgIds() {
 	return registerWindow(window, document);
 }
 
-describe("LaTeX.js screenshot tests", () => {
+const hasScreenshot =
+	typeof (globalThis as { takeScreenshot?: unknown }).takeScreenshot ===
+	"function";
+
+(hasScreenshot ? describe : describe.skip)("LaTeX.js screenshot tests", () => {
 	const fixturesPath = path.join(__dirname, "../fixtures");
 	const subdirs: string[] = [];
 

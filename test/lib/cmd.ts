@@ -78,7 +78,9 @@ function executeWithInput(
 ): Promise<ExecuteResult> {
 	const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
 	const childProcess = createProcess(processPath, args, env);
-	childProcess.stdin.setEncoding("utf-8");
+	if (typeof childProcess.stdin.setEncoding === "function") {
+		childProcess.stdin.setEncoding("utf-8");
+	}
 
 	//
 	let currentInputTimeout: NodeJS.Timeout | undefined;

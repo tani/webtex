@@ -1,0 +1,41 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`LaTeX.js Core Features Snapshots Basic Text Processing simple paragraph 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Basic Text Processing multiple paragraphs 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Basic Text Processing line breaks 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Text Formatting font commands 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Text Formatting emphasis nesting 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Text Formatting font sizes 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Mathematical Expressions inline math 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Mathematical Expressions display math 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Mathematical Expressions math symbols 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Lists and Environments itemize list 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Lists and Environments enumerate list 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Lists and Environments nested lists 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Lists and Environments description list 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Special Characters and Symbols special chars 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Special Characters and Symbols accents and international 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Special Characters and Symbols tex symbols 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Document Structure section headers 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Document Structure quotes 1`] = `undefined`;
+
+exports[`LaTeX.js Core Features Snapshots Full Document Snapshots complete article 1`] = `"<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body" data-line="1" data-column="1"></div></body></html>"`;
+
+exports[`LaTeX.js Core Features Snapshots Full Document Snapshots math heavy document 1`] = `"<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body" data-line="1" data-column="1"></div></body></html>"`;

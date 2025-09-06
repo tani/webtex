@@ -11,7 +11,7 @@
 - **📝 Complete LaTeX Support**: Comprehensive LaTeX document processing with high fidelity output
 - **🧮 Advanced Mathematics**: Full MathJax integration for complex mathematical expressions
 - **🎨 Authentic Styling**: CSS that faithfully reproduces LaTeX typography and layout
-- **🔧 Modern Tooling**: Built with TypeScript, Vite, and modern development practices
+- **🔧 Modern Tooling**: Built with TypeScript, Bun's bundler, and modern development practices
 - **⚡ High Performance**: Optimized build system and efficient parsing
 - **🌐 Web-First**: Enhanced HTML generation with iframe support and complete document structure
 - **🎯 Type Safety**: Strict TypeScript implementation with comprehensive type definitions
@@ -22,12 +22,12 @@
 
 **CLI Usage (Global)**:
 ```bash
-npm install -g webtex
+bun install -g webtex
 ```
 
 **Library Usage (Project)**:
 ```bash
-npm install webtex
+bun add webtex
 ```
 
 ### Basic Usage
@@ -90,9 +90,9 @@ WebTeX is a comprehensive modernization of the original LaTeX.js project with si
 ### 🏗️ **Build System Evolution**
 | Original LaTeX.js | WebTeX |
 |------------------|---------|
-| **Rollup** bundler | **Vite** - Modern, fast build tool |
+| **Rollup** bundler | **Bun** - Modern, fast build tool |
 | **LiveScript** source | **TypeScript** - Type-safe development |
-| **Legacy tooling** | **Modern ecosystem** (Biome, Vitest) |
+| **Legacy tooling** | **Modern ecosystem** (Biome, Bun test) |
 
 ### 📊 **Mathematical Rendering**
 - **Enhanced MathJax Integration**: Upgraded to MathJax 3.x with ESM support
@@ -102,7 +102,7 @@ WebTeX is a comprehensive modernization of the original LaTeX.js project with si
 ### 🛡️ **Type Safety & Quality**
 - **Strict TypeScript**: Comprehensive type definitions throughout codebase
 - **Modern Linting**: Biome for fast, consistent code formatting
-- **Enhanced Testing**: Vitest with visual regression testing via Playwright
+- **Enhanced Testing**: Bun test with visual regression testing via Playwright
 - **CI/CD**: Automated testing and quality checks
 
 ### 🎨 **Enhanced HTML Generation**
@@ -112,7 +112,7 @@ WebTeX is a comprehensive modernization of the original LaTeX.js project with si
 - **Asset Management**: Streamlined font and stylesheet handling
 
 ### ⚡ **Performance Improvements**
-- **Faster Builds**: Vite's optimized bundling (922→686 modules)
+- **Faster Builds**: Bun's optimized bundling
 - **Better Dependencies**: Updated to latest, secure package versions
 - **Reduced Bundle Size**: Optimized output with tree shaking
 
@@ -164,26 +164,26 @@ Options:
 ## 🏗️ Development
 
 ### Prerequisites
-- Node.js ≥ 14.0
-- npm or yarn
+- Node.js ≥ 22.0
+- Bun runtime and package manager
 
 ### Development Setup
 ```bash
 git clone https://github.com/tani/webtex.git
 cd webtex
-npm install
-npm run build
+bun install
+bun run build
 ```
 
 ### Development Scripts
 ```bash
-npm run build         # Full production build
-npm run build:check   # Build only if dist/ doesn't exist  
-npm run dev          # Development mode
-npm test             # Run all tests
-npm run test:watch   # Run tests in watch mode
-npm run lint         # Code linting and formatting
-npm run typecheck    # TypeScript type checking
+bun run build         # Full production build
+bun run build:check   # Build only if dist/ doesn't exist  
+bun run dev          # Development mode
+bun test             # Run all tests
+bun test --watch     # Run tests in watch mode
+bun run lint         # Code linting and formatting
+bun run typecheck    # TypeScript type checking
 ```
 
 ### Testing
@@ -194,9 +194,9 @@ WebTeX includes comprehensive testing:
 - **API Tests**: Public interface validation
 
 ```bash
-npm run test:api         # API functionality tests
-npm run test:visual      # Visual regression tests  
-npm run test:integration # Integration tests
+bun test test/api.ts              # API functionality tests
+bun test test/visual/             # Visual regression tests  
+bun test test/integration/        # Integration tests
 ```
 
 ## 🤝 Contributing
@@ -207,7 +207,7 @@ We welcome contributions! This project maintains the original LaTeX.js commitmen
 - Follow TypeScript strict mode requirements
 - Maintain comprehensive test coverage
 - Use conventional commit messages
-- Ensure all quality checks pass: `npm run lint && npm run typecheck && npm test`
+- Ensure all quality checks pass: `bun run lint && bun run typecheck && bun test`
 
 ## 📜 License & Attribution
 
@@ -232,7 +232,7 @@ WebTeX is built upon the excellent foundation of [LaTeX.js](https://github.com/m
 WebTeX represents a significant evolution while maintaining compatibility:
 
 1. **Language Migration**: LiveScript → JavaScript → TypeScript
-2. **Build System**: Rollup → Vite with modern tooling
+2. **Build System**: Rollup → Bun with modern tooling
 3. **Mathematics**: Enhanced MathJax 3.x integration  
 4. **Type Safety**: Comprehensive TypeScript implementation
 5. **Testing**: Modern test framework with visual regression
@@ -243,7 +243,7 @@ WebTeX represents a significant evolution while maintaining compatibility:
 **Related Projects**:
 - [LaTeX.js](https://github.com/michael-brade/LaTeX.js) - Original project
 - [MathJax](https://github.com/mathjax/MathJax) - Mathematics rendering
-- [Vite](https://vitejs.dev/) - Build tooling
+- [Bun](https://bun.sh/docs/bundler) - Build tooling
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 
 ## ⭐ Show Your Support

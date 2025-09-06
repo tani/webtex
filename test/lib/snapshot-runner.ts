@@ -1,7 +1,6 @@
+import { expect, test } from "bun:test";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
-import decache from "decache";
 import { createHTMLWindow } from "svgdom";
-import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/webtex";
 
 // Set up DOM for Node.js environment
@@ -14,7 +13,6 @@ globalWithDom.window = window;
 globalWithDom.document = window.document;
 
 function resetSvgIds() {
-	decache("@svgdotjs/svg.js");
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
 		SVG?: typeof SVG;
 	};

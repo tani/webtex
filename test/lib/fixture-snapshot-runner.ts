@@ -1,11 +1,10 @@
+import { expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
-import decache from "decache";
 import he from "he";
 import slugify from "slugify";
 import { createHTMLWindow } from "svgdom";
-import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../../dist/webtex";
 import { type FixtureItem, load as loadFixture } from "./load-fixtures";
 
@@ -19,7 +18,6 @@ globalWithDom.window = window;
 globalWithDom.document = window.document;
 
 function resetSvgIds() {
-	decache("@svgdotjs/svg.js");
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
 		SVG?: typeof SVG;
 	};
@@ -203,7 +201,7 @@ export function runMigratedFixture(
 							expect(normalizedOutput).toBe(normalizedExpected);
 							// If fixture passes but snapshot fails, it means output changed
 							throw new Error(
-								`Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: npm run test:update-snapshots`,
+								`Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: bun test --update-snapshots`,
 							);
 						} catch (_fixtureError) {
 							// Both failed, throw original snapshot error
