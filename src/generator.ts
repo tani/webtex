@@ -242,8 +242,8 @@ export abstract class Generator<TNode extends Node = Node> {
 	): TNode;
 	public abstract addAttributes(node: TNode): TNode;
 
-	public setTitle(title: { textContent: string | null }): void {
-		this.documentTitle = title.textContent;
+	public setTitle(title: { textContent: string | null } | null): void {
+		this.documentTitle = title?.textContent ?? null;
 	}
 
 	public hasSymbol(name: string): boolean {

@@ -1835,6 +1835,13 @@ export class LaTeX {
 						"showframe",
 						"luatextra",
 						"lua-visual-debug",
+						"amsmath",
+						"amssymb",
+						"amsfonts",
+						"mathtools",
+						"mhchem",
+						"physics",
+						"siunitx",
 					];
 					if (placeholderPackages.includes(pkg)) {
 						// Placeholder packages are no-op packages, just continue silently

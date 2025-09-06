@@ -18,6 +18,13 @@ const PLACEHOLDER_PACKAGES = [
 	"showframe",
 	"luatextra",
 	"lua-visual-debug",
+	"amsmath",
+	"amssymb",
+	"amsfonts",
+	"mathtools",
+	"mhchem",
+	"physics",
+	"siunitx",
 ];
 const STATIC_ASSETS = [
 	{ src: "src/css", dest: "dist/css", name: "CSS" },
@@ -95,6 +102,7 @@ export default defineConfig(({ mode }) => {
 				formats: ["es"],
 			},
 			rollupOptions: {
+				external: ["mathjax"],
 				output: {
 					format: "es",
 					entryFileNames: "latex.js",
