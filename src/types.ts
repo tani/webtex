@@ -1,10 +1,25 @@
-interface LengthGenerator {
-	error(message: string): any;
-	round(value: number): number;
-	Length: any;
+interface LengthLike {
+	_value: number;
+	unit: string;
+	add(other: LengthLike): LengthLike;
+	sub(other: LengthLike): LengthLike;
+	mul(scalar: number): LengthLike;
+	div(scalar: number): LengthLike;
+	norm(other: LengthLike): LengthLike;
 }
 
-const makeLengthClass = (generator: LengthGenerator) => {
+interface LengthConstructor {
+	new (value: number, unit: string): LengthLike;
+	zero: LengthLike;
+}
+
+interface LengthGenerator {
+	error(message: string): unknown;
+	round(value: number): number;
+	Length: LengthConstructor;
+}
+
+const makeLengthClass = (generator: LengthGenerator): LengthConstructor => {
 	const g = generator;
 
 	const unitsSp = new Map([
@@ -20,7 +35,7 @@ const makeLengthClass = (generator: LengthGenerator) => {
 		["cm", (65536 * 7227) / 254],
 	]);
 
-	class Length {
+	class Length implements LengthLike {
 		public _value: number = 0;
 		public _unit: string = "";
 		static zero: Length;
@@ -86,24 +101,24 @@ const makeLengthClass = (generator: LengthGenerator) => {
 
 		add(other: Length): Length {
 			this.assertCompatible(other, "add");
-			return new g.Length(this._value + other._value, this._unit);
+			return new Length(this._value + other._value, this._unit);
 		}
 
 		sub(other: Length): Length {
 			this.assertCompatible(other, "sub");
-			return new g.Length(this._value - other._value, this._unit);
+			return new Length(this._value - other._value, this._unit);
 		}
 
 		mul(scalar: number): Length {
-			return new g.Length(this._value * scalar, this._unit);
+			return new Length(this._value * scalar, this._unit);
 		}
 
 		div(scalar: number): Length {
-			return new g.Length(this._value / scalar, this._unit);
+			return new Length(this._value / scalar, this._unit);
 		}
 
 		abs(): Length {
-			return new g.Length(Math.abs(this._value), this._unit);
+			return new Length(Math.abs(this._value), this._unit);
 		}
 
 		ratio(other: Length): number {
@@ -113,7 +128,7 @@ const makeLengthClass = (generator: LengthGenerator) => {
 
 		norm(other: Length): Length {
 			this.assertCompatible(other, "norm");
-			return new g.Length(
+			return new Length(
 				Math.sqrt(this._value ** 2 + other._value ** 2),
 				this._unit,
 			);
@@ -143,33 +158,33 @@ interface ShiftCalc {
 	dir_y: number;
 }
 
-class Vector {
-	public _x: any;
-	public _y: any;
+class Vector<T extends LengthLike> {
+	public _x: T;
+	public _y: T;
 
-	constructor(x: any, y: any) {
+	constructor(x: T, y: T) {
 		this._x = x;
 		this._y = y;
 	}
 
-	get x(): any {
+	get x(): T {
 		return this._x;
 	}
 
-	get y(): any {
+	get y(): T {
 		return this._y;
 	}
 
-	add(v: Vector): Vector {
-		return new Vector(this._x.add(v.x), this._y.add(v.y));
+	add(v: Vector<T>): Vector<T> {
+		return new Vector(this._x.add(v.x) as T, this._y.add(v.y) as T);
 	}
 
-	sub(v: Vector): Vector {
-		return new Vector(this._x.sub(v.x), this._y.sub(v.y));
+	sub(v: Vector<T>): Vector<T> {
+		return new Vector(this._x.sub(v.x) as T, this._y.sub(v.y) as T);
 	}
 
-	mul(scalar: number): Vector {
-		return new Vector(this._x.mul(scalar), this._y.mul(scalar));
+	mul(scalar: number): Vector<T> {
+		return new Vector(this._x.mul(scalar) as T, this._y.mul(scalar) as T);
 	}
 
 	private assertCompatibleUnits(operation: string): void {
@@ -194,7 +209,7 @@ class Vector {
 		};
 	}
 
-	private performShift(l: any, direction: ShiftDirection): Vector {
+	private performShift(l: T, direction: ShiftDirection): Vector<T> {
 		this.assertCompatibleUnits(`shift_${direction}`);
 
 		const calc = this.calculateShift();
@@ -203,37 +218,37 @@ class Vector {
 		const isStart = direction === "start";
 		const multiplier = isStart ? -1 : 1;
 
-		let newX: any;
-		let newY: any;
+		let newX: T;
+		let newY: T;
 
 		if (x !== 0 && y !== 0) {
-			const shiftX = l.div(msq).mul(dir_x * multiplier);
-			const shiftY = l.div(imsq).mul(dir_y * multiplier);
-			newX = isStart ? shiftX : this._x.add(shiftX);
-			newY = isStart ? shiftY : this._y.add(shiftY);
+			const shiftX = l.div(msq).mul(dir_x * multiplier) as T;
+			const shiftY = l.div(imsq).mul(dir_y * multiplier) as T;
+			newX = isStart ? shiftX : (this._x.add(shiftX) as T);
+			newY = isStart ? shiftY : (this._y.add(shiftY) as T);
 		} else if (y === 0) {
-			const shiftX = l.mul(dir_x * multiplier);
-			newX = isStart ? shiftX : this._x.add(shiftX);
-			newY = isStart ? this._y.mul(0) : this._y;
+			const shiftX = l.mul(dir_x * multiplier) as T;
+			newX = isStart ? shiftX : (this._x.add(shiftX) as T);
+			newY = isStart ? (this._y.mul(0) as T) : this._y;
 		} else {
-			const shiftY = l.mul(dir_y * multiplier);
-			newX = isStart ? this._x.mul(0) : this._x;
-			newY = isStart ? shiftY : this._y.add(shiftY);
+			const shiftY = l.mul(dir_y * multiplier) as T;
+			newX = isStart ? (this._x.mul(0) as T) : this._x;
+			newY = isStart ? shiftY : (this._y.add(shiftY) as T);
 		}
 
 		return new Vector(newX, newY);
 	}
 
-	shift_start(l: any): Vector {
+	shift_start(l: T): Vector<T> {
 		return this.performShift(l, "start");
 	}
 
-	shift_end(l: any): Vector {
+	shift_end(l: T): Vector<T> {
 		return this.performShift(l, "end");
 	}
 
-	norm(): any {
-		return this._x.norm(this._y);
+	norm(): T {
+		return this._x.norm(this._y) as T;
 	}
 }
 

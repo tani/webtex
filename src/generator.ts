@@ -2,6 +2,26 @@ import { LaTeX } from "./latex.ltx";
 import { symbols } from "./symbols";
 import { makeLengthClass } from "./types";
 
+type MacroFunction = (...args: unknown[]) => unknown;
+
+interface GeneratorOptions {
+	documentClass?: string;
+	precision?: number;
+	CustomMacros?: new (g: Generator<Node>) => Record<string, unknown>;
+	[key: string]: unknown;
+}
+
+interface Location {
+	start: { offset: number };
+	end: { offset: number };
+}
+
+declare global {
+	interface Array<T> {
+		top: T;
+	}
+}
+
 const Macros = LaTeX;
 
 // Extend Array prototype with top getter/setter for stack operations
@@ -16,7 +36,7 @@ Object.defineProperty(Array.prototype, "top", {
 	},
 });
 
-interface StackFrame {
+interface StackFrame<TNode = Node> {
 	attrs: {
 		fontFamily?: string;
 		fontWeight?: string;
@@ -27,21 +47,22 @@ interface StackFrame {
 	align: string | null;
 	currentlabel: {
 		id: string;
-		label: Node;
+		label: TNode;
 	};
-	lengths: Map<string, any>;
+	lengths: Map<string, unknown>;
 }
 
 interface ArgumentFrame {
 	name?: string;
-	args: any[];
-	parsed: any[];
+	args: unknown[];
+	parsed: unknown[];
 }
 
 // Modern deep equality function
-const deepEqual = (a: any, b: any, type: string = "==="): boolean => {
+const deepEqual = (a: unknown, b: unknown, type: string = "==="): boolean => {
 	if (a == null || b == null) return a === b;
-	if (a === b) return a !== 0 || 1 / a === 1 / b;
+	if (a === b)
+		return (a as number) !== 0 || 1 / (a as number) === 1 / (b as number);
 
 	const className = Object.prototype.toString.call(a);
 	if (Object.prototype.toString.call(b) !== className) return false;
@@ -49,17 +70,24 @@ const deepEqual = (a: any, b: any, type: string = "==="): boolean => {
 	switch (className) {
 		case "[object String]":
 			return a === String(b);
-		case "[object Number]":
-			return a !== +a ? b !== +b : a === 0 ? 1 / a === 1 / b : a === +b;
+		case "[object Number]": {
+			const numA = a as number;
+			const numB = b as number;
+			return numA !== +numA
+				? numB !== +numB
+				: numA === 0
+					? 1 / numA === 1 / numB
+					: numA === +numB;
+		}
 		case "[object Date]":
 		case "[object Boolean]":
-			return +a === +b;
+			return +(a as number) === +(b as number);
 		case "[object RegExp]":
 			return (
-				a.source === b.source &&
-				a.global === b.global &&
-				a.multiline === b.multiline &&
-				a.ignoreCase === b.ignoreCase
+				(a as RegExp).source === (b as RegExp).source &&
+				(a as RegExp).global === (b as RegExp).global &&
+				(a as RegExp).multiline === (b as RegExp).multiline &&
+				(a as RegExp).ignoreCase === (b as RegExp).ignoreCase
 			);
 	}
 
@@ -112,26 +140,26 @@ let errorFn = (e: string) => {
 	throw new Error(e);
 };
 
-export class Generator {
+export abstract class Generator<TNode extends Node = Node> {
 	public documentClass: string | null = null;
 	public documentTitle: string | null = null;
-	public Length: any = null;
+	public Length: ReturnType<typeof makeLengthClass> | null = null;
 
-	protected _options: any = null;
-	protected _macros: any = null;
-	protected _stack: StackFrame[] = [];
+	protected _options: GeneratorOptions | null = null;
+	protected _macros: Record<string, MacroFunction> = {};
+	protected _stack: StackFrame<TNode>[] = [];
 	protected _groups: number[] = [];
 	protected _continue: boolean | number = false;
-	protected _labels: Map<string, any> = new Map();
-	protected _refs: Map<string, any[]> = new Map();
+	protected _labels: Map<string, StackFrame<TNode>["currentlabel"]> = new Map();
+	protected _refs: Map<string, TNode[]> = new Map();
 	protected _counters: Map<string, number> = new Map();
 	protected _resets: Map<string, string[]> = new Map();
-	protected _marginpars: any[] = [];
+	protected _marginpars: TNode[] = [];
 	protected _uid: number = 1;
 	protected _curArgs: ArgumentFrame[] = [];
 
-	constructor(options?: any) {
-		this._options = options;
+	constructor(options?: GeneratorOptions) {
+		this._options = options ?? null;
 	}
 
 	public reset(): void {
@@ -147,7 +175,7 @@ export class Generator {
 				align: null,
 				currentlabel: {
 					id: "",
-					label: document.createTextNode(""),
+					label: document.createTextNode("") as unknown as TNode,
 				},
 				lengths: new Map(),
 			},
@@ -165,7 +193,10 @@ export class Generator {
 		this.newCounter("enumiii");
 		this.newCounter("enumiv");
 
-		this._macros = new Macros(this as any, this._options?.CustomMacros);
+		this._macros = new Macros(
+			this as unknown as ConstructorParameters<typeof Macros>[0],
+			this._options?.CustomMacros,
+		) as unknown as Record<string, MacroFunction>;
 	}
 
 	public nextId(): number {
@@ -173,11 +204,11 @@ export class Generator {
 	}
 
 	public round(num: number): number {
-		const factor = 10 ** (this._options?.precision || 3);
+		const factor = 10 ** (this._options?.precision ?? 3);
 		return Math.round(num * factor) / factor;
 	}
 
-	public error(e: string): any {
+	public error(e: string): never {
 		return errorFn(e);
 	}
 
@@ -185,23 +216,32 @@ export class Generator {
 		errorFn = e;
 	}
 
-	public location(): any {
-		errorFn("location function not set!");
+	public location(): Location {
+		return errorFn("location function not set!") as never;
 	}
 
-	public setTitle(title: any): void {
+	public abstract createText(text: string): TNode;
+	public abstract createFragment(...args: TNode[]): TNode;
+	public abstract create(
+		type: unknown,
+		children?: TNode | TNode[] | null,
+		classes?: string,
+	): TNode;
+	public abstract addAttributes(node: TNode): TNode;
+
+	public setTitle(title: { textContent: string | null }): void {
 		this.documentTitle = title.textContent;
 	}
 
 	public hasSymbol(name: string): boolean {
-		return (Macros as any).symbols.has(name);
+		return Macros.symbols.has(name);
 	}
 
 	public symbol(name: string): string {
 		if (!this.hasSymbol(name)) {
 			this.error(`no such symbol: ${name}`);
 		}
-		return (Macros as any).symbols.get(name);
+		return Macros.symbols.get(name) as string;
 	}
 
 	public hasMacro(name: string): boolean {
@@ -214,44 +254,45 @@ export class Generator {
 	}
 
 	public isHmode(macro: string): boolean {
-		const args = (Macros as any).args[macro];
+		const args = Macros.args[macro] as unknown[] | undefined;
 		return args?.[0] === "H" || !args;
 	}
 
 	public isVmode(macro: string): boolean {
-		const args = (Macros as any).args[macro];
+		const args = Macros.args[macro] as unknown[] | undefined;
 		return args?.[0] === "V";
 	}
 
 	public isHVmode(macro: string): boolean {
-		const args = (Macros as any).args[macro];
+		const args = Macros.args[macro] as unknown[] | undefined;
 		return args?.[0] === "HV";
 	}
 
 	public isPreamble(macro: string): boolean {
-		const args = (Macros as any).args[macro];
+		const args = Macros.args[macro] as unknown[] | undefined;
 		return args?.[0] === "P";
 	}
 
-	public macro(name: string, args: any[]): any[] | undefined {
+	public macro(name: string, args: unknown[]): TNode[] | undefined {
 		if (symbols.has(name)) {
-			return [this.createText(symbols.get(name))];
+			const sym = symbols.get(name);
+			return sym ? [this.createText(sym)] : undefined;
 		}
 
 		const result = this._macros[name]?.apply(this._macros, args);
 		return result
-			?.filter((x: any) => x !== undefined)
-			.map((x: any) => {
+			?.filter((x: unknown): x is string | TNode => x !== undefined)
+			.map((x) => {
 				if (typeof x === "string" || x instanceof String) {
 					return this.createText(x.toString());
 				} else {
-					return this.addAttributes(x);
+					return this.addAttributes(x as TNode);
 				}
 			});
 	}
 
 	public beginArgs(macro: string): void {
-		const macroArgs = (Macros as any).args[macro];
+		const macroArgs = Macros.args[macro] as unknown[] | undefined;
 		this._curArgs.push(
 			macroArgs
 				? {
@@ -269,16 +310,17 @@ export class Generator {
 	public selectArgsBranch(nextChar: string): boolean {
 		const optArgs = ["o?", "i?", "k?", "kv?", "n?", "l?", "c-ml?", "cl?"];
 
-		if (Array.isArray((this._curArgs as any).top.args[0])) {
-			const branches = (this._curArgs as any).top.args[0];
+		const first = this._curArgs.top.args[0];
+		if (Array.isArray(first)) {
+			const branches = first as unknown[][];
 
 			for (const branch of branches) {
 				if (
-					(nextChar === "[" && includes(branch[0], optArgs)) ||
-					(nextChar === "{" && !includes(branch[0], optArgs))
+					(nextChar === "[" && includes(branch[0] as string, optArgs)) ||
+					(nextChar === "{" && !includes(branch[0] as string, optArgs))
 				) {
-					(this._curArgs as any).top.args.shift();
-					(this._curArgs as any).top.args.unshift(...branch);
+					this._curArgs.top.args.shift();
+					this._curArgs.top.args.unshift(...branch);
 					return true;
 				}
 			}
@@ -287,30 +329,30 @@ export class Generator {
 	}
 
 	public nextArg(arg: string): boolean {
-		if ((this._curArgs as any).top.args[0] === arg) {
-			(this._curArgs as any).top.args.shift();
+		if (this._curArgs.top.args[0] === arg) {
+			this._curArgs.top.args.shift();
 			return true;
 		}
 		return false;
 	}
 
 	public argError(m: string): void {
-		errorFn(`macro \\${(this._curArgs as any).top.name}: ${m}`);
+		errorFn(`macro \\${this._curArgs.top.name}: ${m}`);
 	}
 
-	public addParsedArg(a: any): void {
-		(this._curArgs as any).top.parsed.push(a);
+	public addParsedArg(a: unknown): void {
+		this._curArgs.top.parsed.push(a);
 	}
 
-	public parsedArgs(): any[] {
-		return (this._curArgs as any).top.parsed;
+	public parsedArgs(): unknown[] {
+		return this._curArgs.top.parsed;
 	}
 
 	public preExecMacro(): void {
-		this.macro((this._curArgs as any).top.name, this.parsedArgs());
+		this.macro(this._curArgs.top.name as string, this.parsedArgs());
 	}
 
-	public endArgs(): any[] {
+	public endArgs(): unknown[] {
 		const frame = this._curArgs.pop();
 		if (!frame) {
 			throw new Error("No argument frame to pop");
@@ -335,7 +377,7 @@ export class Generator {
 		this.beginArgs(env_id);
 	}
 
-	public end(id: string, end_id: string): any {
+	public end(id: string, end_id: string): TNode[] | undefined {
 		if (id !== end_id) {
 			errorFn(
 				"environment '" +
@@ -346,7 +388,7 @@ export class Generator {
 			);
 		}
 
-		let endResult: any[] | undefined;
+		let endResult: TNode[] | undefined;
 		if (this.hasMacro(`end${id}`)) {
 			endResult = this.macro(`end${id}`, []);
 		}
@@ -361,16 +403,16 @@ export class Generator {
 
 	public enterGroup(copyAttrs: boolean = false): void {
 		this._stack.push({
-			attrs: copyAttrs ? Object.assign({}, (this._stack as any).top.attrs) : {},
+			attrs: copyAttrs ? Object.assign({}, this._stack.top.attrs) : {},
 			align: null,
-			currentlabel: Object.assign({}, (this._stack as any).top.currentlabel),
-			lengths: new Map((this._stack as any).top.lengths),
+			currentlabel: Object.assign({}, this._stack.top.currentlabel),
+			lengths: new Map(this._stack.top.lengths),
 		});
-		++(this._groups as any).top;
+		++this._groups.top;
 	}
 
 	public exitGroup(): void {
-		if (--(this._groups as any).top < 0) {
+		if (--this._groups.top < 0) {
 			errorFn("there is no group to end here");
 		}
 		this._stack.pop();
@@ -386,33 +428,36 @@ export class Generator {
 	}
 
 	public isBalanced(): boolean {
-		return (this._groups as any).top === 0;
+		return this._groups.top === 0;
 	}
 
 	public continue(): void {
-		this._continue = (this.location() as any).end.offset;
+		this._continue = this.location().end.offset;
 	}
 
 	public break(): void {
-		if ((this.location() as any).end.offset > this._continue) {
+		if (
+			typeof this._continue === "number" &&
+			this.location().end.offset > this._continue
+		) {
 			this._continue = false;
 		}
 	}
 
 	public setAlignment(align: string): void {
-		(this._stack as any).top.align = align;
+		this._stack.top.align = align;
 	}
 
 	public alignment(): string | null {
-		return (this._stack as any).top.align;
+		return this._stack.top.align;
 	}
 
 	public setFontFamily(family: string): void {
-		(this._stack as any).top.attrs.fontFamily = family;
+		this._stack.top.attrs.fontFamily = family;
 	}
 
 	public setFontWeight(weight: string): void {
-		(this._stack as any).top.attrs.fontWeight = weight;
+		this._stack.top.attrs.fontWeight = weight;
 	}
 
 	public setFontShape(shape: string): void {
@@ -423,19 +468,19 @@ export class Generator {
 				shape = "it";
 			}
 		}
-		(this._stack as any).top.attrs.fontShape = shape;
+		this._stack.top.attrs.fontShape = shape;
 	}
 
 	public setFontSize(size: string): void {
-		(this._stack as any).top.attrs.fontSize = size;
+		this._stack.top.attrs.fontSize = size;
 	}
 
 	public setTextDecoration(decoration: string): void {
-		(this._stack as any).top.attrs.textDecoration = decoration;
+		this._stack.top.attrs.textDecoration = decoration;
 	}
 
 	public _inlineAttributes(): string {
-		const cur = (this._stack as any).top.attrs;
+		const cur = this._stack.top.attrs;
 		return [
 			cur.fontFamily,
 			cur.fontWeight,
@@ -448,7 +493,7 @@ export class Generator {
 			.trim();
 	}
 
-	public _activeAttributeValue(attr: string): any {
+	public _activeAttributeValue(attr: string): string | undefined {
 		for (let i = this._stack.length - 1; i >= 0; i--) {
 			const value =
 				this._stack[i].attrs[attr as keyof (typeof this._stack)[0]["attrs"]];
@@ -462,9 +507,9 @@ export class Generator {
 		sec: string,
 		level: number,
 		star: boolean,
-		toc?: any,
-		ttl?: any,
-	): any {
+		toc?: TNode,
+		ttl?: TNode,
+	): TNode | undefined {
 		if (toc === ttl && ttl === undefined) {
 			if (!star && this.counter("secnumdepth") >= level) {
 				this.stepCounter(sec);
@@ -473,20 +518,21 @@ export class Generator {
 			return;
 		}
 
-		let el: any;
+		let el: TNode;
+		const self = this as unknown as Record<string, unknown>;
 		if (!star && this.counter("secnumdepth") >= level) {
 			if (sec === "chapter") {
 				const chaphead = this.create(
-					(this as any).block,
+					self.block,
 					this.macro("chaptername", []).concat(
 						this.createText(this.symbol("space")),
 						this.macro(`the${sec}`, []),
 					),
 				);
-				el = this.create((this as any)[sec], [chaphead, ttl]);
+				el = this.create(self[sec], [chaphead, ttl]);
 			} else {
 				el = this.create(
-					(this as any)[sec],
+					self[sec],
 					this.macro(`the${sec}`, []).concat(
 						this.createText(this.symbol("quad")),
 						ttl,
@@ -494,12 +540,12 @@ export class Generator {
 				);
 			}
 
-			const currentId = (this._stack as any).top.currentlabel.id;
+			const currentId = this._stack.top.currentlabel.id;
 			if (currentId != null) {
-				el.id = currentId;
+				(el as unknown as { id: string }).id = currentId;
 			}
 		} else {
-			el = this.create((this as any)[sec], ttl);
+			el = this.create(self[sec], ttl);
 		}
 
 		return el;
@@ -522,30 +568,36 @@ export class Generator {
 		if (this.hasLength(l)) {
 			errorFn(`length ${l} already defined!`);
 		}
-		(this._stack as any).top.lengths.set(l, this.Length.zero);
+		this._stack.top.lengths.set(l, this.Length?.zero);
 	}
 
 	public hasLength(l: string): boolean {
-		return (this._stack as any).top.lengths.has(l);
+		return this._stack.top.lengths.has(l);
 	}
 
-	public setLength(id: string, length: any): void {
+	public setLength(id: string, length: unknown): void {
 		if (!this.hasLength(id)) {
 			errorFn(`no such length: ${id}`);
 		}
-		(this._stack as any).top.lengths.set(id, length);
+		this._stack.top.lengths.set(id, length);
 	}
 
-	public length(l: string): any {
+	public length(l: string): unknown {
 		if (!this.hasLength(l)) {
 			errorFn(`no such length: ${l}`);
 		}
-		return (this._stack as any).top.lengths.get(l);
+		return this._stack.top.lengths.get(l);
 	}
 
-	public theLength(id: string): any {
-		const l = this.create((this as any).inline, undefined, "the");
-		l.setAttribute("display-var", id);
+	public theLength(id: string): TNode {
+		const l = this.create(
+			(this as unknown as Record<string, unknown>).inline,
+			undefined,
+			"the",
+		);
+		(
+			l as unknown as { setAttribute: (key: string, value: string) => void }
+		).setAttribute("display-var", id);
 		return l;
 	}
 
@@ -564,9 +616,9 @@ export class Generator {
 			errorFn(`macro \\the${c} already defined!`);
 		}
 
-		this._macros[`the${c}`] = function (this: any) {
+		this._macros[`the${c}`] = function (this: { g: Generator<TNode> }) {
 			return [this.g.arabic(this.g.counter(c))];
-		};
+		} as unknown as MacroFunction;
 	}
 
 	public hasCounter(c: string): boolean {
@@ -596,14 +648,16 @@ export class Generator {
 		return value;
 	}
 
-	public refCounter(c: string, id?: string): any {
-		let el: any;
+	public refCounter(c: string, id?: string): TNode | undefined {
+		let el: TNode | undefined;
 		if (!id) {
 			id = `${c}-${this.nextId()}`;
-			el = this.create((this as any).anchor(id));
+			const anchor = (this as unknown as Record<string, (i: string) => unknown>)
+				.anchor;
+			el = this.create(anchor(id));
 		}
 
-		(this._stack as any).top.currentlabel = {
+		this._stack.top.currentlabel = {
 			id: id,
 			label: this.createFragment(
 				...(this.hasMacro(`p@${c}`) ? this.macro(`p@${c}`, []) || [] : []),
@@ -717,11 +771,11 @@ export class Generator {
 			errorFn(`label ${label} already defined!`);
 		}
 
-		if (!(this._stack as any).top.currentlabel.id) {
+		if (!this._stack.top.currentlabel.id) {
 			console.warn(`warning: no \\@currentlabel available for label ${label}!`);
 		}
 
-		this._labels.set(label, (this._stack as any).top.currentlabel);
+		this._labels.set(label, this._stack.top.currentlabel);
 
 		if (this._refs.has(label)) {
 			const refs = this._refs.get(label);
@@ -732,25 +786,28 @@ export class Generator {
 				while (r.firstChild) {
 					r.removeChild(r.firstChild);
 				}
-				r.appendChild(
-					(this._stack as any).top.currentlabel.label.cloneNode(true),
+				r.appendChild(this._stack.top.currentlabel.label.cloneNode(true));
+				(r as unknown as Element).setAttribute(
+					"href",
+					`#${this._stack.top.currentlabel.id}`,
 				);
-				r.setAttribute("href", `#${(this._stack as any).top.currentlabel.id}`);
 			}
 			this._refs.delete(label);
 		}
 	}
 
-	public ref(label: string): any {
+	public ref(label: string): TNode {
 		const labelData = this._labels.get(label);
+		const self = this as unknown as Record<string, unknown>;
+		const link = self.link as (href: string) => unknown;
 		if (labelData) {
 			return this.create(
-				(this as any).link(`#${labelData.id}`),
-				labelData.label.cloneNode(true),
+				link(`#${labelData.id}`),
+				labelData.label.cloneNode(true) as TNode,
 			);
 		}
 
-		const el = this.create((this as any).link("#"), this.createText("??"));
+		const el = this.create(link("#"), this.createText("??"));
 		if (!this._refs.has(label)) {
 			this._refs.set(label, [el]);
 		} else {
@@ -770,34 +827,18 @@ export class Generator {
 		console.warn("There were undefined references.");
 	}
 
-	public marginpar(txt: any): any {
+	public marginpar(txt: TNode): TNode {
 		const id = this.nextId();
-		const marginPar = this.create((this as any).block, [
-			this.create((this as any).inline, null, "mpbaseline"),
+		const self = this as unknown as Record<string, unknown>;
+		const marginPar = this.create(self.block, [
+			this.create(self.inline, null, "mpbaseline"),
 			txt,
 		]);
-		marginPar.id = id;
+		(marginPar as unknown as { id: number }).id = id;
 		this._marginpars.push(marginPar);
 
-		const marginRef = this.create((this as any).inline, null, "mpbaseline");
-		marginRef.id = `marginref-${id}`;
+		const marginRef = this.create(self.inline, null, "mpbaseline");
+		(marginRef as unknown as { id: string }).id = `marginref-${id}`;
 		return marginRef;
-	}
-
-	// These methods are expected to be overridden by subclasses
-	public createText(_text: string): any {
-		throw new Error("createText method must be implemented by subclass");
-	}
-
-	public createFragment(..._args: any[]): any {
-		throw new Error("createFragment method must be implemented by subclass");
-	}
-
-	public create(_type: any, _children?: any, _classes?: string): any {
-		throw new Error("create method must be implemented by subclass");
-	}
-
-	public addAttributes(_node: any): any {
-		throw new Error("addAttributes method must be implemented by subclass");
 	}
 }

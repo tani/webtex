@@ -39,7 +39,15 @@ export class Graphicx {
 		return [];
 	}
 
-	includegraphics(_s: any, kvl: any, _kvl2: any, file: any): any[] {
-		return [this.g.createImage(kvl.get("width"), kvl.get("height"), file)];
+	includegraphics(
+		_s: unknown,
+		kvl: Map<string, unknown>,
+		_kvl2: unknown,
+		file: unknown,
+	): unknown[] {
+		const width = (kvl.get("width") as number) ?? 100;
+		const height = (kvl.get("height") as number) ?? 100;
+		const filename = (file as string) ?? "";
+		return [this.g.createImage(width, height, filename)];
 	}
 }
