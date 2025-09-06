@@ -113,7 +113,9 @@ body,
 	margin: 0;
 	padding: 0;
 
-	max-width: var(--paperwidth); /* elements wider than this overflow, but don't increase bodywidth */
+	max-width: var(
+		--paperwidth
+	); /* elements wider than this overflow, but don't increase bodywidth */
 	min-width: var(--paperwidth);
 }
 
@@ -142,14 +144,18 @@ body,
 
 .marginpar {
 	width: var(--marginparwidth); /* ideally in percent relative to margin */
-	min-width: var(--marginparwidth); /* min-width if in grid/flex container, to force this width */
+	min-width: var(
+		--marginparwidth
+	); /* min-width if in grid/flex container, to force this width */
 
 	margin-left: var(--marginparsep);
 	margin-right: var(--marginparsep);
 }
 
 .marginpar > * {
-	padding-bottom: var(--marginparpush); /* use padding, which is included in offsetHeight, margin is not */
+	padding-bottom: var(
+		--marginparpush
+	); /* use padding, which is included in offsetHeight, margin is not */
 }
 
 /* columns */
@@ -633,7 +639,10 @@ h4 + * p:first-child,
 /* inline vertical space - this cannot be negative */
 .vspace-inline {
 	display: inline-block;
-	height: calc(1em * var(--line-height)); /* full maximum height, including the leading: line-height * font-size */
+	height: calc(
+		1em *
+		var(--line-height)
+	); /* full maximum height, including the leading: line-height * font-size */
 	vertical-align: top; /* if bottom is used, space could be inserted above this line of text */
 }
 

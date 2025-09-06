@@ -13,7 +13,10 @@ h1 div {
 h1 {
 	font-size: 2.5rem; /* \Huge */
 	font-weight: bold;
-	margin-top: calc(5rem + 1em); /* \vspace*{} in LaTeX adds an additional line */
+	margin-top: calc(
+		5rem +
+		1em
+	); /* \vspace*{} in LaTeX adds an additional line */
 	margin-bottom: 4rem;
 }
 

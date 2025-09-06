@@ -179,7 +179,7 @@ class LaTeXLivePreview {
 
 		if (!latexCode) {
 			const emptyHTML = this.createCompleteHTML(
-				'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>'
+				'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>',
 			);
 			this.preview.srcdoc = emptyHTML;
 			this.compileStatus.textContent = "Ready";
@@ -196,7 +196,10 @@ class LaTeXLivePreview {
 			});
 
 			const htmlDoc = generator.htmlDocument();
-			const fullHTML = this.createCompleteHTML(htmlDoc.body.innerHTML, htmlDoc.head);
+			const fullHTML = this.createCompleteHTML(
+				htmlDoc.body.innerHTML,
+				htmlDoc.head,
+			);
 
 			this.preview.srcdoc = fullHTML;
 
@@ -209,7 +212,7 @@ class LaTeXLivePreview {
 			const errorHTML = this.createCompleteHTML(
 				`<div style="color: #e53e3e; padding: 20px; white-space: pre-wrap; font-family: monospace; background: #fed7d7; border-radius: 4px; margin: 20px;">Compilation Error:
 
-${error.message || error.toString()}</div>`
+${error.message || error.toString()}</div>`,
 			);
 			this.preview.srcdoc = errorHTML;
 
@@ -221,37 +224,37 @@ ${error.message || error.toString()}</div>`
 
 	createCompleteHTML(bodyContent, head = null) {
 		// Extract head content from generated head element if provided
-		let headContent = '';
+		let headContent = "";
 		if (head) {
 			// Get title
-			const titleEl = head.querySelector('title');
-			const title = titleEl ? titleEl.textContent : 'LaTeX Document';
-			
+			const titleEl = head.querySelector("title");
+			const title = titleEl ? titleEl.textContent : "LaTeX Document";
+
 			// Get meta elements
-			const metaElements = head.querySelectorAll('meta');
-			let metaTags = '';
-			metaElements.forEach(meta => {
+			const metaElements = head.querySelectorAll("meta");
+			let metaTags = "";
+			metaElements.forEach((meta) => {
 				metaTags += meta.outerHTML;
 			});
 
 			// Get link elements
-			const linkElements = head.querySelectorAll('link');
-			let linkTags = '';
-			linkElements.forEach(link => {
+			const linkElements = head.querySelectorAll("link");
+			let linkTags = "";
+			linkElements.forEach((link) => {
 				linkTags += link.outerHTML;
 			});
 
 			// Get script elements
-			const scriptElements = head.querySelectorAll('script');
-			let scriptTags = '';
-			scriptElements.forEach(script => {
+			const scriptElements = head.querySelectorAll("script");
+			let scriptTags = "";
+			scriptElements.forEach((script) => {
 				scriptTags += script.outerHTML;
 			});
 
-			// Get style elements  
-			const styleElements = head.querySelectorAll('style');
-			let styleTags = '';
-			styleElements.forEach(style => {
+			// Get style elements
+			const styleElements = head.querySelectorAll("style");
+			let styleTags = "";
+			styleElements.forEach((style) => {
 				styleTags += style.outerHTML;
 			});
 
@@ -440,7 +443,7 @@ G & H & I \\\\
 
 		this.editor.value = "";
 		const emptyHTML = this.createCompleteHTML(
-			'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>'
+			'<p style="color: #a0aec0; text-align: center; margin-top: 2rem;">Enter LaTeX code to see preview</p>',
 		);
 		this.preview.srcdoc = emptyHTML;
 		this.updateEditorStats();
@@ -482,7 +485,10 @@ G & H & I \\\\
 			});
 
 			const htmlDoc = generator.htmlDocument();
-			const fullHTML = this.createCompleteHTML(htmlDoc.body.innerHTML, htmlDoc.head);
+			const fullHTML = this.createCompleteHTML(
+				htmlDoc.body.innerHTML,
+				htmlDoc.head,
+			);
 
 			const blob = new Blob([fullHTML], { type: "text/html;charset=utf-8" });
 			const url = URL.createObjectURL(blob);
