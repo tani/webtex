@@ -4,7 +4,7 @@ type Generator = Record<string, unknown>;
 
 export class Textcomp {
 	static displayName = "Textcomp";
-	static args: Record<string, any[]> = {};
+	static args: Record<string, unknown[]> = {};
 
 	static symbols = new Map([
 		["textcentoldstyle", "\uF7A2"],
@@ -28,9 +28,9 @@ export class Textcomp {
 	]);
 
 	g: Generator;
-	options?: any;
+	options?: unknown;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: Generator, options?: unknown) {
 		this.g = generator;
 		this.options = options;
 	}

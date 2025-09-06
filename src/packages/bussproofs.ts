@@ -1,14 +1,14 @@
 import type { PackageGenerator } from "../interfaces";
 
 export interface BussproofsGenerator extends PackageGenerator {
-	create(element: any, content?: any, className?: string): any;
-	createText(text: string): any;
-	parseMath(math: string, display?: boolean): any;
+	create(element: string, content?: unknown, className?: string): unknown;
+	createText(text: string): unknown;
+	parseMath(math: string, display?: boolean): unknown;
 }
 
 export class Bussproofs {
 	static displayName = "Bussproofs";
-	static args: Record<string, any[]> = {
+	static args: Record<string, unknown[]> = {
 		// Axiom commands
 		AxiomC: ["H", "g"],
 		AXC: ["H", "g"],
@@ -41,14 +41,14 @@ export class Bussproofs {
 		rootAtBottom: ["H"],
 	};
 
-	static environments: Record<string, any[]> = {
+	static environments: Record<string, unknown[]> = {
 		prooftree: ["HV"],
 	};
 
 	private g: BussproofsGenerator;
 	private proofCommands: string[] = [];
 
-	constructor(generator: BussproofsGenerator, options?: any) {
+	constructor(generator: BussproofsGenerator, options?: unknown) {
 		this.g = generator;
 		// Options could be used for future extensions
 		if (options) {
@@ -57,138 +57,138 @@ export class Bussproofs {
 	}
 
 	// Helper to extract math content
-	private extractMathContent(content: any): string {
+	private extractMathContent(content: unknown): string {
 		// For the simplified implementation, just return empty string
 		// This bypasses any content extraction issues
 		return "";
 	}
 
 	// Axiom commands
-	AxiomC(content: any): any[] {
+	AxiomC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\AxiomC{${mathContent}}`);
 		return [];
 	}
 
-	AXC(content: any): any[] {
+	AXC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\AXC{${mathContent}}`);
 		return [];
 	}
 
-	Axiom(): any[] {
+	Axiom(): unknown[] {
 		this.proofCommands.push(`\\Axiom`);
 		return [];
 	}
 
 	// Inference commands
-	UnaryInfC(content: any): any[] {
+	UnaryInfC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\UnaryInfC{${mathContent}}`);
 		return [];
 	}
 
-	UIC(content: any): any[] {
+	UIC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\UIC{${mathContent}}`);
 		return [];
 	}
 
-	BinaryInfC(content: any): any[] {
+	BinaryInfC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\BinaryInfC{${mathContent}}`);
 		return [];
 	}
 
-	BIC(content: any): any[] {
+	BIC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\BIC{${mathContent}}`);
 		return [];
 	}
 
-	TrinaryInfC(content: any): any[] {
+	TrinaryInfC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\TrinaryInfC{${mathContent}}`);
 		return [];
 	}
 
-	TIC(content: any): any[] {
+	TIC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\TIC{${mathContent}}`);
 		return [];
 	}
 
-	QuaternaryInfC(content: any): any[] {
+	QuaternaryInfC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\QuaternaryInfC{${mathContent}}`);
 		return [];
 	}
 
-	QuinaryInfC(content: any): any[] {
+	QuinaryInfC(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\QuinaryInfC{${mathContent}}`);
 		return [];
 	}
 
 	// Label commands
-	LeftLabel(content: any): any[] {
+	LeftLabel(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\LeftLabel{${mathContent}}`);
 		return [];
 	}
 
-	LL(content: any): any[] {
+	LL(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\LL{${mathContent}}`);
 		return [];
 	}
 
-	RightLabel(content: any): any[] {
+	RightLabel(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\RightLabel{${mathContent}}`);
 		return [];
 	}
 
-	RL(content: any): any[] {
+	RL(content: unknown): unknown[] {
 		const mathContent = this.extractMathContent(content);
 		this.proofCommands.push(`\\RL{${mathContent}}`);
 		return [];
 	}
 
 	// Line style commands
-	dashedLine(): any[] {
+	dashedLine(): unknown[] {
 		this.proofCommands.push(`\\dashedLine`);
 		return [];
 	}
 
-	solidLine(): any[] {
+	solidLine(): unknown[] {
 		this.proofCommands.push(`\\solidLine`);
 		return [];
 	}
 
-	singleLine(): any[] {
+	singleLine(): unknown[] {
 		this.proofCommands.push(`\\singleLine`);
 		return [];
 	}
 
-	noLine(): any[] {
+	noLine(): unknown[] {
 		this.proofCommands.push(`\\noLine`);
 		return [];
 	}
 
 	// Root positioning commands
-	rootAtTop(): any[] {
+	rootAtTop(): unknown[] {
 		this.proofCommands.push(`\\rootAtTop`);
 		return [];
 	}
 
-	rootAtBottom(): any[] {
+	rootAtBottom(): unknown[] {
 		this.proofCommands.push(`\\rootAtBottom`);
 		return [];
 	}
 
 	// Environment handling
-	prooftree(content: any): any[] {
+	prooftree(content: unknown): unknown[] {
 		// For now, create a simple test proof tree to see if MathJax integration works
 		// This bypasses the command collection issue for now
 		const simpleProof = `\\begin{prooftree}\\AxiomC{$A$}\\UnaryInfC{$B$}\\end{prooftree}`;

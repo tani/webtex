@@ -2,7 +2,7 @@ import type { PackageGenerator } from "../interfaces";
 
 export class XColor {
 	static displayName = "XColor";
-	static args: Record<string, any[]> = {
+	static args: Record<string, unknown[]> = {
 		definecolorset: ["P", "i?", "c-ml", "ie", "ie", "c-ssp"],
 		definecolor: ["P", "i?", "i", "c-ml", "c-spl"],
 		color: ["HV", [["c-ml?", "c-spl"], ["c"]]],
@@ -36,14 +36,14 @@ export class XColor {
 	static symbols = new Map<string, string>();
 
 	private g: PackageGenerator;
-	private options?: any;
+	private options?: Map<string, unknown>;
 
-	constructor(generator: PackageGenerator, options?: any) {
+	constructor(generator: PackageGenerator, options?: Map<string, unknown>) {
 		this.g = generator;
 		this.options = options;
 
 		if (this.options?.forEach) {
-			this.options.forEach((_value: any, key: string) => {
+			this.options.forEach((_value: unknown, key: string) => {
 				switch (key) {
 					case "natural":
 					case "rgb":
@@ -72,11 +72,11 @@ export class XColor {
 		}
 	}
 	definecolorset(
-		type: any,
-		models: any,
+		type: string | null,
+		models: { models: string[] },
 		hd: string = "",
 		tl: string = "",
-		setspec: any[],
+		setspec: Array<{ name: string; speclist: unknown[] }>,
 	): void {
 		if (type !== null && type !== "named" && type !== "ps") {
 			this.g.error("unknown color type");
@@ -87,7 +87,12 @@ export class XColor {
 		}
 	}
 
-	definecolor(type: any, name: string, models: any, colorspec: any[]): void {
+	definecolor(
+		type: string | null,
+		name: string,
+		models: { models: string[] },
+		colorspec: unknown[],
+	): void {
 		if (type !== null && type !== "named" && type !== "ps") {
 			this.g.error("unknown color type");
 		}
@@ -95,7 +100,7 @@ export class XColor {
 			this.g.error("color models and specs don't match");
 		}
 
-		const color: Record<string, any> = {};
+		const color: Record<string, unknown> = {};
 		for (let i = 0; i < models.models.length; i++) {
 			const model = models.models[i];
 			color[model] = colorspec[i];
@@ -103,7 +108,7 @@ export class XColor {
 		XColor.colors.set(name, color);
 	}
 
-	color(...args: any[]): any[] {
+	color(...args: unknown[]): unknown[] {
 		if (args.length === 1) {
 			// Handle color expression
 			return [];
@@ -113,7 +118,7 @@ export class XColor {
 		}
 	}
 
-	textcolor(...args: any[]): any[] {
+	textcolor(...args: unknown[]): unknown[] {
 		if (args.length === 2) {
 			// Return the text content without color styling for now
 			return [args[1]];
@@ -125,11 +130,11 @@ export class XColor {
 		return [];
 	}
 
-	colorbox(_model: any, _color: any, _text: any): any[] {
+	colorbox(_model: unknown, _color: unknown, _text: unknown): unknown[] {
 		return [];
 	}
 
-	fcolorbox(_model: any, _color: any, _text: any): any[] {
+	fcolorbox(_model: unknown, _color: unknown, _text: unknown): unknown[] {
 		return [];
 	}
 }

@@ -2,7 +2,7 @@ type Generator = Record<string, unknown>;
 
 export class Latexsym {
 	static displayName = "Latexsym";
-	static args: Record<string, any[]> = {};
+	static args: Record<string, unknown[]> = {};
 
 	static symbols = new Map([
 		["mho", "\u2127"],
@@ -19,9 +19,9 @@ export class Latexsym {
 	]);
 
 	g: Generator;
-	options?: any;
+	options?: unknown;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: Generator, options?: unknown) {
 		this.g = generator;
 		this.options = options;
 	}

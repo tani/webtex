@@ -18,7 +18,7 @@ interface TheoremEnvironment {
 
 export class Amsthm {
 	static displayName = "Amsthm";
-	static args: Record<string, any[]> = {
+	static args: Record<string, unknown[]> = {
 		newtheorem: ["V", "g", "g"],
 		theoremstyle: ["V", "g"],
 		qed: ["H"],
@@ -38,7 +38,7 @@ export class Amsthm {
 		conjecture: ["HV", "o?"],
 	};
 
-	static environments: Record<string, any[]> = {
+	static environments: Record<string, unknown[]> = {
 		proof: ["HV", "o?"],
 		// Theorem environments with optional argument support
 		theorem: ["HV", "o?"],
@@ -61,7 +61,7 @@ export class Amsthm {
 	private theoremEnvironments: Record<string, TheoremEnvironment> = {};
 	private counters: Record<string, number> = {};
 
-	constructor(generator: AmsthrmGenerator, options?: any) {
+	constructor(generator: AmsthrmGenerator, _options?: unknown) {
 		this.g = generator;
 
 		// Define the three standard theorem styles
@@ -85,7 +85,7 @@ export class Amsthm {
 	}
 
 	// Set the current theorem style
-	theoremstyle(styleName: string): any[] {
+	theoremstyle(styleName: string): unknown[] {
 		if (this.theoremStyles[styleName]) {
 			this.currentStyle = styleName;
 		}
@@ -116,7 +116,7 @@ export class Amsthm {
 	 * @param displayName - Display name for the theorem (e.g., "Theorem", "Lemma")
 	 * @param parentCounter - Optional parent counter for hierarchical numbering
 	 */
-	newtheorem(envName: any, displayName: any): any[] {
+	newtheorem(envName: string | Node, displayName: string | Node): unknown[] {
 		// Extract text content from DOM nodes
 		const envNameStr =
 			typeof envName === "string"
@@ -192,7 +192,7 @@ export class Amsthm {
 		// For non-pre-defined environments, we can't create a usable method due to LaTeX.js limitations
 		if (!isPredefined) {
 			// Store a placeholder method that explains the limitation
-			(this as any)[actualEnvName] = () => {
+			(this as Record<string, unknown>)[actualEnvName] = () => {
 				return [
 					this.g.error(
 						`Environment '${actualEnvName}' was defined with \\newtheorem but is not available. ` +
@@ -206,9 +206,9 @@ export class Amsthm {
 	}
 
 	// Proof environment with optional argument support
-	proof(label?: any): any[] {
+	proof(label?: unknown): unknown[] {
 		// Create proof header with optional label
-		let headerContent: any;
+		let headerContent: unknown;
 		if (label) {
 			headerContent = [label, this.g.createText(". ")];
 		} else {
@@ -227,7 +227,7 @@ export class Amsthm {
 	}
 
 	// QED symbol command
-	qed(): any[] {
+	qed(): unknown[] {
 		const qedSymbol = this.g.create(
 			"span",
 			this.g.createText("◻"),
@@ -237,56 +237,56 @@ export class Amsthm {
 	}
 
 	// Pre-defined theorem environment methods with optional argument support
-	theorem(title?: any): any[] {
+	theorem(title?: unknown): unknown[] {
 		return this.createTheoremContainer("theorem", title);
 	}
 
-	lemma(title?: any): any[] {
+	lemma(title?: unknown): unknown[] {
 		return this.createTheoremContainer("lemma", title);
 	}
 
-	corollary(title?: any): any[] {
+	corollary(title?: unknown): unknown[] {
 		return this.createTheoremContainer("corollary", title);
 	}
 
-	proposition(title?: any): any[] {
+	proposition(title?: unknown): unknown[] {
 		return this.createTheoremContainer("proposition", title);
 	}
 
-	definition(title?: any): any[] {
+	definition(title?: unknown): unknown[] {
 		return this.createTheoremContainer("definition", title);
 	}
 
-	example(title?: any): any[] {
+	example(title?: unknown): unknown[] {
 		return this.createTheoremContainer("example", title);
 	}
 
-	remark(title?: any): any[] {
+	remark(title?: unknown): unknown[] {
 		return this.createTheoremContainer("remark", title);
 	}
 
-	note(title?: any): any[] {
+	note(title?: unknown): unknown[] {
 		return this.createTheoremContainer("note", title);
 	}
 
-	observation(title?: any): any[] {
+	observation(title?: unknown): unknown[] {
 		return this.createTheoremContainer("observation", title);
 	}
 
-	claim(title?: any): any[] {
+	claim(title?: unknown): unknown[] {
 		return this.createTheoremContainer("claim", title);
 	}
 
-	fact(title?: any): any[] {
+	fact(title?: unknown): unknown[] {
 		return this.createTheoremContainer("fact", title);
 	}
 
-	conjecture(title?: any): any[] {
+	conjecture(title?: unknown): unknown[] {
 		return this.createTheoremContainer("conjecture", title);
 	}
 
 	// Create theorem container with header - parser will append content
-	private createTheoremContainer(envName: string, title?: any): any[] {
+	private createTheoremContainer(envName: string, title?: unknown): unknown[] {
 		// Get or create environment configuration
 		if (!this.theoremEnvironments[envName]) {
 			const defaultStyle = this.getDefaultStyle(envName);
@@ -342,7 +342,7 @@ export class Amsthm {
 		}
 
 		// Create theorem header with optional title
-		let headerContent: any;
+		let headerContent: unknown;
 		if (title) {
 			headerContent = [
 				this.g.createText(`${headerText} (`),

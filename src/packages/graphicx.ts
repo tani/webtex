@@ -2,7 +2,7 @@ import type { GraphicxGenerator } from "../interfaces";
 
 export class Graphicx {
 	static displayName = "Graphicx";
-	static args: Record<string, any[]> = {
+	static args: Record<string, unknown[]> = {
 		rotatebox: ["H", "kv?", "n", "hg"],
 		scalebox: ["H", "n", "n?", "g"],
 		reflectbox: ["H", "g"],
@@ -12,30 +12,35 @@ export class Graphicx {
 	};
 
 	private g: GraphicxGenerator;
-	options?: any;
+	options?: unknown;
 
-	constructor(generator: GraphicxGenerator, options?: any) {
+	constructor(generator: GraphicxGenerator, options?: unknown) {
 		this.g = generator;
 		this.options = options;
 	}
 
-	rotatebox(_kvl: any, _angle: any, _text: any): any[] {
+	rotatebox(_kvl: unknown, _angle: unknown, _text: unknown): unknown[] {
 		return [];
 	}
 
-	scalebox(_hsc: any, _vsc?: any, _text?: any): any[] {
+	scalebox(_hsc: unknown, _vsc?: unknown, _text?: unknown): unknown[] {
 		return [];
 	}
 
-	reflectbox(text: any): any[] {
+	reflectbox(text: unknown): unknown[] {
 		return this.scalebox(-1, 1, text);
 	}
 
-	resizebox(_s: any, _hl: any, _vl: any, _text: any): any[] {
+	resizebox(
+		_s: unknown,
+		_hl: unknown,
+		_vl: unknown,
+		_text: unknown,
+	): unknown[] {
 		return [];
 	}
 
-	graphicspath(_paths: any): any[] {
+	graphicspath(_paths: unknown): unknown[] {
 		return [];
 	}
 

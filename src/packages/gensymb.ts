@@ -4,7 +4,7 @@ type Generator = Record<string, unknown>;
 
 export class Gensymb {
 	static displayName = "Gensymb";
-	static args: Record<string, any[]> = {};
+	static args: Record<string, unknown[]> = {};
 
 	static symbols = new Map([
 		["degree", he.decode("&deg;")],
@@ -15,9 +15,9 @@ export class Gensymb {
 	]);
 
 	g: Generator;
-	options?: any;
+	options?: unknown;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: Generator, options?: unknown) {
 		this.g = generator;
 		this.options = options;
 	}

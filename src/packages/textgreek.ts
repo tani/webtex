@@ -4,7 +4,7 @@ type Generator = Record<string, unknown>;
 
 export class Textgreek {
 	static displayName = "Textgreek";
-	static args: Record<string, any[]> = {};
+	static args: Record<string, unknown[]> = {};
 
 	static symbols = new Map([
 		["textalpha", he.decode("&alpha;")],
@@ -64,9 +64,9 @@ export class Textgreek {
 	]);
 
 	g: Generator;
-	options?: any;
+	options?: unknown;
 
-	constructor(generator: Generator, options?: any) {
+	constructor(generator: Generator, options?: unknown) {
 		this.g = generator;
 		this.options = options;
 	}
