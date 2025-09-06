@@ -67,7 +67,7 @@ console.log(doc.documentElement.outerHTML);
 
 WebTeX includes a modern live preview application with real-time LaTeX compilation. You can use it online or run it locally:
 
-**Online Demo**: Visit [https://tani.github.io/webtex/](https://tani.github.io/webtex/) to try WebTeX directly in your browser.
+**Online Demo**: Visit [https://tani.github.io/webtex/](https://tani.github.io/webtex/) for the homepage or [https://tani.github.io/webtex/editor.html](https://tani.github.io/webtex/editor.html) to go directly to the live editor.
 
 **Local Development**:
 ```bash

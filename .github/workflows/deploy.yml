@@ -41,13 +41,14 @@ jobs:
         run: |
           mkdir -p gh-pages
           
-          # Copy the live preview app
-          cp -r app/* gh-pages/
-          
-          # Copy built assets
+          # Copy built assets first
           cp -r dist gh-pages/
           
-          # Create index.html that redirects to the app
+          # Copy app files but rename index.html to editor.html to avoid conflicts
+          cp app/main.js gh-pages/
+          cp app/styles.css gh-pages/
+          
+          # Create the main landing page as index.html
           cat > gh-pages/index.html << 'EOF'
           <!DOCTYPE html>
           <html>
@@ -141,7 +142,7 @@ jobs:
                   <h1>WebTeX</h1>
                   <p>A modern JavaScript LaTeX to HTML5 translator</p>
                   <div class="buttons">
-                      <a href="app.html" class="btn btn-primary">🚀 Try Live Editor</a>
+                      <a href="editor.html" class="btn btn-primary">🚀 Try Live Editor</a>
                       <a href="https://github.com/tani/webtex" class="btn btn-secondary">📚 View on GitHub</a>
                   </div>
               </div>
@@ -183,12 +184,8 @@ jobs:
           </html>
           EOF
           
-          # Rename the app's index.html to app.html for the live editor
-          mv gh-pages/index.html gh-pages/app.html
-          
-          # Move the landing page to index.html
-          mv gh-pages/app.html temp.html
-          cat > gh-pages/app.html << 'EOF'
+          # Create the live editor as editor.html
+          cat > gh-pages/editor.html << 'EOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
