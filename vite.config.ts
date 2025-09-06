@@ -50,35 +50,23 @@ function assetCopyPlugin() {
 }
 
 /**
- * Plugin to compile TypeScript modules and CLI
+ * Plugin to generate package placeholders
  */
-function typescriptModulesPlugin() {
+function packagePlaceholdersPlugin() {
 	return {
-		name: "typescript-modules",
+		name: "package-placeholders",
 		async writeBundle() {
-			console.log("Building TypeScript modules...");
+			console.log("Building package placeholders...");
 
 			try {
-				await Promise.all([buildPackages(), buildDocumentClasses()]);
-
 				await buildPackagePlaceholders();
-				console.log("TypeScript modules built successfully!");
+				console.log("Package placeholders built successfully!");
 			} catch (error) {
-				console.error("Error building TypeScript modules:", error);
+				console.error("Error building package placeholders:", error);
 				throw error;
 			}
 		},
 	};
-}
-
-async function buildPackages() {
-	await execAsync(`tsc src/packages/*.ts --outDir dist/packages`);
-	writeFileSync("dist/packages/.keep", "");
-}
-
-async function buildDocumentClasses() {
-	await execAsync(`tsc src/documentclasses/*.ts --outDir dist/documentclasses`);
-	writeFileSync("dist/documentclasses/.keep", "");
 }
 
 async function buildPackagePlaceholders() {
@@ -127,7 +115,7 @@ export default defineConfig(({ mode }) => {
 				trace: false,
 			}),
 			assetCopyPlugin(),
-			typescriptModulesPlugin(),
+			packagePlaceholdersPlugin(),
 			dts({
 				tsconfigPath: "./tsconfig.json",
 				include: ["src"],
