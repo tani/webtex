@@ -141,6 +141,7 @@ let errorFn = (e: string) => {
 };
 
 export abstract class Generator<TNode extends Node = Node> {
+	[key: string]: unknown;
 	public documentClass: string | null = null;
 	public documentTitle: string | null = null;
 	public Length: ReturnType<typeof makeLengthClass> | null = null;
@@ -175,7 +176,7 @@ export abstract class Generator<TNode extends Node = Node> {
 				align: null,
 				currentlabel: {
 					id: "",
-					label: document.createTextNode("") as unknown as TNode,
+					label: document.createTextNode("") as Node as TNode,
 				},
 				lengths: new Map(),
 			},
@@ -193,10 +194,13 @@ export abstract class Generator<TNode extends Node = Node> {
 		this.newCounter("enumiii");
 		this.newCounter("enumiv");
 
-		this._macros = new Macros(
-			this as unknown as ConstructorParameters<typeof Macros>[0],
+		const generatorForMacros = this as unknown;
+		const macros = new Macros(
+			generatorForMacros as ConstructorParameters<typeof Macros>[0],
 			this._options?.CustomMacros,
-		) as unknown as Record<string, MacroFunction>;
+		);
+		const macrosRecord = macros as unknown;
+		this._macros = macrosRecord as Record<string, MacroFunction>;
 	}
 
 	public nextId(): number {
@@ -519,20 +523,19 @@ export abstract class Generator<TNode extends Node = Node> {
 		}
 
 		let el: TNode;
-		const self = this as unknown as Record<string, unknown>;
 		if (!star && this.counter("secnumdepth") >= level) {
 			if (sec === "chapter") {
 				const chaphead = this.create(
-					self.block,
+					this.block,
 					this.macro("chaptername", []).concat(
 						this.createText(this.symbol("space")),
 						this.macro(`the${sec}`, []),
 					),
 				);
-				el = this.create(self[sec], [chaphead, ttl]);
+				el = this.create(this[sec], [chaphead, ttl]);
 			} else {
 				el = this.create(
-					self[sec],
+					this[sec],
 					this.macro(`the${sec}`, []).concat(
 						this.createText(this.symbol("quad")),
 						ttl,
@@ -542,10 +545,10 @@ export abstract class Generator<TNode extends Node = Node> {
 
 			const currentId = this._stack.top.currentlabel.id;
 			if (currentId != null) {
-				(el as unknown as { id: string }).id = currentId;
+				(el as Node as Element).id = currentId;
 			}
 		} else {
-			el = this.create(self[sec], ttl);
+			el = this.create(this[sec], ttl);
 		}
 
 		return el;
@@ -590,14 +593,8 @@ export abstract class Generator<TNode extends Node = Node> {
 	}
 
 	public theLength(id: string): TNode {
-		const l = this.create(
-			(this as unknown as Record<string, unknown>).inline,
-			undefined,
-			"the",
-		);
-		(
-			l as unknown as { setAttribute: (key: string, value: string) => void }
-		).setAttribute("display-var", id);
+		const l = this.create(this.inline, undefined, "the");
+		(l as Node as Element).setAttribute("display-var", id);
 		return l;
 	}
 
@@ -618,7 +615,7 @@ export abstract class Generator<TNode extends Node = Node> {
 
 		this._macros[`the${c}`] = function (this: { g: Generator<TNode> }) {
 			return [this.g.arabic(this.g.counter(c))];
-		} as unknown as MacroFunction;
+		} as MacroFunction;
 	}
 
 	public hasCounter(c: string): boolean {
@@ -652,8 +649,7 @@ export abstract class Generator<TNode extends Node = Node> {
 		let el: TNode | undefined;
 		if (!id) {
 			id = `${c}-${this.nextId()}`;
-			const anchor = (this as unknown as Record<string, (i: string) => unknown>)
-				.anchor;
+			const anchor = (this as Record<string, (i: string) => unknown>).anchor;
 			el = this.create(anchor(id));
 		}
 
@@ -787,7 +783,7 @@ export abstract class Generator<TNode extends Node = Node> {
 					r.removeChild(r.firstChild);
 				}
 				r.appendChild(this._stack.top.currentlabel.label.cloneNode(true));
-				(r as unknown as Element).setAttribute(
+				(r as Node as Element).setAttribute(
 					"href",
 					`#${this._stack.top.currentlabel.id}`,
 				);
@@ -798,8 +794,9 @@ export abstract class Generator<TNode extends Node = Node> {
 
 	public ref(label: string): TNode {
 		const labelData = this._labels.get(label);
-		const self = this as unknown as Record<string, unknown>;
-		const link = self.link as (href: string) => unknown;
+		const link = (this as Record<string, unknown>).link as (
+			href: string,
+		) => unknown;
 		if (labelData) {
 			return this.create(
 				link(`#${labelData.id}`),
@@ -829,16 +826,15 @@ export abstract class Generator<TNode extends Node = Node> {
 
 	public marginpar(txt: TNode): TNode {
 		const id = this.nextId();
-		const self = this as unknown as Record<string, unknown>;
-		const marginPar = this.create(self.block, [
-			this.create(self.inline, null, "mpbaseline"),
+		const marginPar = this.create(this.block, [
+			this.create(this.inline, null, "mpbaseline"),
 			txt,
 		]);
-		(marginPar as unknown as { id: number }).id = id;
+		Object.assign(marginPar, { id });
 		this._marginpars.push(marginPar);
 
-		const marginRef = this.create(self.inline, null, "mpbaseline");
-		(marginRef as unknown as { id: string }).id = `marginref-${id}`;
+		const marginRef = this.create(this.inline, null, "mpbaseline");
+		Object.assign(marginRef, { id: `marginref-${id}` });
 		return marginRef;
 	}
 }
