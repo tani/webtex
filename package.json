@@ -1,95 +1,95 @@
 {
-  "name": "latex.js",
-  "description": "JavaScript LaTeX to HTML5 translator",
-  "version": "0.12.6",
-  "author": {
-    "name": "Michael Brade",
-    "email": "brade@kde.org"
-  },
-  "keywords": [
-    "pegjs",
-    "latex",
-    "parser",
-    "html5"
-  ],
-  "bin": {
-    "latex.js": "./bin/latex.js"
-  },
-  "type": "module",
-  "main": "./dist/latex.js",
-  "exports": {
-    "import": "./dist/latex.js",
-    "default": "./dist/latex.js"
-  },
-  "browser": "./dist/latex.js",
-  "files": [
-    "bin/latex.js",
-    "dist/latex.js",
-    "dist/latex.js.map",
-    "dist/css/",
-    "dist/fonts/",
-    "dist/js/",
-    "dist/packages/",
-    "dist/documentclasses/"
-  ],
-  "scripts": {
-    "clean": "rimraf dist test/test-results.xml",
-    "build": "npm run clean && vite build",
-    "build:check": "test -d dist || npm run build",
-    "pretest": "vite build --mode test",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:api": "vitest run test/api.ts",
-    "test:cli": "vitest run test/cli.ts",
-    "test:parsing": "vitest run test/parsing.spec.ts",
-    "test:integration": "vitest run test/integration/",
-    "test:integration:update": "vitest run test/integration/ -u",
-    "test:visual": "vitest run test/visual/",
-    "test:screenshots": "vitest run test/visual/screenshots.spec.ts",
-    "test:update-snapshots": "vitest run -u",
-    "typecheck": "tsc --noEmit --skipLibCheck",
-    "lint": "biome check",
-    "lint:fix": "biome check --write",
-    "format": "biome format --write",
-    "format:check": "biome format"
-  },
-  "dependencies": {
-    "@svgdotjs/svg.js": "3.x",
-    "gunshi": "^0.26.3",
-    "he": "^1.2.0",
-    "hyphenation.de": "*",
-    "hyphenation.en-us": "*",
-    "hypher": "^0.2.5",
-    "mathjax": "^4.0.0",
-    "prettier": "^3.6.2",
-    "slugify": "^1.6.6",
-    "svgdom": "^0.1.8"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.2.2",
-    "@types/he": "^1.2.3",
-    "@types/node": "^24.3.0",
-    "@vitest/ui": "^3.2.4",
-    "decache": "^4.6.2",
-    "peggy": "^5.0.6",
-    "playwright": "^1.55.0",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.19",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^3.2.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/michael-brade/LaTeX.js.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/michael-brade/LaTeX.js/issues"
-  },
-  "homepage": "https://latex.js.org",
-  "engines": {
-    "node": ">= 14.0"
-  }
+	"name": "latex.js",
+	"description": "JavaScript LaTeX to HTML5 translator",
+	"version": "0.12.6",
+	"author": {
+		"name": "Michael Brade",
+		"email": "brade@kde.org"
+	},
+	"keywords": [
+		"pegjs",
+		"latex",
+		"parser",
+		"html5"
+	],
+	"bin": {
+		"latex.js": "./bin/latex.js"
+	},
+	"type": "module",
+	"main": "./dist/latex.js",
+	"exports": {
+		"import": "./dist/latex.js",
+		"default": "./dist/latex.js"
+	},
+	"browser": "./dist/latex.js",
+	"files": [
+		"bin/latex.js",
+		"dist/latex.js",
+		"dist/latex.js.map",
+		"dist/css/",
+		"dist/fonts/",
+		"dist/js/",
+		"dist/packages/",
+		"dist/documentclasses/"
+	],
+	"scripts": {
+		"clean": "rimraf dist test/test-results.xml",
+		"build": "npm run clean && vite build",
+		"build:check": "test -d dist || npm run build",
+		"pretest": "vite build --mode test",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"test:api": "vitest run test/api.ts",
+		"test:cli": "vitest run test/cli.ts",
+		"test:parsing": "vitest run test/parsing.spec.ts",
+		"test:integration": "vitest run test/integration/",
+		"test:integration:update": "vitest run test/integration/ -u",
+		"test:visual": "vitest run test/visual/",
+		"test:screenshots": "vitest run test/visual/screenshots.spec.ts",
+		"test:update-snapshots": "vitest run -u",
+		"typecheck": "tsc --noEmit --skipLibCheck",
+		"lint": "biome check",
+		"lint:fix": "biome check --write",
+		"format": "biome format --write",
+		"format:check": "biome format"
+	},
+	"dependencies": {
+		"@svgdotjs/svg.js": "3.x",
+		"gunshi": "^0.26.3",
+		"he": "^1.2.0",
+		"hyphenation.de": "*",
+		"hyphenation.en-us": "*",
+		"hypher": "^0.2.5",
+		"mathjax": "^4.0.0",
+		"prettier": "^3.6.2",
+		"slugify": "^1.6.6",
+		"svgdom": "^0.1.8"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.2",
+		"@types/he": "^1.2.3",
+		"@types/node": "^24.3.0",
+		"@vitest/ui": "^3.2.4",
+		"decache": "^4.6.2",
+		"peggy": "^5.0.6",
+		"playwright": "^1.55.0",
+		"rimraf": "^6.0.1",
+		"typescript": "^5.6.3",
+		"vite": "^5.4.19",
+		"vite-plugin-dts": "^4.5.4",
+		"vitest": "^3.2.4"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/michael-brade/LaTeX.js.git"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/michael-brade/LaTeX.js/issues"
+	},
+	"homepage": "https://latex.js.org",
+	"engines": {
+		"node": ">= 14.0"
+	}
 }
