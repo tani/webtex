@@ -1,4 +1,3 @@
-import { exec } from "node:child_process";
 import {
 	cpSync,
 	existsSync,
@@ -7,13 +6,10 @@ import {
 	writeFileSync,
 } from "node:fs";
 import path from "node:path";
-import { promisify } from "node:util";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 import pegjs from "./lib/vite-plugin-pegjs.mjs";
-
-const execAsync = promisify(exec);
 
 // Constants
 const PLACEHOLDER_PACKAGES = [
@@ -99,7 +95,6 @@ export default defineConfig(({ mode }) => {
 				formats: ["es"],
 			},
 			rollupOptions: {
-				external: ["mathjax"],
 				output: {
 					format: "es",
 					entryFileNames: "latex.js",

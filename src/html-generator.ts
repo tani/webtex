@@ -2,16 +2,26 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import mathjax from "mathjax";
+import type { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
+import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
+import { RegisterHTMLHandler } from "mathjax-full/js/handlers/html.js";
+import { AllPackages } from "mathjax-full/js/input/tex/AllPackages.js";
+import { TeX } from "mathjax-full/js/input/tex.js";
+import { mathjax } from "mathjax-full/js/mathjax.js";
+import { SVG as MJSVG } from "mathjax-full/js/output/svg.js";
 
-const MathJax = await mathjax.init({
-	loader: { load: ["input/tex", "output/svg", "[tex]/bussproofs"] },
-	startup: { typeset: false },
-	svg: { fontCache: "none" },
-	tex: {
-		packages: { "[+]": ["bussproofs"] },
-	},
-});
+const adaptor = liteAdaptor();
+RegisterHTMLHandler(adaptor);
+
+const tex = new TeX({ packages: AllPackages });
+const svg = new MJSVG({ fontCache: "none" });
+const documentHandler = mathjax.document("", { InputJax: tex, OutputJax: svg });
+
+const MathJax = {
+	tex2svg: (math: string, options?: { display?: boolean }): LiteElement =>
+		documentHandler.convert(math, { display: options?.display }),
+	startup: { adaptor, document: documentHandler },
+};
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -405,8 +415,10 @@ export class HtmlGenerator extends Generator {
 
 		// Add MathJax stylesheet using the proper method with fallback
 		try {
-			const jax = MathJax.startup.document.outputJax;
-			const mathJaxStyleElement = jax.styleSheet();
+			const jax = MathJax.startup.document.outputJax as {
+				styleSheet: (doc?: unknown) => Element | null;
+			};
+			const mathJaxStyleElement = jax.styleSheet(MathJax.startup.document);
 			if (mathJaxStyleElement) {
 				el.appendChild(mathJaxStyleElement.cloneNode(true));
 			} else {

@@ -11,17 +11,3 @@ declare module "hypher" {
 		patterns: unknown;
 	}
 }
-
-declare module "mathjax" {
-	interface MathJaxAPI {
-		tex2svg(math: string, options?: unknown): unknown;
-		startup: {
-			adaptor: { outerHTML(node: unknown): string };
-			document: { outputJax: { styleSheet(): Element | null } };
-		};
-	}
-	const mathjax: {
-		init(options?: unknown): Promise<MathJaxAPI>;
-	};
-	export default mathjax;
-}

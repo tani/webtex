@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaTeX.js Live Preview</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <div class="toolbar">
+            <h1>LaTeX.js Live Preview</h1>
+            <div class="toolbar-buttons">
+                <button id="example-article" title="Load article example">Article</button>
+                <button id="example-math" title="Load math example">Math</button>
+                <button id="example-table" title="Load table example">Table</button>
+                <button id="download-html" title="Download HTML">Download</button>
+                <button id="clear-editor" title="Clear editor">Clear</button>
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <div class="panel editor-panel">
+                <div class="panel-header">
+                    <h3>LaTeX Source</h3>
+                    <div class="editor-controls">
+                        <button id="wrap-toggle" title="Toggle line wrap">Wrap</button>
+                    </div>
+                </div>
+                <div class="editor-wrapper">
+                    <textarea id="latex-editor" placeholder="Enter your LaTeX code here..."></textarea>
+                </div>
+            </div>
+            
+            <div class="splitter"></div>
+            
+            <div class="panel preview-panel">
+                <div class="panel-header">
+                    <h3>HTML Preview</h3>
+                    <div class="preview-controls">
+                        <span id="compile-status">Ready</span>
+                    </div>
+                </div>
+                <div class="preview-wrapper">
+                    <div id="preview-content"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <span id="editor-stats">Lines: 0 | Characters: 0</span>
+            <span id="last-compile">Never compiled</span>
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+</body>
+</html>
