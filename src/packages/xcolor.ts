@@ -103,6 +103,7 @@ export class XColor {
 		const color: Record<string, unknown> = {};
 		for (let i = 0; i < models.models.length; i++) {
 			const model = models.models[i];
+			if (model === undefined) continue;
 			color[model] = colorspec[i];
 		}
 		XColor.colors.set(name, color);

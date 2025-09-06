@@ -284,7 +284,7 @@ export class HtmlGenerator extends Generator {
 		return svgInstance;
 	}
 
-	public MathJax = MathJax;
+	public MathJax: unknown = MathJax;
 
 	public reset(): void {
 		super.reset();
@@ -318,7 +318,7 @@ export class HtmlGenerator extends Generator {
 		if (this._activeAttributeValue("fontFamily") === "tt") {
 			return l;
 		} else {
-			return ligatures.get(l);
+			return ligatures.get(l) ?? l;
 		}
 	}
 
@@ -327,10 +327,14 @@ export class HtmlGenerator extends Generator {
 	}
 
 	public diacritic(d: string, c?: string): string {
+		const pair = diacritics.get(d);
+		if (!pair) {
+			return c ?? "";
+		}
 		if (!c) {
-			return diacritics.get(d)[1];
+			return pair[1];
 		} else {
-			return c + diacritics.get(d)[0];
+			return c + pair[0];
 		}
 	}
 
@@ -563,15 +567,13 @@ export class HtmlGenerator extends Generator {
 		return appendChildren(el, children) as Element;
 	}
 
-	public createText(t: string): Text | undefined {
-		if (!t) {
-			return undefined;
-		}
+	public createText(t: string): Text {
+		const text = t || "";
 		return this.addAttributes(
 			document.createTextNode(
-				this._options.hyphenate ? this._h?.hyphenateText(t) : t,
+				this._options.hyphenate ? (this._h?.hyphenateText(text) ?? text) : text,
 			),
-		);
+		) as Text;
 	}
 
 	public createVerbatim(t: string): Text | undefined {
@@ -581,13 +583,8 @@ export class HtmlGenerator extends Generator {
 		return document.createTextNode(t);
 	}
 
-	public createFragment(
-		...args: unknown[]
-	): DocumentFragment | Element | undefined {
+	public createFragment(...args: unknown[]): DocumentFragment | Element {
 		const children = compact(flattenDeep(args)) as Node[];
-		if (args.length > 0 && (!children || !children.length)) {
-			return undefined;
-		}
 
 		if (children.length === 1 && (children[0] as Node).nodeType) {
 			return children[0] as Element;

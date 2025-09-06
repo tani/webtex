@@ -39,11 +39,13 @@ export class Report extends Base {
 	}
 
 	part(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("part", -1, s, toc, ttl)];
+		const el = this.g.startsection("part", -1, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	chapter(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("chapter", 0, s, toc, ttl)];
+		const el = this.g.startsection("chapter", 0, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	thechapter(): string[] {
@@ -70,21 +72,21 @@ export class Report extends Base {
 	}
 
 	tableofcontents(): Element[] {
-		return (
-			this.chapter(true, undefined, this.g.macro("contentsname")) as Element[]
-		).concat([this.g._toc]);
+		const head = this.chapter(true, undefined, this.g.macro("contentsname"));
+		const toc = this.g._toc ? [this.g._toc] : [];
+		return head.concat(toc);
 	}
 
 	abstract(): Element[] {
-		this.g.setFontSize("small");
-		this.g.enterGroup();
-		this.g.setFontWeight("bf");
+		this.g.setFontSize?.("small");
+		this.g.enterGroup?.();
+		this.g.setFontWeight?.("bf");
 		const head = this.g.create(
 			this.g.list,
 			this.g.macro("abstractname"),
 			"center",
 		);
-		this.g.exitGroup();
+		this.g.exitGroup?.();
 		return [head].concat(this.quotation());
 	}
 

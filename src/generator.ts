@@ -7,7 +7,7 @@ type MacroFunction = (...args: unknown[]) => unknown;
 interface GeneratorOptions {
 	documentClass?: string;
 	precision?: number;
-	CustomMacros?: new (g: Generator<Node>) => Record<string, unknown>;
+	CustomMacros?: new (g: unknown) => Record<string, unknown>;
 	[key: string]: unknown;
 }
 
@@ -59,6 +59,10 @@ interface ArgumentFrame {
 }
 
 // Modern deep equality function
+const isRecord = (v: unknown): v is Record<string, unknown> => {
+	return typeof v === "object" && v !== null;
+};
+
 const deepEqual = (a: unknown, b: unknown, type: string = "==="): boolean => {
 	if (a == null || b == null) return a === b;
 	if (a === b)
@@ -104,15 +108,20 @@ const deepEqual = (a: unknown, b: unknown, type: string = "==="): boolean => {
 		return true;
 	}
 
-	const keysA = Object.keys(a);
-	const keysB = Object.keys(b);
+	// Ensure non-array objects for safe indexing
+	if (!isRecord(a) || !isRecord(b)) return false;
+
+	const objA = a as Record<string, unknown>;
+	const objB = b as Record<string, unknown>;
+	const keysA = Object.keys(objA);
+	const keysB = Object.keys(objB);
 
 	if (type === "===") return keysA.length === keysB.length;
 	if (type === "<==") return keysA.length <= keysB.length;
 	if (type === "<<=") return keysA.length < keysB.length;
 
 	for (const key of keysA) {
-		if (!keysB.includes(key) || !deepEqual(a[key], b[key])) return false;
+		if (!keysB.includes(key) || !deepEqual(objA[key], objB[key])) return false;
 	}
 
 	return true;
@@ -144,7 +153,7 @@ export abstract class Generator<TNode extends Node = Node> {
 	[key: string]: unknown;
 	public documentClass: string | null = null;
 	public documentTitle: string | null = null;
-	public Length: ReturnType<typeof makeLengthClass> | null = null;
+	public Length!: ReturnType<typeof makeLengthClass>;
 
 	protected _options: GeneratorOptions | null = null;
 	protected _macros: Record<string, MacroFunction> = {};
@@ -286,7 +295,7 @@ export abstract class Generator<TNode extends Node = Node> {
 		const result = this._macros[name]?.apply(this._macros, args);
 		return result
 			?.filter((x: unknown): x is string | TNode => x !== undefined)
-			.map((x) => {
+			.map((x: string | TNode) => {
 				if (typeof x === "string" || x instanceof String) {
 					return this.createText(x.toString());
 				} else {
@@ -499,8 +508,9 @@ export abstract class Generator<TNode extends Node = Node> {
 
 	public _activeAttributeValue(attr: string): string | undefined {
 		for (let i = this._stack.length - 1; i >= 0; i--) {
+			const frame = this._stack[i];
 			const value =
-				this._stack[i].attrs[attr as keyof (typeof this._stack)[0]["attrs"]];
+				frame?.attrs[attr as keyof (typeof this._stack)[0]["attrs"]];
 			if (value) {
 				return value;
 			}
@@ -528,18 +538,19 @@ export abstract class Generator<TNode extends Node = Node> {
 			if (sec === "chapter") {
 				const chaphead = this.create(
 					this.block,
-					this.macro("chaptername", []).concat(
+					(this.macro("chaptername", []) ?? []).concat(
 						this.createText(this.symbol("space")),
-						this.macro(`the${sec}`, []),
+						...(this.macro(`the${sec}`, []) ?? []),
 					),
 				);
-				el = this.create(this[sec], [chaphead, ttl]);
+				const kids = (ttl ? [chaphead, ttl] : [chaphead]) as TNode[];
+				el = this.create(this[sec], kids);
 			} else {
 				el = this.create(
 					this[sec],
-					this.macro(`the${sec}`, []).concat(
+					(this.macro(`the${sec}`, []) ?? []).concat(
 						this.createText(this.symbol("quad")),
-						ttl,
+						...(ttl ? [ttl] : []),
 					),
 				);
 			}
@@ -650,15 +661,19 @@ export abstract class Generator<TNode extends Node = Node> {
 		let el: TNode | undefined;
 		if (!id) {
 			id = `${c}-${this.nextId()}`;
-			const anchor = (this as Record<string, (i: string) => unknown>).anchor;
-			el = this.create(anchor(id));
+			const anchor = (
+				this as Record<string, ((i?: string) => unknown) | undefined>
+			).anchor;
+			if (typeof anchor === "function") {
+				el = this.create(anchor(id));
+			}
 		}
 
 		this._stack.top.currentlabel = {
 			id: id,
 			label: this.createFragment(
-				...(this.hasMacro(`p@${c}`) ? this.macro(`p@${c}`, []) || [] : []),
-				...(this.macro(`the${c}`, []) || []),
+				...((this.hasMacro(`p@${c}`) ? this.macro(`p@${c}`, []) : []) ?? []),
+				...((this.macro(`the${c}`, []) ?? []) as TNode[]),
 			),
 		};
 

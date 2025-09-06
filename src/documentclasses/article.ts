@@ -28,21 +28,21 @@ export class Article extends Base {
 	}
 
 	tableofcontents(): Element[] {
-		return (
-			this.section(true, undefined, this.g.macro("contentsname")) as Element[]
-		).concat([this.g._toc]);
+		const head = this.section(true, undefined, this.g.macro("contentsname"));
+		const toc = this.g._toc ? [this.g._toc] : [];
+		return head.concat(toc);
 	}
 
 	abstract(): Element[] {
-		this.g.setFontSize("small");
-		this.g.enterGroup();
-		this.g.setFontWeight("bf");
+		this.g.setFontSize?.("small");
+		this.g.enterGroup?.();
+		this.g.setFontWeight?.("bf");
 		const head = this.g.create(
 			this.g.list,
 			this.g.macro("abstractname"),
 			"center",
 		);
-		this.g.exitGroup();
+		this.g.exitGroup?.();
 		return [head].concat(this.quotation());
 	}
 
@@ -60,7 +60,7 @@ export class Article extends Base {
 
 	// Method that will be dynamically overridden in appendix()
 	thesection(): string[] {
-		return super.thesection ? super.thesection() : [];
+		return super.thesection();
 	}
 
 	// Methods inherited from Base or provided via macros; type-only declarations

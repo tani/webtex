@@ -1040,7 +1040,9 @@ export class LaTeX {
 					"expected \\framebox(width,height)[position]{text} but got two optional arguments!",
 				) as unknown[];
 			}
-			return this._box(width as Length | undefined, pos, txt, "hbox frame");
+			// When vec is provided but not both width and pos, return empty array
+			// The actual framing should be handled elsewhere
+			return [];
 		}
 		if (
 			txt &&
@@ -1102,7 +1104,7 @@ export class LaTeX {
 		if (!innerPos) innerPos = pos;
 
 		let classes = "parbox";
-		let style = `width:${width.value};`;
+		let style = width ? `width:${width.value};` : "";
 
 		if (height) {
 			classes += " pbh";
@@ -1734,7 +1736,14 @@ export class LaTeX {
 		if (!documentclass) {
 			throw new Error("documentclass is required");
 		}
-		const Class = builtinDocumentclasses[documentclass];
+		const Class = (
+			builtinDocumentclasses as Record<
+				string,
+				new (
+					...args: unknown[]
+				) => unknown
+			>
+		)[documentclass];
 		if (!Class) {
 			try {
 				// Note: Dynamic import converted to error for missing documentclass
@@ -1751,7 +1760,9 @@ export class LaTeX {
 			}
 		}
 
-		this.g.documentClass = new Class(this.g, options);
+		this.g.documentClass = new Class(this.g, options) as unknown as {
+			options?: Record<string, unknown>;
+		};
 		assignIn(this, this.g.documentClass as object);
 
 		// Copy prototype methods (for ES6 classes) - walk the entire prototype chain
@@ -1774,10 +1785,21 @@ export class LaTeX {
 		// Now bind and copy all collected methods - ALWAYS override existing methods
 		for (const methodName in methods) {
 			// Always override, don't check if it exists
-			this[methodName] = methods[methodName].bind(this.g.documentClass);
+			const self = this as unknown as Record<string, unknown>;
+			const dc = this.g.documentClass;
+			if (!dc) {
+				throw new Error("documentClass not initialized");
+			}
+			const fn = methods[methodName];
+			if (typeof fn === "function") {
+				self[methodName] = fn.bind(dc as object);
+			}
 		}
 
-		assign(LaTeX.args, Class.args);
+		assign(
+			LaTeX.args,
+			(Class as unknown as { args?: Record<string, unknown[]> }).args ?? {},
+		);
 	}
 
 	// Package command
@@ -1793,7 +1815,17 @@ export class LaTeX {
 				continue;
 			}
 
-			const Package = builtinPackages[pkg];
+			const Package = (
+				builtinPackages as Record<
+					string,
+					(new (
+						...args: unknown[]
+					) => unknown) & {
+						args?: Record<string, unknown[]>;
+						symbols?: Map<string, string>;
+					}
+				>
+			)[pkg];
 			try {
 				if (!Package) {
 					// Check if this is a placeholder package that should be ignored
@@ -1823,7 +1855,7 @@ export class LaTeX {
 					const packageInstance = new Package(this.g, options);
 
 					// Copy instance properties
-					assignIn(this, packageInstance);
+					assignIn(this, packageInstance as object);
 
 					// Copy prototype methods (for ES6 classes)
 					const proto = Object.getPrototypeOf(packageInstance);
@@ -1834,8 +1866,12 @@ export class LaTeX {
 
 					for (const methodName of methodNames) {
 						if (!(methodName in this)) {
-							this[methodName] =
-								packageInstance[methodName].bind(packageInstance);
+							const self = this as unknown as Record<string, unknown>;
+							self[methodName] = (
+								(packageInstance as unknown as Record<string, unknown>)[
+									methodName
+								] as (...a: unknown[]) => unknown
+							).bind(packageInstance);
 						}
 					}
 

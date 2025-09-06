@@ -156,27 +156,33 @@ export class Base {
 	}
 
 	part(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("part", 0, s, toc, ttl)];
+		const el = this.g.startsection("part", 0, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	section(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("section", 1, s, toc, ttl)];
+		const el = this.g.startsection("section", 1, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	subsection(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("subsection", 2, s, toc, ttl)];
+		const el = this.g.startsection("subsection", 2, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	subsubsection(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("subsubsection", 3, s, toc, ttl)];
+		const el = this.g.startsection("subsubsection", 3, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	paragraph(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("paragraph", 4, s, toc, ttl)];
+		const el = this.g.startsection("paragraph", 4, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	subparagraph(s: boolean, toc?: unknown, ttl?: unknown): Element[] {
-		return [this.g.startsection("subparagraph", 5, s, toc, ttl)];
+		const el = this.g.startsection("subparagraph", 5, s, toc, ttl);
+		return el ? [el] : [];
 	}
 
 	thepart(): string[] {

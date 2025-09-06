@@ -1,4 +1,4 @@
-import he from "he";
+import * as he from "he";
 
 import type { StixGenerator } from "../interfaces";
 

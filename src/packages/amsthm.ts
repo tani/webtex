@@ -56,7 +56,11 @@ export class Amsthm {
 	};
 
 	private g: AmsthrmGenerator;
-	private theoremStyles: Record<string, TheoremStyle>;
+	private theoremStyles: {
+		plain: TheoremStyle;
+		definition: TheoremStyle;
+		remark: TheoremStyle;
+	} & Record<string, TheoremStyle>;
 	private currentStyle: string = "plain";
 	private theoremEnvironments: Record<string, TheoremEnvironment> = {};
 	private counters: Record<string, number> = {};
@@ -150,7 +154,8 @@ export class Amsthm {
 				counter: numbered ? counterName : undefined,
 				parentCounter: parentResetBy,
 				numbered: numbered,
-				style: this.theoremStyles[this.currentStyle],
+				style:
+					this.theoremStyles[this.currentStyle] ?? this.theoremStyles.plain,
 				sharedWith: sharedWith,
 			};
 
@@ -295,7 +300,7 @@ export class Amsthm {
 				displayName: this.capitalizeFirst(envName),
 				numbered: true,
 				counter: envName,
-				style: this.theoremStyles[defaultStyle],
+				style: this.theoremStyles[defaultStyle] ?? this.theoremStyles.plain,
 			};
 			this.theoremEnvironments[envName] = environment;
 

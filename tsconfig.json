@@ -14,9 +14,9 @@
 		"outDir": "dist",
 		"removeComments": false,
 		"strict": false,
-		"noImplicitAny": false,
-		"strictNullChecks": false,
-		"strictFunctionTypes": false,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"strictFunctionTypes": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedIndexedAccess": true,
@@ -29,6 +29,6 @@
 		"noEmit": true
 	},
 	"include": ["src/**/*"],
-	"files": ["test/types/globals.d.ts"],
+	"files": ["test/types/globals.d.ts", "src/types/external.d.ts"],
 	"exclude": ["node_modules", "dist", "docs", "website", "**/*.d.ts"]
 }
