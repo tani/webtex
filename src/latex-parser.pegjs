@@ -148,7 +148,8 @@ hmode_macro =
   /
     escape
     m:(
-      &is_hmode     m:macro         { return m; }
+      verbatim_env
+    / &is_hmode     m:macro         { return m; }
     / &is_hmode_env e:h_environment { return e; }
 
     / noindent
@@ -173,7 +174,8 @@ vmode_macro =
     skip_all_space
     escape
     m:(
-        &is_vmode     m:macro       { g.break(); return m; }
+        verbatim_env
+      / &is_vmode     m:macro       { g.break(); return m; }
       / &is_vmode_env e:environment { return e; }
       / vspace_vmode
       / smbskip_vmode
@@ -707,6 +709,18 @@ verb            =   "verb" s:"*"? _ !char
 
                         return g.create(g.verb, g.createVerbatim(v, true));
                     }
+
+// verbatim - multi-line verbatim environment
+verbatim_env "verbatim environment" =
+    begin begin_group "verbatim" s:"*"? end_group
+        v:$((!"\\end{verbatim" .)*)
+    "\\end{verbatim" e:"*"? "}" _
+    {
+        e === s || error(`verbatim environment is missing its end delimiter`);
+        if (s) v = v.replace(/ /g, g.visp);
+        g.break();
+        return g.create(g.verbatim, g.create(g.verb, g.createVerbatim(v)));
+    }
 
 
 
