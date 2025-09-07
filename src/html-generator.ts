@@ -588,8 +588,8 @@ export class HtmlGenerator extends Generator {
 
 		try {
 			const loc = this.location();
-			el.setAttribute("data-line", String(loc.start.line));
-			el.setAttribute("data-column", String(loc.start.column));
+			el.setAttribute("data-source-line", String(loc.start.line));
+			el.setAttribute("data-source-column", String(loc.start.column));
 		} catch {
 			// location not available outside parser context
 		}

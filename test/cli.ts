@@ -89,7 +89,7 @@ describe("LaTeX.js CLI test", () => {
 			const output = fs.readFileSync(outputFile.name, "utf8");
 			expect(output).toContain("Hello");
 			expect(output).toContain(
-				'<span data-line="1" data-column="8" class="latex">L<span class="a" data-line="1" data-column="8">a</span>T<span class="e" data-line="1" data-column="8">e</span>X</span>',
+				'<span data-source-line="1" data-source-column="8" class="latex">L<span class="a" data-source-line="1" data-source-column="8">a</span>T<span class="e" data-source-line="1" data-source-column="8">e</span>X</span>',
 			);
 		} finally {
 			tmpFile.removeCallback();
