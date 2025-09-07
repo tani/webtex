@@ -129,7 +129,7 @@ async function bundleApplication(): Promise<void> {
 			target: "browser",
 			naming: {
 				entry: "webtex.browser.js",
-			}
+			},
 		});
 
 		// Node bundle
