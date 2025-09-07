@@ -488,46 +488,17 @@ export class HtmlGenerator extends Generator {
 	 */
 	public domFragment(): DocumentFragment {
 		const el = document.createDocumentFragment();
-		const bodyEl = this.create(this.block, this._dom, "body");
-
+		el.appendChild(this.create(this.block, this._dom, "body"));
 		const marginPars = this._marginpars;
 		if (marginPars.length) {
-			marginPars.forEach((noteNode) => {
-				const note = noteNode as HTMLElement & { id?: string };
-				const id = note.id;
-				if (!id) {
-					return;
-				}
-
-				const ref = bodyEl.querySelector<HTMLElement>(`#marginref-${id}`);
-				if (!ref) {
-					return;
-				}
-
-				const block = ref.closest<HTMLElement>("p");
-				if (!block) {
-					return;
-				}
-
-				ref.remove();
-
-				const wrapper = this.create(this.block, null, "content-with-note");
-				const main = this.create(this.block, null, "main-text");
-				wrapper.appendChild(main);
-				const aside = this.create(
-					() => document.createElement("aside"),
-					null,
-					"margin-note",
-				);
-				note.querySelector(".mpbaseline")?.remove();
-				aside.appendChild(note);
-				wrapper.appendChild(aside);
-				block.replaceWith(wrapper);
-				main.appendChild(block);
-			});
+			el.appendChild(
+				this.create(
+					this.block,
+					this.create(this.block, marginPars, "marginpar"),
+					"margin-right",
+				),
+			);
 		}
-
-		el.appendChild(bodyEl);
 		return el;
 	}
 

@@ -109,7 +109,6 @@ body,
 			--textwidth
 		) [margin-right] var(--marginrightwidth);
 	grid-template-rows: auto;
-	column-gap: var(--marginparsep);
 
 	margin: 0;
 	padding: 0;
@@ -122,12 +121,8 @@ body,
 
 /* LaTeX page body */
 .body {
-	display: contents;
-}
-
-/* default placement for content */
-.body > :not(.content-with-note) {
 	grid-column: body;
+	grid-row: 1;
 }
 
 /* LaTeX page margins */
@@ -147,41 +142,20 @@ body,
 	display: flex;
 }
 
-/* margin notes layout */
-.content-with-note {
-	display: contents;
-}
+.marginpar {
+	width: var(--marginparwidth); /* ideally in percent relative to margin */
+	min-width: var(
+		--marginparwidth
+	); /* min-width if in grid/flex container, to force this width */
 
-.content-with-note > .main-text {
-	grid-column: body;
-	margin-bottom: 1.5rem;
-}
-
-.content-with-note > .margin-note {
-	grid-column: margin-right;
-	width: var(--marginparwidth);
-	max-width: var(--marginparwidth);
 	margin-left: var(--marginparsep);
 	margin-right: var(--marginparsep);
-	margin-bottom: 1.5rem;
-	font-size: 0.9em;
-	color: #555;
-	align-self: start;
 }
 
-@media (max-width: 768px) {
-	body,
-	.page {
-		display: block;
-	}
-
-	.content-with-note > .margin-note {
-		grid-column: body;
-		margin-left: 0;
-		margin-top: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid #ccc;
-	}
+.marginpar > * {
+	padding-bottom: var(
+		--marginparpush
+	); /* use padding, which is included in offsetHeight, margin is not */
 }
 
 /* columns */
