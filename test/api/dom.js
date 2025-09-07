@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
-import { document, HtmlGenerator, parse, window } from "../../dist/webtex.js";
+import {
+	document,
+	HtmlGenerator,
+	parse,
+	window,
+} from "../../dist/webtex.browser.js";
 
 void window;
 void document;

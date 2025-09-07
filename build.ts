@@ -124,15 +124,27 @@ async function bundleApplication(): Promise<void> {
 	const start = Date.now();
 
 	try {
+		// Browser bundle
 		await bunBuild({
 			entrypoints: [CONFIG.paths.entrypoint],
 			outdir: CONFIG.paths.distDir,
 			format: CONFIG.bundler.format,
 			target: CONFIG.bundler.target,
 			naming: {
-				entry: CONFIG.bundler.outputName,
+				entry: "webtex.browser.js",
 			},
 			external: CONFIG.bundler.external,
+		});
+
+		// Node bundle
+		await bunBuild({
+			entrypoints: [CONFIG.paths.entrypoint],
+			outdir: CONFIG.paths.distDir,
+			format: CONFIG.bundler.format,
+			target: "node",
+			naming: {
+				entry: "webtex.node.js",
+			},
 		});
 
 		log.timing("Bundled application", Date.now() - start);

@@ -4,7 +4,12 @@ import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import slugify from "slugify";
-import { document, HtmlGenerator, parse, window } from "../../dist/webtex";
+import {
+	document,
+	HtmlGenerator,
+	parse,
+	window,
+} from "../../dist/webtex.node.js";
 import { type FixtureItem, load as loadFixture } from "./load-fixtures";
 
 function resetSvgIds() {

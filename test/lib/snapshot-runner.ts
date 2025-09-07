@@ -1,6 +1,11 @@
 import { expect, test } from "bun:test";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
-import { document, HtmlGenerator, parse, window } from "../../dist/webtex";
+import {
+	document,
+	HtmlGenerator,
+	parse,
+	window,
+} from "../../dist/webtex.node.js";
 
 function resetSvgIds() {
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {

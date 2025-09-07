@@ -19,16 +19,25 @@
 		"webtex": "./bin/webtex.js"
 	},
 	"type": "module",
-	"main": "./dist/webtex.js",
+	"main": "./dist/webtex.node.js",
 	"exports": {
-		"import": "./dist/webtex.js",
-		"default": "./dist/webtex.js"
+		".": {
+			"browser": "./dist/webtex.browser.js",
+			"node": "./dist/webtex.node.js",
+			"default": "./dist/webtex.browser.js"
+		}
 	},
-	"browser": "./dist/webtex.js",
+	"browser": "./dist/webtex.browser.js",
 	"files": [
 		"bin/",
 		"dist/"
 	],
+	"imports": {
+		"#window": {
+			"node": "./src/window.node.ts",
+			"default": "./src/window.browser.ts"
+		}
+	},
 	"scripts": {
 		"clean": "rm -rf dist test/test-results.xml",
 		"build": "bun run clean && bun run build.ts",
