@@ -90,21 +90,6 @@ class WebTeXLivePreview {
 			this.editor.value = `${value.substring(0, start)}  ${value.substring(end)}`;
 			this.editor.selectionStart = this.editor.selectionEnd = start + 2;
 		}
-
-		// Handle auto-closing brackets
-		if (e.key === "{") {
-			e.preventDefault();
-			this.insertText("{}");
-			this.editor.selectionStart = this.editor.selectionEnd -= 1;
-		} else if (e.key === "[") {
-			e.preventDefault();
-			this.insertText("[]");
-			this.editor.selectionStart = this.editor.selectionEnd -= 1;
-		} else if (e.key === "(") {
-			e.preventDefault();
-			this.insertText("()");
-			this.editor.selectionStart = this.editor.selectionEnd -= 1;
-		}
 	}
 
 	insertText(text) {
