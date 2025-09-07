@@ -14,9 +14,6 @@ const CONFIG = {
 	},
 	bundler: {
 		format: "esm" as const,
-		target: "browser" as const,
-		outputName: "webtex.js",
-		external: ["svgdom"] as string[],
 	},
 	pegjs: {
 		output: "source" as const,
@@ -129,11 +126,10 @@ async function bundleApplication(): Promise<void> {
 			entrypoints: [CONFIG.paths.entrypoint],
 			outdir: CONFIG.paths.distDir,
 			format: CONFIG.bundler.format,
-			target: CONFIG.bundler.target,
+			target: "browser",
 			naming: {
 				entry: "webtex.browser.js",
-			},
-			external: CONFIG.bundler.external,
+			}
 		});
 
 		// Node bundle
