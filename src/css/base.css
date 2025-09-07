@@ -169,21 +169,6 @@ body,
 	align-self: start;
 }
 
-@media (max-width: 768px) {
-	body,
-	.page {
-		display: block;
-	}
-
-	.content-with-note > .margin-note {
-		grid-column: body;
-		margin-left: 0;
-		margin-top: 1rem;
-		padding-top: 1rem;
-		border-top: 1px solid #ccc;
-	}
-}
-
 /* columns */
 .onecolumn {
 	column-count: 1;

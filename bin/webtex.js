@@ -194,9 +194,6 @@ async function main(ctx) {
 				try {
 					html = await prettier.format(html, {
 						parser: "html",
-						printWidth: 120,
-						htmlWhitespaceSensitivity: "ignore",
-						singleAttributePerLine: false,
 					});
 				} catch (_error) {
 					console.warn(
