@@ -14,17 +14,20 @@ import { cli } from "gunshi";
 import de from "hyphenation.de";
 import en from "hyphenation.en-us";
 import prettier from "prettier";
-import { createHTMLWindow } from "svgdom";
-
 
 const info = JSON.parse(
 	readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 );
-
-global.window = createHTMLWindow();
-global.document = window.document;
-
-const { HtmlGenerator, he, parse: latexParse } = await import("../dist/webtex.js");
+const {
+	HtmlGenerator,
+	he,
+	parse: latexParse,
+	window,
+	document,
+} = await import("../dist/webtex.js");
+// ensure window and document are initialized
+void window;
+void document;
 he.encode.options.strict = true;
 he.encode.options.useNamedReferences = true;
 const command = {

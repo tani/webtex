@@ -35,6 +35,7 @@ const flattenDeep = (arr: unknown[]): unknown[] =>
 
 import { Generator } from "./generator";
 import { diacritics, ligatures } from "./symbols";
+import { document, window } from "./window";
 
 interface HtmlGeneratorOptions {
 	documentClass: string;

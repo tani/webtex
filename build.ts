@@ -16,7 +16,7 @@ const CONFIG = {
 		format: "esm" as const,
 		target: "browser" as const,
 		outputName: "webtex.js",
-		externals: ["mathjax"],
+		externals: ["mathjax", "svgdom"],
 	},
 	pegjs: {
 		output: "source" as const,

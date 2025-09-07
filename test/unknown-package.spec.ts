@@ -1,20 +1,8 @@
 import { describe, expect, it, spyOn } from "bun:test";
-import { createHTMLWindow } from "svgdom";
-import { HtmlGenerator, parse } from "../src/index.ts";
+import { document, HtmlGenerator, parse, window } from "../src/index.ts";
 
-const window = createHTMLWindow();
-(
-	globalThis as unknown as {
-		window: typeof window;
-		document: Document;
-	}
-).window = window;
-(
-	globalThis as unknown as {
-		window: typeof window;
-		document: Document;
-	}
-).document = window.document;
+void window;
+void document;
 
 describe("Unknown package handling", () => {
 	it("warns and continues when package is missing", () => {

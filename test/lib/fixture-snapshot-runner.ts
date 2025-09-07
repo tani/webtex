@@ -4,18 +4,8 @@ import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import slugify from "slugify";
-import { createHTMLWindow } from "svgdom";
-import { HtmlGenerator, parse } from "../../dist/webtex";
+import { document, HtmlGenerator, parse, window } from "../../dist/webtex";
 import { type FixtureItem, load as loadFixture } from "./load-fixtures";
-
-// Set up DOM for Node.js environment
-const window = createHTMLWindow() as Window & typeof globalThis;
-const globalWithDom = globalThis as typeof globalThis & {
-	window: Window & typeof globalThis;
-	document: Document;
-};
-globalWithDom.window = window;
-globalWithDom.document = window.document;
 
 function resetSvgIds() {
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {

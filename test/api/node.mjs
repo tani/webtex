@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import { createHTMLWindow } from "svgdom";
 // #region code
-import { HtmlGenerator, parse } from "webtex";
+import { document, HtmlGenerator, parse, window } from "webtex";
 
-global.window = createHTMLWindow();
-global.document = window.document;
+void window;
+void document;
 
 const latex = "Hi, this is a line of text.";
 

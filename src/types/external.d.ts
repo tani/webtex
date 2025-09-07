@@ -11,3 +11,7 @@ declare module "hypher" {
 		patterns: unknown;
 	}
 }
+
+declare module "svgdom" {
+	export function createHTMLWindow(title?: string): Window & typeof globalThis;
+}

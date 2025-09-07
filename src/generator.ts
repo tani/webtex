@@ -1,6 +1,7 @@
 import { LaTeX } from "./latex.ltx";
 import { symbols } from "./symbols";
 import { makeLengthClass } from "./types";
+import { document } from "./window";
 
 type MacroFunction = (...args: unknown[]) => unknown;
 

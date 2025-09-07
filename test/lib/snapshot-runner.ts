@@ -1,16 +1,6 @@
 import { expect, test } from "bun:test";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
-import { createHTMLWindow } from "svgdom";
-import { HtmlGenerator, parse } from "../../dist/webtex";
-
-// Set up DOM for Node.js environment
-const window = createHTMLWindow() as Window & typeof globalThis;
-const globalWithDom = globalThis as typeof globalThis & {
-	window: Window & typeof globalThis;
-	document: Document;
-};
-globalWithDom.window = window;
-globalWithDom.document = window.document;
+import { document, HtmlGenerator, parse, window } from "../../dist/webtex";
 
 function resetSvgIds() {
 	const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
