@@ -14,17 +14,18 @@ import { cli } from "gunshi";
 import de from "hyphenation.de";
 import en from "hyphenation.en-us";
 import prettier from "prettier";
+import {
+	document,
+	HtmlGenerator,
+	he,
+	parse as latexParse,
+	window,
+} from "../dist/webtex.js";
 
 const info = JSON.parse(
 	readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 );
-const {
-	HtmlGenerator,
-	he,
-	parse: latexParse,
-	window,
-	document,
-} = await import("../dist/webtex.js");
+
 // ensure window and document are initialized
 void window;
 void document;
