@@ -213,7 +213,7 @@ bun test test/visual/screenshots.spec.ts   # Run screenshot comparison tests
 
 ### Directory Organization
 ```
-latex.js/
+webtex/
 ├── src/                    # TypeScript source files
 │   ├── documentclasses/    # LaTeX document class implementations
 │   ├── packages/          # LaTeX package implementations  
@@ -226,7 +226,7 @@ latex.js/
 │   ├── integration/      # End-to-end workflow tests
 │   └── visual/           # Visual regression tests
 ├── lib/                   # Build utilities and Vite plugins
-└── bin/latex.js          # CLI entry point
+└── bin/webtex             # CLI entry point
 ```
 
 ### Key Files
