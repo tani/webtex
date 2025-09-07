@@ -46,6 +46,13 @@ describe("LaTeX.js Parsing Tests", () => {
 		});
 	});
 
+	describe("FBox with verb", () => {
+		const fixtureFile = path.join(__dirname, "fixtures/fbox-verb.tex");
+		migrateFixtureFile(fixtureFile, "fbox-verb.tex", {
+			strategy: "snapshot-only",
+		});
+	});
+
 	describe("Macros", () => {
 		const fixtureFile = path.join(__dirname, "fixtures/macros.tex");
 		migrateFixtureFile(fixtureFile, "macros.tex", {

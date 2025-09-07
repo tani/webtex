@@ -1017,34 +1017,57 @@ export class LaTeX {
 		pos?: string,
 		txt?: unknown,
 	): unknown[] {
+		// Case 1: vector mode — validate optional args and exit early
 		if (vec) {
 			if (width && pos) {
 				return this.g.error(
 					"expected \\framebox(width,height)[position]{text} but got two optional arguments!",
 				) as unknown[];
 			}
-			// When vec is provided but not both width and pos, return empty array
-			// The actual framing should be handled elsewhere
-			return [];
+			return []; // handled elsewhere
 		}
 
+		// --- Helpers ---
 		const getFirstElement = (node: unknown): Element | undefined => {
-			if (Array.isArray(node)) {
-				return getFirstElement(node[0]);
-			}
+			if (Array.isArray(node)) return getFirstElement(node[0]);
+
 			if (typeof node === "object" && node !== null) {
 				if ("hasAttribute" in node) return node as Element;
+
 				if ("firstElementChild" in node) {
 					const child = (node as ParentNode).firstElementChild;
-					if (child) return getFirstElement(child);
+					return child ? getFirstElement(child) : undefined;
 				}
 			}
 			return undefined;
 		};
+
+		const countElements = (node: unknown): number => {
+			if (Array.isArray(node)) return node.length;
+			if (
+				typeof node === "object" &&
+				node !== null &&
+				"childElementCount" in node
+			) {
+				return (node as ParentNode).childElementCount || 1;
+			}
+			return 1;
+		};
+
+		// --- Main logic ---
 		const target = getFirstElement(txt);
-		if (!width && !pos && target && !this.g.hasAttribute(target, "frame")) {
+		const elementCount = countElements(txt);
+
+		const canAddFrame =
+			!width &&
+			!pos &&
+			target &&
+			elementCount === 1 &&
+			!this.g.hasAttribute(target, "frame");
+
+		if (canAddFrame) {
 			this.g.addAttribute(target, "frame");
-			return [target];
+			return Array.isArray(txt) ? txt : [txt];
 		}
 
 		return this._box(width as Length | undefined, pos, txt, "hbox frame");
