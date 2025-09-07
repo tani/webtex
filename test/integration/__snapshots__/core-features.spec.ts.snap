@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`LaTeX.js Core Features Snapshots Basic Text Processing simple paragraph 1`] = `undefined`;
 

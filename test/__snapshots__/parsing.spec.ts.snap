@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+// Bun Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`LaTeX.js Parsing Tests Text Processing ** simple text in paragraphs: text_tex-___simple_text_in_paragraphs.html 1`] = `"<div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">This is just some simple text.</p><p data-source-line="3" data-source-column="1">This is just some simple text.</p><p data-source-line="5" data-source-column="1">This is just some simple text.</p></div>"`;
 
