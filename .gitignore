@@ -11,4 +11,6 @@
 /js/
 /fonts/
 /src/latex-parser.ts
-.direnv/
+/.direnv/
+/example/latexjs/
+/example/webtex/
