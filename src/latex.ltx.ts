@@ -1008,14 +1008,14 @@ export class LaTeX {
 	}
 
 	public fbox(txt: unknown): unknown[] {
-		return this.framebox(undefined, undefined, undefined, txt as Element);
+		return this.framebox(undefined, undefined, undefined, txt);
 	}
 
 	public framebox(
 		vec?: unknown,
 		width?: Length | string,
 		pos?: string,
-		txt?: Element,
+		txt?: unknown,
 	): unknown[] {
 		if (vec) {
 			if (width && pos) {
@@ -1027,16 +1027,26 @@ export class LaTeX {
 			// The actual framing should be handled elsewhere
 			return [];
 		}
-		if (
-			txt &&
-			txt.hasAttribute != null &&
-			!width &&
-			!pos &&
-			!this.g.hasAttribute(txt, "frame")
-		) {
-			this.g.addAttribute(txt, "frame");
-			return [txt];
+
+		const getFirstElement = (node: unknown): Element | undefined => {
+			if (Array.isArray(node)) {
+				return getFirstElement(node[0]);
+			}
+			if (typeof node === "object" && node !== null) {
+				if ("hasAttribute" in node) return node as Element;
+				if ("firstElementChild" in node) {
+					const child = (node as ParentNode).firstElementChild;
+					if (child) return getFirstElement(child);
+				}
+			}
+			return undefined;
+		};
+		const target = getFirstElement(txt);
+		if (!width && !pos && target && !this.g.hasAttribute(target, "frame")) {
+			this.g.addAttribute(target, "frame");
+			return [target];
 		}
+
 		return this._box(width as Length | undefined, pos, txt, "hbox frame");
 	}
 

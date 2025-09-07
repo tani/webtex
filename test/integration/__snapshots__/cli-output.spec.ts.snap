@@ -27,7 +27,7 @@ OPTIONS:
 `;
 
 exports[`LaTeX.js CLI Output Snapshots version output snapshot: cli-version-output.txt 1`] = `
-"0.1.2
+"0.2.0
 "
 `;
 
