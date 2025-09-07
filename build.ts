@@ -28,7 +28,6 @@ const CONFIG = {
 	staticAssets: [
 		{ src: "src/css", dest: "dist/css" },
 		{ src: "src/fonts", dest: "dist/fonts" },
-		{ src: "src/js", dest: "dist/js" },
 	],
 } as const;
 

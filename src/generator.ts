@@ -610,7 +610,8 @@ export abstract class Generator<TNode extends Node = Node> {
 
 	public theLength(id: string): TNode {
 		const l = this.create(this.inline, undefined, "the");
-		(l as Node as Element).setAttribute("display-var", id);
+		const value = this.length(id);
+		(l as Node as Element).setAttribute("data-length", String(value));
 		return l;
 	}
 

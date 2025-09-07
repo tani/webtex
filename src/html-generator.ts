@@ -417,12 +417,6 @@ export class HtmlGenerator extends Generator {
 			return link;
 		};
 
-		const createScript = (url: string): HTMLScriptElement => {
-			const script = document.createElement("script");
-			script.src = url;
-			return script;
-		};
-
 		// Add MathJax stylesheet using the proper method with fallback
 		try {
 			const jax = MathJax.startup.document.outputJax as {
@@ -469,7 +463,6 @@ export class HtmlGenerator extends Generator {
 			for (const style of this._options.styles) {
 				el.appendChild(createStyleSheet(new URL(style, baseURL).toString()));
 			}
-			el.appendChild(createScript(new URL("js/base.js", baseURL).toString()));
 		} else {
 			if (docClass) {
 				el.appendChild(createStyleSheet(docClass.constructor.css));
@@ -477,7 +470,6 @@ export class HtmlGenerator extends Generator {
 			for (const style of this._options.styles) {
 				el.appendChild(createStyleSheet(style));
 			}
-			el.appendChild(createScript("js/base.js"));
 		}
 
 		return el;

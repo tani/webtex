@@ -237,13 +237,10 @@ async function main(ctx) {
 		const __dirname = path.dirname(new URL(import.meta.url).pathname);
 		const css = path.join(dir, "css");
 		const fonts = path.join(dir, "fonts");
-		const js = path.join(dir, "js");
 		mkdirSync(css, { recursive: true });
 		mkdirSync(fonts, { recursive: true });
-		mkdirSync(js, { recursive: true });
 		cpSync(path.join(__dirname, "../dist/css"), css, { recursive: true });
 		cpSync(path.join(__dirname, "../dist/fonts"), fonts, { recursive: true });
-		cpSync(path.join(__dirname, "../dist/js"), js, { recursive: true });
 	}
 }
 

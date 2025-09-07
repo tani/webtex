@@ -860,3 +860,8 @@ span.latex > .e {
 	font-size: 1.2rem;
 	margin-left: 0.5em;
 }
+
+/* Display length values without JavaScript */
+.the::before {
+	content: attr(data-length);
+}

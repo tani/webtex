@@ -212,7 +212,6 @@ ${error.message || error.toString()}</div>`,
 ${headContent}
 <link type="text/css" rel="stylesheet" href="/dist/css/mathjax.css">
 <link type="text/css" rel="stylesheet" href="/dist/css/article.css">
-<script src="/dist/js/base.js"></script>
 </head>
 <body>
 <div class="body">

@@ -35,7 +35,7 @@ describe("LaTeX.js API test", () => {
 		});
 
 		expect(result).toBe(
-			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
+			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
 				EOL,
 		);
 	});
@@ -70,7 +70,7 @@ describe("LaTeX.js API test", () => {
 		});
 
 		expect(result).toBe(
-			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
+			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
 				EOL,
 		);
 	});
@@ -78,7 +78,7 @@ describe("LaTeX.js API test", () => {
 	test("fs document API", async () => {
 		const file = await fs.readFile(path.join(__dirname, "api/file.html"));
 		expect(file.toString()).toBe(
-			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"><script src="js/base.js"></script></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
+			'<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/mathjax.css"><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
 				EOL,
 		);
 	});
