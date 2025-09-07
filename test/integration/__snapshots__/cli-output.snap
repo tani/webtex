@@ -12,7 +12,7 @@ exports[`LaTeX.js CLI Output Snapshots > help output snapshot > cli-help-output.
 
 OPTIONS:
   -o, --output <output>                  specify output file, otherwise STDOUT will be used
-  -a, --assets <assets>                  copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)
+  -a, --assets <assets>                  copy CSS to the directory of the output file, unless dir is given (default: no assets are copied)
   -u, --url <url>                        set the base URL to use for the assets (default: use relative URLs)
   -b, --body                             don't include HTML boilerplate and CSS, only output the contents of body
   -e, --entities                         encode HTML entities in the output instead of using UTF-8 characters

@@ -25,10 +25,7 @@ const CONFIG = {
 		format: "bare" as const,
 		trace: false,
 	},
-	staticAssets: [
-		{ src: "src/css", dest: "dist/css" },
-		{ src: "src/fonts", dest: "dist/fonts" },
-	],
+	staticAssets: [{ src: "src/css", dest: "dist/css" }],
 } as const;
 
 // Logging utilities

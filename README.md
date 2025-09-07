@@ -125,7 +125,7 @@ Usage: webtex [options] [files...]
 
 Options:
   -o, --output <file>      Specify output file (default: STDOUT)
-  -a, --assets [dir]       Copy CSS and fonts to output directory
+  -a, --assets [dir]       Copy CSS to output directory
   -u, --url <url>          Set base URL for assets
   -b, --body               Output body content only (no HTML boilerplate)
   -e, --entities           Encode HTML entities instead of UTF-8

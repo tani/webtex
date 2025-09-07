@@ -46,7 +46,7 @@ const command = {
 			short: "a",
 			optional: true,
 			description:
-				"copy CSS and fonts to the directory of the output file, unless dir is given (default: no assets are copied)",
+				"copy CSS to the directory of the output file, unless dir is given (default: no assets are copied)",
 		},
 		url: {
 			type: "string",
@@ -233,11 +233,8 @@ async function main(ctx) {
 	if (dir) {
 		const __dirname = path.dirname(new URL(import.meta.url).pathname);
 		const css = path.join(dir, "css");
-		const fonts = path.join(dir, "fonts");
 		mkdirSync(css, { recursive: true });
-		mkdirSync(fonts, { recursive: true });
 		cpSync(path.join(__dirname, "../dist/css"), css, { recursive: true });
-		cpSync(path.join(__dirname, "../dist/fonts"), fonts, { recursive: true });
 	}
 }
 
