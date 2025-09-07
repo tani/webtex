@@ -1,4 +1,13 @@
-import { createHTMLWindow } from "svgdom";
+let window: typeof globalThis.window;
+let document: typeof globalThis.document;
 
-export const window = createHTMLWindow();
-export const document = window.document;
+try {
+    const { createHTMLWindow } = await import("svgdom");
+    window = createHTMLWindow();
+    document = window.document;
+} catch (error) {
+    window = globalThis.window;
+    document = globalThis.document;
+}
+
+export { window, document };
