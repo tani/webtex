@@ -16,7 +16,7 @@ const CONFIG = {
 		format: "esm" as const,
 		target: "browser" as const,
 		outputName: "webtex.js",
-		externals: ["svgdom"],
+		external: ["svgdom"] as string[],
 	},
 	pegjs: {
 		output: "source" as const,
@@ -135,7 +135,7 @@ async function bundleApplication(): Promise<void> {
 			naming: {
 				entry: CONFIG.bundler.outputName,
 			},
-			external: CONFIG.bundler.externals,
+			external: CONFIG.bundler.external,
 		});
 
 		log.timing("Bundled application", Date.now() - start);
