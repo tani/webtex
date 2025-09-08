@@ -149,6 +149,7 @@ hmode_macro =
     escape
     m:(
       verbatim_env
+    / prooftree_env
     / &is_hmode     m:macro         { return m; }
     / &is_hmode_env e:h_environment { return e; }
 
@@ -175,6 +176,7 @@ vmode_macro =
     escape
     m:(
         verbatim_env
+      / prooftree_env
       / &is_vmode     m:macro       { g.break(); return m; }
       / &is_vmode_env e:environment { return e; }
       / vspace_vmode
@@ -720,6 +722,16 @@ verbatim_env "verbatim environment" =
         if (s) v = v.replace(/ /g, g.visp);
         g.break();
         return g.create(g.verbatim, g.create(g.verb, g.createVerbatim(v)));
+    }
+
+// prooftree - capture content verbatim and delegate to bussproofs package
+prooftree_env "prooftree environment" =
+    begin begin_group "prooftree" end_group
+        v:$((!"\\end{prooftree" .)*)
+    "\\end{prooftree}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("prooftree", [v]));
     }
 
 
