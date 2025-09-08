@@ -2,26 +2,13 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import type { LiteElement } from "mathjax-full/js/adaptors/lite/Element.js";
+import juice from "juice";
 import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
 import { RegisterHTMLHandler } from "mathjax-full/js/handlers/html.js";
 import { AllPackages } from "mathjax-full/js/input/tex/AllPackages.js";
 import { TeX } from "mathjax-full/js/input/tex.js";
 import { mathjax } from "mathjax-full/js/mathjax.js";
 import { SVG as MJSVG } from "mathjax-full/js/output/svg.js";
-
-const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
-
-const tex = new TeX({ packages: AllPackages });
-const svg = new MJSVG({ fontCache: "none" });
-const documentHandler = mathjax.document("", { InputJax: tex, OutputJax: svg });
-
-const MathJax = {
-	tex2svg: (math: string, options?: { display?: boolean }): LiteElement =>
-		documentHandler.convert(math, { display: options?.display }),
-	startup: { adaptor, document: documentHandler },
-};
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -295,8 +282,6 @@ export class HtmlGenerator extends Generator {
 		return svgInstance;
 	}
 
-	public MathJax: unknown = MathJax;
-
 	public reset(): void {
 		super.reset();
 		this._dom = document.createDocumentFragment();
@@ -416,35 +401,6 @@ export class HtmlGenerator extends Generator {
 			link.href = url;
 			return link;
 		};
-
-		// Add MathJax stylesheet using the proper method with fallback
-		try {
-			const jax = MathJax.startup.document.outputJax as {
-				styleSheet: (doc?: unknown) => Element | null;
-			};
-			const mathJaxStyleElement = jax.styleSheet(MathJax.startup.document);
-			if (mathJaxStyleElement) {
-				el.appendChild(mathJaxStyleElement.cloneNode(true));
-			} else {
-				// No stylesheet available, fallback to static CSS
-				if (baseURL) {
-					el.appendChild(
-						createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
-					);
-				} else {
-					el.appendChild(createStyleSheet("css/mathjax.css"));
-				}
-			}
-		} catch (_e) {
-			// MathJax stylesheet method failed, fallback to static CSS
-			if (baseURL) {
-				el.appendChild(
-					createStyleSheet(new URL("css/mathjax.css", baseURL).toString()),
-				);
-			} else {
-				el.appendChild(createStyleSheet("css/mathjax.css"));
-			}
-		}
 
 		const maybeDocClass: unknown = this.documentClass;
 		const docClass =
@@ -713,10 +669,23 @@ export class HtmlGenerator extends Generator {
 	}
 
 	public parseMath(math: string, display?: boolean): DocumentFragment {
-		const svg = MathJax.tex2svg(math, { display: !!display });
-		const html = MathJax.startup.adaptor.outerHTML(svg);
+		const adaptor = liteAdaptor();
+		RegisterHTMLHandler(adaptor);
+
+		const tex = new TeX({ packages: AllPackages });
+		const svg = new MJSVG({ fontCache: "none" });
+		const documentHandler = mathjax.document("", {
+			InputJax: tex,
+			OutputJax: svg,
+		});
+		const html = adaptor.outerHTML(
+			documentHandler.convert(math, { display: !!display }),
+		);
+		const css = adaptor.outerHTML(
+			documentHandler.outputJax.styleSheet(documentHandler.document),
+		);
 		const div = document.createElement("div");
-		div.innerHTML = html;
+		div.innerHTML = juice(`${html}${css}`);
 		const fragment = document.createDocumentFragment();
 		while (div.firstChild) {
 			fragment.appendChild(div.firstChild);

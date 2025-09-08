@@ -195,7 +195,6 @@ ${error.message || error.toString()}</div>`,
 <html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;">
 <head>
 ${headContent}
-<link type="text/css" rel="stylesheet" href="/dist/css/mathjax.css">
 <link type="text/css" rel="stylesheet" href="/dist/css/article.css">
 </head>
 <body>

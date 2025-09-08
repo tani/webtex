@@ -65,6 +65,7 @@
 		"hyphenation.de": "*",
 		"hyphenation.en-us": "*",
 		"hypher": "^0.2.5",
+		"juice": "^11.0.1",
 		"mathjax-full": "3.2.2",
 		"prettier": "^3.6.2",
 		"slugify": "^1.6.6",
