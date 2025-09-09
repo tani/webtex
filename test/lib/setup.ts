@@ -27,7 +27,6 @@ screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
     <head>
       <meta charset="utf-8">
       <style>
-        ${readFileSync(new URL("../../dist/css/mathjax.css", import.meta.url), "utf8")}
         body { margin: 20px; font-family: 'Computer Modern', serif; }
       </style>
     </head>
