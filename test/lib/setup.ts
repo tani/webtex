@@ -1,6 +1,6 @@
 // Global takeScreenshot function using Playwright
 
-import { mkdirSync, readFileSync } from "node:fs";
+import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { chromium } from "playwright";
 

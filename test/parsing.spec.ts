@@ -151,5 +151,12 @@ describe("LaTeX.js Parsing Tests", () => {
 				strategy: "snapshot-only",
 			});
 		});
+
+		describe("Amsmath", () => {
+			const fixtureFile = path.join(__dirname, "fixtures/packages/amsmath.tex");
+			migrateFixtureFile(fixtureFile, "packages/amsmath.tex", {
+				strategy: "snapshot-only",
+			});
+		});
 	});
 });

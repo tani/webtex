@@ -150,6 +150,7 @@ hmode_macro =
     m:(
       verbatim_env
     / prooftree_env
+    / amsmath_env
     / &is_hmode     m:macro         { return m; }
     / &is_hmode_env e:h_environment { return e; }
 
@@ -177,6 +178,7 @@ vmode_macro =
     m:(
         verbatim_env
       / prooftree_env
+      / amsmath_env
       / &is_vmode     m:macro       { g.break(); return m; }
       / &is_vmode_env e:environment { return e; }
       / vspace_vmode
@@ -732,6 +734,99 @@ prooftree_env "prooftree environment" =
     {
         g.break();
         return g.createFragment(g.macro("prooftree", [v]));
+    }
+
+// amsmath environments - capture content verbatim and delegate to amsmath package
+amsmath_env =
+    align_env
+  / align_star_env
+  / gather_env
+  / gather_star_env
+  / equation_env
+  / equation_star_env
+  / multline_env
+  / multline_star_env
+  / eqnarray_env
+
+align_env "align environment" =
+    begin begin_group "align" end_group
+        v:$((!"\\end{align" .)*)
+    "\\end{align}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("align", [v]));
+    }
+
+align_star_env "align* environment" =
+    begin begin_group "align*" end_group
+        v:$((!"\\end{align*" .)*)
+    "\\end{align*}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("align*", [v]));
+    }
+
+gather_env "gather environment" =
+    begin begin_group "gather" end_group
+        v:$((!"\\end{gather" .)*)
+    "\\end{gather}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("gather", [v]));
+    }
+
+gather_star_env "gather* environment" =
+    begin begin_group "gather*" end_group
+        v:$((!"\\end{gather*" .)*)
+    "\\end{gather*}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("gather*", [v]));
+    }
+
+equation_env "equation environment" =
+    begin begin_group "equation" end_group
+        v:$((!"\\end{equation" .)*)
+    "\\end{equation}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("equation", [v]));
+    }
+
+equation_star_env "equation* environment" =
+    begin begin_group "equation*" end_group
+        v:$((!"\\end{equation*" .)*)
+    "\\end{equation*}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("equation*", [v]));
+    }
+
+multline_env "multline environment" =
+    begin begin_group "multline" end_group
+        v:$((!"\\end{multline" .)*)
+    "\\end{multline}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("multline", [v]));
+    }
+
+multline_star_env "multline* environment" =
+    begin begin_group "multline*" end_group
+        v:$((!"\\end{multline*" .)*)
+    "\\end{multline*}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("multline*", [v]));
+    }
+
+eqnarray_env "eqnarray environment" =
+    begin begin_group "eqnarray" end_group
+        v:$((!"\\end{eqnarray" .)*)
+    "\\end{eqnarray}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("eqnarray", [v]));
     }
 
 
