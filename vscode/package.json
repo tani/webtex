@@ -1,0 +1,87 @@
+{
+  "name": "webtex-preview",
+  "displayName": "WebTeX Preview",
+  "description": "Live Previewer for LaTeX",
+  "version": "0.3.2",
+  "publisher": "masaya",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tani/webtex-preview.git"
+  },
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:webtex-preview.openPreview",
+    "onCommand:webtex-preview.openPreviewToSide",
+    "onLanguage:latex"
+  ],
+  "main": "./out/extension.js",
+  "browser": "./out/extension.js",
+  "icon": "webtex.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "webtex-preview.openPreview",
+        "title": "Open LaTeX Preview",
+        "category": "WebTeX"
+      },
+      {
+        "command": "webtex-preview.openPreviewToSide",
+        "title": "Open LaTeX Preview to the Side",
+        "category": "WebTeX"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "resourceExtname == .tex",
+          "command": "webtex-preview.openPreviewToSide",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceExtname == .tex",
+          "command": "webtex-preview.openPreview",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "webtex-preview.openPreviewToSide",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "resourceExtname == .tex"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:package": "vsce package",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.103.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.6.0",
+    "eslint": "^9.34.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "webtex": "^0.7.0"
+  }
+}

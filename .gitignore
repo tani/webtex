@@ -1,16 +1,2 @@
-.uuid
-.vscode
-.lsmcp/
-*.stats.html
-/dist/
-/website/
-/node_modules/
-/test/test-results.xml
-/test/screenshots/test-results.xml
-/css/
-/js/
-/fonts/
-/src/latex-parser.ts
 /.direnv/
-/example/latexjs/
-/example/webtex/
+/.claude/
