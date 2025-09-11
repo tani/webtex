@@ -2,7 +2,7 @@
   "name": "webtex-preview",
   "displayName": "WebTeX Preview",
   "description": "Live Previewer for LaTeX",
-  "version": "0.3.2",
+  "version": "0.8.0",
   "publisher": "masaya",
   "repository": {
     "type": "git",
@@ -15,8 +15,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:webtex-preview.openPreview",
-    "onCommand:webtex-preview.openPreviewToSide",
     "onLanguage:latex"
   ],
   "main": "./out/extension.js",
