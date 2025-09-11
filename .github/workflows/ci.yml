@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test-core:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./core
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            ./core/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('./core/bun.lockb', './core/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('./core/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright dependencies
+        run: bunx playwright install-deps
+
+      - name: Install Playwright browsers
+        run: bunx playwright install
+
+      - name: Lint code
+        run: bun run lint
+
+      - name: Type check
+        run: bun run typecheck
+
+      - name: Build project
+        run: bun run build
+
+      - name: Run tests
+        run: bun test
+
+  test-vscode:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./vscode
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: './vscode/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install VS Code test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Compile TypeScript
+        run: npm run compile
+
+      - name: Run tests
+        run: xvfb-run -a npm test
