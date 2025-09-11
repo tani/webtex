@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`LaTeX.js CLI Output Snapshots Error output snapshots macro error snapshot: macro-error-output.txt 1`] = `"SyntaxError: unknown macro: \\invalidcommand"`;
 
@@ -27,7 +27,7 @@ OPTIONS:
 `;
 
 exports[`LaTeX.js CLI Output Snapshots version output snapshot: cli-version-output.txt 1`] = `
-"0.5.0
+"0.7.0
 "
 `;
 

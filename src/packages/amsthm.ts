@@ -63,7 +63,7 @@ export class Amsthm {
 	} & Record<string, TheoremStyle>;
 	private currentStyle: string = "plain";
 	private theoremEnvironments: Record<string, TheoremEnvironment> = {};
-	private counters: Record<string, number> = {};
+	private counterInitialized: Record<string, boolean> = {};
 
 	constructor(generator: AmsthrmGenerator, _options?: unknown) {
 		this.g = generator;
@@ -180,13 +180,12 @@ export class Amsthm {
 			isPredefined &&
 			numbered &&
 			!sharedWith &&
-			!this.counters[counterName]
+			!this.counterInitialized[counterName]
 		) {
-			this.counters[counterName] = 0;
+			this.counterInitialized[counterName] = true;
 			try {
 				this.g.newCounter(counterName, parentResetBy);
 			} catch (e) {
-				// Fallback if generator doesn't support newCounter
 				console.warn(
 					`amsthm warning: Could not create counter '${counterName}': ${e}`,
 				);
@@ -303,36 +302,15 @@ export class Amsthm {
 				style: this.theoremStyles[defaultStyle] ?? this.theoremStyles.plain,
 			};
 			this.theoremEnvironments[envName] = environment;
-
-			// Initialize counter
-			if (!this.counters[envName]) {
-				this.counters[envName] = 0;
-			}
 		}
 
 		const env = this.theoremEnvironments[envName];
 		let headerText = env.displayName;
 
+		let labelId: string | undefined;
 		if (env.numbered && env.counter) {
-			// Handle parent counter resets (like section numbering)
-			if (env.parentCounter) {
-				try {
-					const parentValue = this.g.counter(env.parentCounter);
-					// Reset counter when parent counter changes
-					const parentKey = `${env.counter}_parent`;
-					const lastParentValue = this.counters[parentKey] || 0;
-					if (parentValue !== lastParentValue) {
-						this.counters[env.counter] = 0;
-						this.counters[parentKey] = parentValue;
-					}
-				} catch {
-					// Parent counter doesn't exist, continue without parent numbering
-				}
-			}
-
-			// Increment counter
-			this.counters[env.counter] = (this.counters[env.counter] || 0) + 1;
-			const counter = this.counters[env.counter];
+			this.g.stepCounter(env.counter);
+			const counter = this.g.counter(env.counter);
 
 			if (env.parentCounter) {
 				try {
@@ -344,6 +322,9 @@ export class Amsthm {
 			} else {
 				headerText = `${headerText} ${counter}`;
 			}
+
+			labelId = `${env.counter}-${counter}`;
+			this.g.refCounter(env.counter, labelId);
 		}
 
 		// Create theorem header with optional title
@@ -365,6 +346,10 @@ export class Amsthm {
 			[header],
 			`amsthm-environment amsthm-${env.style.name} ${env.style.bodyFormat}`,
 		);
+
+		if (labelId) {
+			(container as Node as Element).id = labelId;
+		}
 
 		return [container];
 	}

@@ -103,6 +103,8 @@ export interface AmsthrmGenerator extends PackageGenerator {
 	createText(text: string): Text | undefined;
 	setCounter(name: string, value: number): void;
 	counter(name: string): number;
+	stepCounter(name: string): void;
+	refCounter(name: string, id?: string): Node | undefined;
 	newCounter(name: string, resetBy?: string): void;
 	arabic(value: number): string;
 }

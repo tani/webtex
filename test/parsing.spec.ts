@@ -158,5 +158,15 @@ describe("LaTeX.js Parsing Tests", () => {
 				strategy: "snapshot-only",
 			});
 		});
+
+		describe("Amsthm", () => {
+			const fixtureFile = path.join(
+				__dirname,
+				"fixtures/packages/amsthm-labels.tex",
+			);
+			migrateFixtureFile(fixtureFile, "packages/amsthm-labels.tex", {
+				strategy: "snapshot-only",
+			});
+		});
 	});
 });
