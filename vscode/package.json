@@ -80,6 +80,6 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "webtex": "^0.7.0"
+    "webtex": "^0.9.0"
   }
 }
