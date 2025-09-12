@@ -19,7 +19,7 @@ interface TheoremEnvironment {
 export class Amsthm {
 	static displayName = "Amsthm";
 	static args: Record<string, unknown[]> = {
-		newtheorem: ["V", "g", "g"],
+		newtheorem: ["V", "g", "g", "o?"],
 		theoremstyle: ["V", "g"],
 		qed: ["H"],
 		// Environment arguments - required for parser to handle optional arguments
@@ -116,30 +116,74 @@ export class Amsthm {
 	 * will not be available for use.
 	 *
 	 * @param envName - Name of the theorem environment (may include *)
-	 * @param sharedCounter - Optional counter to share with existing theorem
-	 * @param displayName - Display name for the theorem (e.g., "Theorem", "Lemma")
+	 * @param sharedCounterOrDisplayName - Either shared counter name or display name
+	 * @param displayNameOrParentCounter - Either display name or parent counter
 	 * @param parentCounter - Optional parent counter for hierarchical numbering
 	 */
-	newtheorem(envName: string | Node, displayName: string | Node): unknown[] {
+	newtheorem(
+		envName: string | Node, 
+		sharedCounterOrDisplayName: string | Node,
+		displayNameOrParentCounter?: string | Node,
+		parentCounter?: string | Node
+	): unknown[] {
 		// Extract text content from DOM nodes
 		const envNameStr =
 			typeof envName === "string"
 				? envName
 				: envName.nodeValue || envName.textContent || "";
-		const displayNameStr =
-			typeof displayName === "string"
-				? displayName
-				: displayName.nodeValue || displayName.textContent || "";
+		
+		const arg2Str =
+			typeof sharedCounterOrDisplayName === "string"
+				? sharedCounterOrDisplayName
+				: sharedCounterOrDisplayName.nodeValue || sharedCounterOrDisplayName.textContent || "";
+		
+		const arg3Str = displayNameOrParentCounter
+			? typeof displayNameOrParentCounter === "string"
+				? displayNameOrParentCounter
+				: displayNameOrParentCounter.nodeValue || displayNameOrParentCounter.textContent || ""
+			: undefined;
+		
+		const arg4Str = parentCounter
+			? typeof parentCounter === "string"
+				? parentCounter
+				: parentCounter.nodeValue || parentCounter.textContent || ""
+			: undefined;
 
 		// Handle starred version for unnumbered theorems
 		const isStarred = envNameStr.includes("*");
 		const actualEnvName = isStarred ? envNameStr.replace("*", "") : envNameStr;
 		const numbered = !isStarred;
 
-		// Simple version: \newtheorem{name}{display} - Simple numbered theorem
-		const counterName = actualEnvName;
-		const parentResetBy = undefined;
-		const sharedWith = undefined;
+		// Parse arguments to determine syntax variant
+		let displayName: string;
+		let sharedWith: string | undefined;
+		let parentResetBy: string | undefined;
+		let counterName: string;
+
+		if (arg3Str && arg4Str) {
+			// \newtheorem{name}[counter]{display}[parent] - Full syntax (rare)
+			sharedWith = arg2Str;
+			displayName = arg3Str;
+			parentResetBy = arg4Str;
+			counterName = sharedWith;
+		} else if (arg3Str) {
+			// Check if arg2 looks like a counter name (lowercase, existing environment)
+			if (this.theoremEnvironments[arg2Str] || Object.keys(Amsthm.environments).includes(arg2Str)) {
+				// \newtheorem{name}[counter]{display} - Shared counter
+				sharedWith = arg2Str;
+				displayName = arg3Str;
+				counterName = sharedWith;
+			} else {
+				// \newtheorem{name}{display}[parent] - Parent counter
+				displayName = arg2Str;
+				parentResetBy = arg3Str;
+				counterName = actualEnvName;
+			}
+		} else {
+			// \newtheorem{name}{display} - Simple numbered theorem
+			displayName = arg2Str;
+			counterName = actualEnvName;
+		}
 
 		// Check if this environment is already pre-defined in static environments
 		const isPredefined = Object.keys(Amsthm.environments).includes(
@@ -150,7 +194,7 @@ export class Amsthm {
 			// Customize existing pre-defined environment
 			const environment: TheoremEnvironment = {
 				name: actualEnvName,
-				displayName: displayNameStr,
+				displayName: displayName,
 				counter: numbered ? counterName : undefined,
 				parentCounter: parentResetBy,
 				numbered: numbered,
@@ -175,16 +219,24 @@ export class Amsthm {
 			);
 		}
 
-		// Initialize counter if needed and not sharing (only for predefined environments)
-		if (
-			isPredefined &&
-			numbered &&
-			!sharedWith &&
-			!this.counterInitialized[counterName]
-		) {
+		// Initialize counter if needed (only for predefined environments)
+		if (isPredefined && numbered && !this.counterInitialized[counterName]) {
 			this.counterInitialized[counterName] = true;
 			try {
-				this.g.newCounter(counterName, parentResetBy);
+				if (sharedWith) {
+					// When sharing counter, don't create a new one, just mark as initialized
+					// The shared counter should already exist
+					if (!this.counterInitialized[sharedWith]) {
+						console.warn(
+							`amsthm warning: Trying to share counter '${sharedWith}' but it doesn't exist. Creating it.`,
+						);
+						this.g.newCounter(sharedWith, parentResetBy);
+						this.counterInitialized[sharedWith] = true;
+					}
+				} else {
+					// Create new counter
+					this.g.newCounter(counterName, parentResetBy);
+				}
 			} catch (e) {
 				console.warn(
 					`amsthm warning: Could not create counter '${counterName}': ${e}`,
@@ -309,8 +361,31 @@ export class Amsthm {
 
 		let labelId: string | undefined;
 		if (env.numbered && env.counter) {
-			this.g.stepCounter(env.counter);
-			const counter = this.g.counter(env.counter);
+			// Ensure counter exists before using it
+			if (!this.counterInitialized[env.counter]) {
+				this.counterInitialized[env.counter] = true;
+				try {
+					this.g.newCounter(env.counter, env.parentCounter);
+				} catch (e) {
+					// Counter might already exist, that's ok
+				}
+			}
+
+			// Use the actual counter name (which might be shared)
+			const actualCounterName = env.sharedWith || env.counter;
+			
+			// Ensure the actual counter exists too
+			if (env.sharedWith && !this.counterInitialized[actualCounterName]) {
+				this.counterInitialized[actualCounterName] = true;
+				try {
+					this.g.newCounter(actualCounterName, env.parentCounter);
+				} catch (e) {
+					// Counter might already exist, that's ok
+				}
+			}
+
+			this.g.stepCounter(actualCounterName);
+			const counter = this.g.counter(actualCounterName);
 
 			if (env.parentCounter) {
 				try {
@@ -323,8 +398,8 @@ export class Amsthm {
 				headerText = `${headerText} ${counter}`;
 			}
 
-			labelId = `${env.counter}-${counter}`;
-			this.g.refCounter(env.counter, labelId);
+			labelId = `${actualCounterName}-${counter}`;
+			this.g.refCounter(actualCounterName, labelId);
 		}
 
 		// Create theorem header with optional title
