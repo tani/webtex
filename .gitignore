@@ -42,6 +42,7 @@ website/
 # VS Code extension specific
 .vscode-test/
 *.vsix
+packages/vscode/webtex/
 
 # Temporary files
 *.tmp

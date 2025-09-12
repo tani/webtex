@@ -40,8 +40,8 @@
 	},
 	"scripts": {
 		"clean": "rm -rf dist test/test-results.xml",
-		"build": "bun run clean && bun run build.ts",
-		"build:check": "[ -d \"dist\" ] || bun run build.ts",
+		"compile": "bun run clean && bun run build.ts",
+		"compile:check": "[ -d \"dist\" ] || bun run build.ts",
 		"pretest": "bun run build.ts",
 		"test": "bun test",
 		"test:watch": "bun test --watch",

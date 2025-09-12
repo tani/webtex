@@ -112,7 +112,7 @@ class WebTeXPreviewPanel {
       {
         enableScripts: true,
         localResourceRoots: [
-          vscode.Uri.joinPath(extensionUri, "node_modules"),
+          vscode.Uri.joinPath(extensionUri, "webtex"),
           vscode.Uri.joinPath(extensionUri, "media"),
         ],
       },
@@ -276,30 +276,24 @@ class WebTeXPreviewPanel {
   }
 
   private async _getHtmlForWebview(webview: vscode.Webview) {
-    // Get paths to resources on disk
+    // Get paths to local WebTeX resources (copied from core package)
     const webtexBaseCssPath = vscode.Uri.joinPath(
       this._extensionUri,
-      "node_modules",
       "webtex",
-      "dist",
       "css",
       "base.css",
     );
     const webtexBaseCssUri = webview.asWebviewUri(webtexBaseCssPath);
     const webtexArticleCssPath = vscode.Uri.joinPath(
       this._extensionUri,
-      "node_modules",
       "webtex",
-      "dist",
       "css",
       "article.css",
     );
     const webtexArticleCssUri = webview.asWebviewUri(webtexArticleCssPath);
     const webtexBrowserPath = vscode.Uri.joinPath(
       this._extensionUri,
-      "node_modules",
       "webtex",
-      "dist",
       "webtex.browser.js",
     );
     const webtexBrowserUri = webview.asWebviewUri(webtexBrowserPath);

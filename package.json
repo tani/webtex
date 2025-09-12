@@ -11,9 +11,9 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "bun run build:core && bun run build:vscode",
-    "build:core": "bun run --cwd packages/core build",
-    "build:vscode": "bun run --cwd packages/vscode compile",
+    "compile": "bun run compile:core && bun run compile:vscode",
+    "compile:core": "bun run --cwd packages/core compile",
+    "compile:vscode": "bun run --cwd packages/vscode compile",
     "test": "bun run test:core && bun run test:vscode",
     "test:core": "bun run --cwd packages/core test",
     "test:vscode": "bun run --cwd packages/vscode test",
