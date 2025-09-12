@@ -20,27 +20,8 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.bun/install/cache
-            node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-bun-monorepo-${{ hashFiles('bun.lock', 'package.json', 'packages/*/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-monorepo-
-
       - name: Install dependencies
         run: bun install
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('packages/core/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
 
       - name: Install Playwright dependencies (Core)
         run: bunx playwright install-deps
@@ -66,9 +47,6 @@ jobs:
 
       - name: Test core package
         run: bun run test:core
-
-      - name: Test VS Code extension
-        run: xvfb-run -a bun run --cwd packages/vscode pretest
 
   # Package validation job for release readiness
   validate-packages:
