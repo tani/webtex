@@ -1,0 +1,44 @@
+{
+  "name": "webtex-monorepo",
+  "version": "0.9.0",
+  "private": true,
+  "description": "WebTeX - LaTeX to HTML5 translator monorepo",
+  "author": {
+    "name": "tani",
+    "email": "ta2gch@gmail.com"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "bun run build:core && bun run build:vscode",
+    "build:core": "bun run --cwd packages/core build",
+    "build:vscode": "bun run --cwd packages/vscode compile",
+    "test": "bun run test:core && bun run test:vscode",
+    "test:core": "bun run --cwd packages/core test",
+    "test:vscode": "bun run --cwd packages/vscode test",
+    "lint": "bun run lint:core && bun run lint:vscode",
+    "lint:core": "bun run --cwd packages/core lint",
+    "lint:vscode": "bun run --cwd packages/vscode lint",
+    "typecheck": "bun run typecheck:core && bun run typecheck:vscode",
+    "typecheck:core": "bun run --cwd packages/core typecheck",
+    "typecheck:vscode": "bun run --cwd packages/vscode typecheck",
+    "clean": "bun run clean:core && bun run clean:vscode",
+    "clean:core": "bun run --cwd packages/core clean",
+    "clean:vscode": "bun run --cwd packages/vscode clean",
+    "dev:core": "bun run --cwd packages/core test:watch",
+    "dev:vscode": "bun run --cwd packages/vscode watch"
+  },
+  "engines": {
+    "node": ">= 22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tani/webtex.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tani/webtex/issues"
+  },
+  "homepage": "https://github.com/tani/webtex"
+}
