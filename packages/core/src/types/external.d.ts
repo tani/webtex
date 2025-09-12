@@ -1,17 +1,17 @@
 declare module "hyphenation.en-us" {
-	const patterns: unknown;
-	export default patterns;
+  const patterns: unknown;
+  export default patterns;
 }
 
 declare module "hypher" {
-	export default class Hypher {
-		constructor(patterns: unknown);
-		hyphenate(word: string): string[];
-		hyphenateText(text: string): string;
-		patterns: unknown;
-	}
+  export default class Hypher {
+    constructor(patterns: unknown);
+    hyphenate(word: string): string[];
+    hyphenateText(text: string): string;
+    patterns: unknown;
+  }
 }
 
 declare module "svgdom" {
-	export function createHTMLWindow(title?: string): Window & typeof globalThis;
+  export function createHTMLWindow(title?: string): Window & typeof globalThis;
 }

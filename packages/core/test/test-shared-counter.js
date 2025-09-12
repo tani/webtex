@@ -25,31 +25,39 @@ This is another theorem.
 console.log("Testing shared counter functionality...");
 
 try {
-    const generator = new HtmlGenerator({ hyphenate: false });
-    const doc = parse(input, { generator }).htmlDocument();
-    const html = doc.documentElement.outerHTML;
-    
-    console.log("Generated HTML:");
-    console.log(html);
-    
-    // Check for correct numbering
-    const theoremMatches = html.match(/Theorem (\d+)/g);
-    const lemmaMatches = html.match(/Lemma (\d+)/g);
-    
-    console.log("\nFound theorem numbers:", theoremMatches);
-    console.log("Found lemma numbers:", lemmaMatches);
-    
-    if (theoremMatches && lemmaMatches) {
-        console.log("\n✅ SUCCESS: Found theorem and lemma numbering");
-        if (html.includes("Theorem 1") && html.includes("Lemma 2") && html.includes("Theorem 3")) {
-            console.log("✅ PERFECT: Shared counter working correctly - Theorem 1, Lemma 2, Theorem 3");
-        } else {
-            console.log("⚠️  PARTIAL: Basic numbering works but shared counter might have issues");
-        }
+  const generator = new HtmlGenerator({ hyphenate: false });
+  const doc = parse(input, { generator }).htmlDocument();
+  const html = doc.documentElement.outerHTML;
+
+  console.log("Generated HTML:");
+  console.log(html);
+
+  // Check for correct numbering
+  const theoremMatches = html.match(/Theorem (\d+)/g);
+  const lemmaMatches = html.match(/Lemma (\d+)/g);
+
+  console.log("\nFound theorem numbers:", theoremMatches);
+  console.log("Found lemma numbers:", lemmaMatches);
+
+  if (theoremMatches && lemmaMatches) {
+    console.log("\n✅ SUCCESS: Found theorem and lemma numbering");
+    if (
+      html.includes("Theorem 1") &&
+      html.includes("Lemma 2") &&
+      html.includes("Theorem 3")
+    ) {
+      console.log(
+        "✅ PERFECT: Shared counter working correctly - Theorem 1, Lemma 2, Theorem 3",
+      );
     } else {
-        console.log("❌ ISSUE: Missing theorem or lemma numbering");
+      console.log(
+        "⚠️  PARTIAL: Basic numbering works but shared counter might have issues",
+      );
     }
+  } else {
+    console.log("❌ ISSUE: Missing theorem or lemma numbering");
+  }
 } catch (e) {
-    console.error("❌ ERROR:", e);
-    process.exit(1);
+  console.error("❌ ERROR:", e);
+  process.exit(1);
 }

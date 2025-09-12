@@ -8,9 +8,9 @@ export { document, window } from "#window";
 export * from "./types";
 
 export {
-	he,
-	parse,
-	ParserSyntaxError as SyntaxError,
-	Generator,
-	HtmlGenerator,
+  he,
+  parse,
+  ParserSyntaxError as SyntaxError,
+  Generator,
+  HtmlGenerator,
 };

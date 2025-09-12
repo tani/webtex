@@ -4,8 +4,8 @@ const window = createHTMLWindow();
 const document = window.document;
 
 interface GlobalWithDOM {
-	window: typeof window;
-	document: typeof document;
+  window: typeof window;
+  document: typeof document;
 }
 
 const globalScope = globalThis as typeof globalThis & GlobalWithDOM;

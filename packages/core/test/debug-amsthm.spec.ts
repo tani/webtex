@@ -1,11 +1,11 @@
-import { test, expect } from "bun:test";
+import { expect, test } from "bun:test";
 import { HtmlGenerator, parse } from "../src/index";
 
 test("Debug amsthm - multiple theorem styles from fixture", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   // This is copied from the amsthm.tex fixture
-const input = `\\documentclass{article}
+  const input = `\\documentclass{article}
 \\usepackage{amsthm}
 \\begin{document}
 
@@ -44,27 +44,26 @@ This is a remark in remark style.
   try {
     const doc = parse(input, { generator }).htmlDocument();
     const html = doc.documentElement.outerHTML;
-    
+
     console.log("Generated HTML for multiple theorem styles:");
     console.log(html);
-    
+
     // Basic checks
     expect(html).toContain("Theorem");
     expect(html).toContain("Lemma");
-    
+
     // Check for numbering issues
     const theoremMatch = html.match(/Theorem (\d+)/);
     const lemmaMatch = html.match(/Lemma (\d+)/);
-    
+
     console.log("Theorem number:", theoremMatch?.[1]);
     console.log("Lemma number:", lemmaMatch?.[1]);
-    
+
     if (theoremMatch && lemmaMatch) {
       console.log(`Theorem: ${theoremMatch[1]}, Lemma: ${lemmaMatch[1]}`);
       // If shared counter works correctly, lemma should be 2
       console.log("Expected: Theorem 1, Lemma 2 (shared counter)");
     }
-    
   } catch (e) {
     console.error("Parse error:", e);
     throw e;

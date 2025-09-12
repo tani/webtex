@@ -1,10 +1,10 @@
-import { test, expect } from "bun:test";
+import { expect, test } from "bun:test";
 import { HtmlGenerator, parse } from "../src/index";
 
 test("Amsthm theorem numbering - basic sequential numbering", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
-const input = `
+
+  const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
 \\begin{document}
@@ -22,16 +22,16 @@ Third theorem
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // Should have three theorems numbered 1, 2, 3
   expect(html).toContain("Theorem 1");
-  expect(html).toContain("Theorem 2"); 
+  expect(html).toContain("Theorem 2");
   expect(html).toContain("Theorem 3");
 });
 
 test("Amsthm theorem numbering - multiple environment types", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -55,7 +55,7 @@ First corollary
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // Each environment should have its own counter
   expect(html).toContain("Theorem 1");
   expect(html).toContain("Lemma 1");
@@ -65,7 +65,7 @@ First corollary
 
 test("Amsthm theorem numbering - shared counters", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -89,7 +89,7 @@ First corollary (should be numbered 4)
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // All should share the same counter sequence
   expect(html).toContain("Theorem 1");
   expect(html).toContain("Lemma 2");
@@ -99,7 +99,7 @@ First corollary (should be numbered 4)
 
 test("Amsthm theorem numbering - hierarchical numbering with sections", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -120,7 +120,7 @@ First theorem in section 2 (should reset to 1)
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // Should be numbered hierarchically: section.theorem
   expect(html).toContain("Theorem 1.1");
   expect(html).toContain("Theorem 1.2");
@@ -129,7 +129,7 @@ First theorem in section 2 (should reset to 1)
 
 test("Amsthm theorem numbering - unnumbered theorems", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -149,7 +149,7 @@ Another numbered theorem
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // Should have numbered and unnumbered versions
   expect(html).toContain("Theorem 1.");
   expect(html).toContain("Theorem."); // Unnumbered (remark with Theorem display name)
@@ -158,7 +158,7 @@ Another numbered theorem
 
 test("Amsthm theorem numbering - with optional titles", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -174,14 +174,14 @@ Theorem with title
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   expect(html).toContain("Theorem 1.");
   expect(html).toContain("Theorem 2 (Important Result).");
 });
 
 test("Amsthm proof environment", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -196,14 +196,14 @@ This is a proof with custom label.
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   expect(html).toContain("Proof.");
   expect(html).toContain("Proof of Main Theorem.");
 });
 
 test("Amsthm theorem styles", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
-  
+
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
@@ -227,7 +227,7 @@ Remark style
 
   const doc = parse(input, { generator }).htmlDocument();
   const html = doc.documentElement.outerHTML;
-  
+
   // Check that different styles are applied
   expect(html).toContain("amsthm-plain-header");
   expect(html).toContain("amsthm-definition-header");

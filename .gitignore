@@ -61,3 +61,7 @@ $RECYCLE.BIN/
 *.swp
 *.swo
 *~
+
+packages/core/example/latexjs/
+packages/core/example/webtex/
+packages/core/src/latex-parser.ts

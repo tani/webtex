@@ -5,23 +5,23 @@ import { dirname } from "node:path";
 import { chromium } from "playwright";
 
 interface ScreenshotGlobal {
-	takeScreenshot?: (html: string, filename: string) => Promise<void>;
+  takeScreenshot?: (html: string, filename: string) => Promise<void>;
 }
 
 const screenshotGlobal = globalThis as ScreenshotGlobal;
 
 screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
-	// Add .png extension if not present
-	const screenshotPath = filename.endsWith(".png")
-		? filename
-		: `${filename}.png`;
-	console.log(`Taking screenshot for: ${screenshotPath}`);
+  // Add .png extension if not present
+  const screenshotPath = filename.endsWith(".png")
+    ? filename
+    : `${filename}.png`;
+  console.log(`Taking screenshot for: ${screenshotPath}`);
 
-	const browser = await chromium.launch();
-	const page = await browser.newPage();
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
 
-	// Set up the page with CSS and HTML
-	const fullHtml = `
+  // Set up the page with CSS and HTML
+  const fullHtml = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -36,13 +36,13 @@ screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
     </html>
   `;
 
-	await page.setContent(fullHtml);
+  await page.setContent(fullHtml);
 
-	// Ensure directory exists
-	mkdirSync(dirname(screenshotPath), { recursive: true });
+  // Ensure directory exists
+  mkdirSync(dirname(screenshotPath), { recursive: true });
 
-	// Take screenshot
-	await page.screenshot({ path: screenshotPath, fullPage: true });
+  // Take screenshot
+  await page.screenshot({ path: screenshotPath, fullPage: true });
 
-	await browser.close();
+  await browser.close();
 };

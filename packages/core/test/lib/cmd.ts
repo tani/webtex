@@ -7,8 +7,8 @@
  */
 
 import {
-	type ChildProcessWithoutNullStreams,
-	spawn as spawnCmd,
+  type ChildProcessWithoutNullStreams,
+  spawn as spawnCmd,
 } from "node:child_process";
 import { existsSync } from "node:fs";
 import { constants } from "node:os";
@@ -22,28 +22,28 @@ const PATH = process.env.PATH;
  * @param {Object} env (optional) Environment variables
  */
 function createProcess(
-	processPath: string,
-	args: string[] = [],
-	env: NodeJS.ProcessEnv | null = null,
+  processPath: string,
+  args: string[] = [],
+  env: NodeJS.ProcessEnv | null = null,
 ) {
-	// ensure that path exists
-	if (!processPath || !existsSync(processPath)) {
-		throw new Error("Invalid process path");
-	}
+  // ensure that path exists
+  if (!processPath || !existsSync(processPath)) {
+    throw new Error("Invalid process path");
+  }
 
-	args = [processPath].concat(args);
+  args = [processPath].concat(args);
 
-	// this works for node-based CLIs and has to be adjusted for other processes
-	return spawnCmd("node", args, {
-		env: Object.assign(
-			{
-				NODE_ENV: "test",
-				PATH, // this is needed in order to get all the binaries in the current terminal
-			},
-			env,
-		),
-		stdio: ["pipe", "pipe", "pipe", "ipc"], // create an IPC channel, enable subprocess.send()
-	});
+  // this works for node-based CLIs and has to be adjusted for other processes
+  return spawnCmd("node", args, {
+    env: Object.assign(
+      {
+        NODE_ENV: "test",
+        PATH, // this is needed in order to get all the binaries in the current terminal
+      },
+      env,
+    ),
+    stdio: ["pipe", "pipe", "pipe", "ipc"], // create an IPC channel, enable subprocess.send()
+  });
 }
 
 /**
@@ -56,151 +56,151 @@ function createProcess(
  * @param {Object} opts (optional) Environment variables
  */
 interface ExecuteOptions {
-	env?: NodeJS.ProcessEnv | null;
-	timeout?: number;
-	maxTimeout?: number;
+  env?: NodeJS.ProcessEnv | null;
+  timeout?: number;
+  maxTimeout?: number;
 }
 
 interface ExecuteResult {
-	stdout: string;
-	stderr: string;
+  stdout: string;
+  stderr: string;
 }
 
 interface AttachedProcessPromise<T> extends Promise<T> {
-	attachedProcess?: ChildProcessWithoutNullStreams;
+  attachedProcess?: ChildProcessWithoutNullStreams;
 }
 
 function executeWithInput(
-	processPath: string,
-	args: string[] = [],
-	inputs: string[] = [],
-	opts: ExecuteOptions = {},
+  processPath: string,
+  args: string[] = [],
+  inputs: string[] = [],
+  opts: ExecuteOptions = {},
 ): Promise<ExecuteResult> {
-	const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
-	const childProcess = createProcess(processPath, args, env);
-	if (typeof childProcess.stdin.setEncoding === "function") {
-		childProcess.stdin.setEncoding("utf-8");
-	}
+  const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
+  const childProcess = createProcess(processPath, args, env);
+  if (typeof childProcess.stdin.setEncoding === "function") {
+    childProcess.stdin.setEncoding("utf-8");
+  }
 
-	//
-	let currentInputTimeout: NodeJS.Timeout | undefined;
+  //
+  let currentInputTimeout: NodeJS.Timeout | undefined;
 
-	// waiting for a response to input on stdin; kills process when expired
-	let killIOTimeout: NodeJS.Timeout | undefined;
+  // waiting for a response to input on stdin; kills process when expired
+  let killIOTimeout: NodeJS.Timeout | undefined;
 
-	// Creates a loop to feed user inputs to the child process in order to get results from the tool.
-	// This code is heavily inspired (if not blatantly copied) from inquirer-test:
-	// https://github.com/ewnd9/inquirer-test/blob/6e2c40bbd39a061d3e52a8b1ee52cdac88f8d7f7/index.js#L14
-	const loop = (inputs: string[]) => {
-		if (killIOTimeout) {
-			clearTimeout(killIOTimeout);
-		}
+  // Creates a loop to feed user inputs to the child process in order to get results from the tool.
+  // This code is heavily inspired (if not blatantly copied) from inquirer-test:
+  // https://github.com/ewnd9/inquirer-test/blob/6e2c40bbd39a061d3e52a8b1ee52cdac88f8d7f7/index.js#L14
+  const loop = (inputs: string[]) => {
+    if (killIOTimeout) {
+      clearTimeout(killIOTimeout);
+    }
 
-		if (!inputs.length) {
-			childProcess.stdin.end();
+    if (!inputs.length) {
+      childProcess.stdin.end();
 
-			// Set a timeout to wait for CLI response. If CLI takes longer than
-			// maxTimeout to respond, kill the childProcess and notify user
-			killIOTimeout = setTimeout(() => {
-				console.error("Error: Reached I/O timeout");
-				childProcess.kill(constants.signals.SIGTERM);
-			}, maxTimeout);
+      // Set a timeout to wait for CLI response. If CLI takes longer than
+      // maxTimeout to respond, kill the childProcess and notify user
+      killIOTimeout = setTimeout(() => {
+        console.error("Error: Reached I/O timeout");
+        childProcess.kill(constants.signals.SIGTERM);
+      }, maxTimeout);
 
-			return;
-		}
+      return;
+    }
 
-		currentInputTimeout = setTimeout(() => {
-			childProcess.stdin.write(inputs[0]);
-			// Log debug I/O statements on tests
-			if (env?.DEBUG) {
-				console.log("input:", inputs[0]);
-			}
-			loop(inputs.slice(1));
-		}, timeout);
-	};
+    currentInputTimeout = setTimeout(() => {
+      childProcess.stdin.write(inputs[0]);
+      // Log debug I/O statements on tests
+      if (env?.DEBUG) {
+        console.log("input:", inputs[0]);
+      }
+      loop(inputs.slice(1));
+    }, timeout);
+  };
 
-	const promise: AttachedProcessPromise<ExecuteResult> = new Promise(
-		(resolve, reject) => {
-			let stdout = "";
-			let stderr = "";
+  const promise: AttachedProcessPromise<ExecuteResult> = new Promise(
+    (resolve, reject) => {
+      let stdout = "";
+      let stderr = "";
 
-			// get output from CLI
-			childProcess.stdout.on("data", (data) => {
-				stdout += data.toString();
+      // get output from CLI
+      childProcess.stdout.on("data", (data) => {
+        stdout += data.toString();
 
-				if (killIOTimeout) {
-					clearTimeout(killIOTimeout);
-				}
+        if (killIOTimeout) {
+          clearTimeout(killIOTimeout);
+        }
 
-				// Log debug I/O statements on tests
-				if (env?.DEBUG) {
-					console.log("stdout:", data.toString());
-				}
-			});
+        // Log debug I/O statements on tests
+        if (env?.DEBUG) {
+          console.log("stdout:", data.toString());
+        }
+      });
 
-			// get errors from CLI
-			childProcess.stderr.on("data", (data) => {
-				stderr += data.toString();
+      // get errors from CLI
+      childProcess.stderr.on("data", (data) => {
+        stderr += data.toString();
 
-				if (killIOTimeout) {
-					clearTimeout(killIOTimeout);
-				}
+        if (killIOTimeout) {
+          clearTimeout(killIOTimeout);
+        }
 
-				// Log debug I/O statements on tests
-				if (env?.DEBUG) {
-					console.log("stderr:", data.toString());
-				}
-			});
+        // Log debug I/O statements on tests
+        if (env?.DEBUG) {
+          console.log("stderr:", data.toString());
+        }
+      });
 
-			childProcess.on("exit", (code, signal) => {
-				if (currentInputTimeout) {
-					clearTimeout(currentInputTimeout);
-				}
+      childProcess.on("exit", (code, signal) => {
+        if (currentInputTimeout) {
+          clearTimeout(currentInputTimeout);
+        }
 
-				if (code === 0) {
-					resolve({
-						stdout: stdout,
-						stderr: stderr,
-					});
-				} else {
-					reject({
-						code: code,
-						signal: signal,
-						stdout: stdout,
-						stderr: stderr,
-					});
-				}
-			});
+        if (code === 0) {
+          resolve({
+            stdout: stdout,
+            stderr: stderr,
+          });
+        } else {
+          reject({
+            code: code,
+            signal: signal,
+            stdout: stdout,
+            stderr: stderr,
+          });
+        }
+      });
 
-			childProcess.on("error", (err) => {
-				childProcess.removeAllListeners("exit"); // don't call other listeners after error
-				reject(err);
-			});
+      childProcess.on("error", (err) => {
+        childProcess.removeAllListeners("exit"); // don't call other listeners after error
+        reject(err);
+      });
 
-			// kick off the process
-			loop(inputs);
-		},
-	);
+      // kick off the process
+      loop(inputs);
+    },
+  );
 
-	// Appending the process to the promise, in order to add additional parameters or behavior
-	// (such as IPC communication)
-	promise.attachedProcess = childProcess;
+  // Appending the process to the promise, in order to add additional parameters or behavior
+  // (such as IPC communication)
+  promise.attachedProcess = childProcess;
 
-	return promise;
+  return promise;
 }
 
 export { createProcess };
 
 export function create(processPath: string) {
-	function execute(
-		args: string[] = [],
-		inputs: string[] = [],
-		opts: ExecuteOptions = {},
-	): Promise<ExecuteResult> {
-		return executeWithInput(processPath, args, inputs, opts);
-	}
+  function execute(
+    args: string[] = [],
+    inputs: string[] = [],
+    opts: ExecuteOptions = {},
+  ): Promise<ExecuteResult> {
+    return executeWithInput(processPath, args, inputs, opts);
+  }
 
-	return { execute };
+  return { execute };
 }
 
 export const DOWN = "\x1B\x5B\x42";

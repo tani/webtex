@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import {
-	document,
-	HtmlGenerator,
-	parse,
-	window,
+  document,
+  HtmlGenerator,
+  parse,
+  window,
 } from "../../dist/webtex.browser.js";
 
 void window;

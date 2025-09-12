@@ -1,312 +1,312 @@
 /* Reset and base styles */
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-	font-family:
-		-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-	height: 100vh;
-	overflow: hidden;
-	background: #f5f5f5;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  background: #f5f5f5;
 }
 
 /* App container */
 .app-container {
-	display: grid;
-	grid-template-rows: 56px 1fr 36px;
-	height: 100vh;
+  display: grid;
+  grid-template-rows: 56px 1fr 36px;
+  height: 100vh;
 }
 
 /* Toolbar */
 .toolbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: #2d3748;
-	color: white;
-	padding: 0.75rem 1rem;
-	border-bottom: 1px solid #4a5568;
-	min-height: 56px;
-	height: 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2d3748;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #4a5568;
+  min-height: 56px;
+  height: 56px;
 }
 
 .toolbar h1 {
-	font-size: 1.2rem;
-	font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .toolbar-buttons {
-	display: flex;
-	gap: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .toolbar-buttons button {
-	background: #4a5568;
-	color: white;
-	border: 1px solid #718096;
-	padding: 0.375rem 0.75rem;
-	border-radius: 0.25rem;
-	cursor: pointer;
-	font-size: 0.875rem;
-	transition: background-color 0.2s;
+  background: #4a5568;
+  color: white;
+  border: 1px solid #718096;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
 }
 
 .toolbar-buttons button:hover {
-	background: #718096;
+  background: #718096;
 }
 
 .toolbar-buttons button:active {
-	background: #2d3748;
+  background: #2d3748;
 }
 
 .btn-home {
-	background: #4a5568;
-	color: white;
-	border: 1px solid #718096;
-	padding: 0.375rem 0.75rem;
-	border-radius: 0.25rem;
-	text-decoration: none;
-	font-size: 0.875rem;
-	transition: background-color 0.2s;
-	display: inline-flex;
-	align-items: center;
+  background: #4a5568;
+  color: white;
+  border: 1px solid #718096;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn-home:hover {
-	background: #718096;
-	color: white;
+  background: #718096;
+  color: white;
 }
 
 .btn-home:active {
-	background: #2d3748;
+  background: #2d3748;
 }
 
 /* Editor container */
 .editor-container {
-	display: grid;
-	grid-template-columns: 1fr 1px 1fr;
-	min-height: 0;
-	overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Panels */
 .panel,
 .editor-panel,
 .preview-panel {
-	display: grid;
-	grid-template-rows: auto 1fr auto;
-	background: white;
-	min-width: 300px;
-	overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: white;
+  min-width: 300px;
+  overflow: hidden;
 }
 
 .editor-panel {
-	border-right: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
 }
 
 .preview-container {
-	display: grid;
-	grid-template-rows: 1fr;
-	min-height: 0;
-	overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .panel-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0.75rem 1rem;
-	background: #f7fafc;
-	border-bottom: 1px solid #e2e8f0;
-	min-height: 48px;
-	height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+  min-height: 48px;
+  height: 48px;
 }
 
 .panel-header h3 {
-	font-size: 0.875rem;
-	font-weight: 600;
-	color: #2d3748;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #2d3748;
 }
 
 .editor-controls,
 .preview-controls {
-	display: flex;
-	gap: 0.5rem;
-	align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .editor-controls button {
-	background: #e2e8f0;
-	color: #4a5568;
-	border: 1px solid #cbd5e0;
-	padding: 0.25rem 0.5rem;
-	border-radius: 0.25rem;
-	cursor: pointer;
-	font-size: 0.75rem;
-	transition: background-color 0.2s;
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s;
 }
 
 .editor-controls button:hover {
-	background: #cbd5e0;
+  background: #cbd5e0;
 }
 
 .editor-controls button.active {
-	background: #3182ce;
-	color: white;
+  background: #3182ce;
+  color: white;
 }
 
 #compile-status {
-	font-size: 0.75rem;
-	color: #4a5568;
-	font-weight: 500;
+  font-size: 0.75rem;
+  color: #4a5568;
+  font-weight: 500;
 }
 
 #compile-status.compiling {
-	color: #d69e2e;
+  color: #d69e2e;
 }
 
 #compile-status.error {
-	color: #e53e3e;
+  color: #e53e3e;
 }
 
 #compile-status.success {
-	color: #38a169;
+  color: #38a169;
 }
 
 /* Simple splitter */
 .splitter {
-	background: #e2e8f0;
+  background: #e2e8f0;
 }
 
 /* Editor */
 .editor-wrapper {
-	position: relative;
-	min-height: 0;
-	overflow: auto;
+  position: relative;
+  min-height: 0;
+  overflow: auto;
 }
 
 #latex-editor {
-	width: 100%;
-	height: 100%;
-	border: none;
-	outline: none;
-	font-family:
-		"SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New",
-		monospace;
-	font-size: 14px;
-	line-height: 1.5;
-	padding: 1rem;
-	resize: none;
-	background: #fefefe;
-	color: #2d3748;
-	tab-size: 2;
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  font-family:
+    "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New",
+    monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 1rem;
+  resize: none;
+  background: #fefefe;
+  color: #2d3748;
+  tab-size: 2;
 }
 
 #latex-editor::placeholder {
-	color: #a0aec0;
+  color: #a0aec0;
 }
 
 #latex-editor:focus {
-	background: #fff;
+  background: #fff;
 }
 
 /* Preview */
 .preview-wrapper {
-	overflow: auto;
-	min-height: 0;
+  overflow: auto;
+  min-height: 0;
 }
 
 #preview-iframe {
-	width: 100%;
-	height: 100%;
-	background: white;
-	border: none;
-	border-radius: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  border: none;
+  border-radius: 0;
 }
 
 /* Status bar */
 .status-bar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: #f7fafc;
-	border-top: 1px solid #e2e8f0;
-	padding: 0.5rem 1rem;
-	font-size: 0.75rem;
-	color: #4a5568;
-	min-height: 36px;
-	height: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: #4a5568;
+  min-height: 36px;
+  height: 36px;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
-	.editor-container {
-		grid-template-columns: 1fr;
-		grid-template-rows: 1fr 6px 1fr;
-	}
+  .editor-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 6px 1fr;
+  }
 
-	.editor-panel {
-		border-right: none;
-		border-bottom: none;
-	}
+  .editor-panel {
+    border-right: none;
+    border-bottom: none;
+  }
 
-	.splitter {
-		width: 100%;
-		height: 6px;
-		background: #e2e8f0;
-	}
+  .splitter {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+  }
 
-	.toolbar {
-		padding: 0.5rem;
-	}
+  .toolbar {
+    padding: 0.5rem;
+  }
 
-	.toolbar h1 {
-		font-size: 1rem;
-	}
+  .toolbar h1 {
+    font-size: 1rem;
+  }
 
-	.toolbar-buttons {
-		gap: 0.25rem;
-	}
+  .toolbar-buttons {
+    gap: 0.25rem;
+  }
 
-	.toolbar-buttons button {
-		padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;
-	}
+  .toolbar-buttons button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
 /* Loading animation */
 @keyframes pulse {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .compiling {
-	animation: pulse 1.5s infinite;
+  animation: pulse 1.5s infinite;
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-	background: #f1f1f1;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #c1c1c1;
-	border-radius: 4px;
+  background: #c1c1c1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #a1a1a1;
+  background: #a1a1a1;
 }
