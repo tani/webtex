@@ -74,5 +74,5 @@ jobs:
         working-directory: ./packages/core
 
       - name: Validate VS Code extension packaging
-        run: bunx vsce package --no-dependencies
+        run: bunx @vscode/vsce package --no-dependencies
         working-directory: ./packages/vscode
