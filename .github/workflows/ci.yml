@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
       - name: Checkout code
@@ -61,19 +62,19 @@ jobs:
         run: bun run typecheck
 
       - name: Build all packages
-        run: bun run build
+        run: bun run compile
 
       - name: Test core package
         run: bun run test:core
 
       - name: Test VS Code extension
-        run: xvfb-run -a bun run test:vscode
+        run: xvfb-run -a bun run --cwd packages/vscode pretest
 
-  # Optional: Add a job for package publishing validation
+  # Package validation job for release readiness
   validate-packages:
     runs-on: ubuntu-latest
     needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
     
     steps:
       - name: Checkout code
@@ -88,12 +89,12 @@ jobs:
         run: bun install
 
       - name: Build packages
-        run: bun run build
+        run: bun run compile
 
-      - name: Check core package can be packed
+      - name: Validate core package
         run: npm pack --dry-run
         working-directory: ./packages/core
 
-      - name: Check VS Code extension can be packaged
-        run: bunx vsce package --no-yarn
+      - name: Validate VS Code extension packaging
+        run: bunx vsce package --no-dependencies
         working-directory: ./packages/vscode
