@@ -92,9 +92,9 @@ jobs:
         run: bun run compile
 
       - name: Validate core package
-        run: npm pack --dry-run
+        run: cd packages/core && npm pack --dry-run
         working-directory: ./packages/core
 
       - name: Validate VS Code extension packaging
-        run: bunx vsce package --no-dependencies
+        run: bunx --cwd packages/vscode vsce package --no-dependencies
         working-directory: ./packages/vscode
