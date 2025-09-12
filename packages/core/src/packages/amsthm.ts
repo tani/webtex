@@ -19,7 +19,7 @@ interface TheoremEnvironment {
 export class Amsthm {
 	static displayName = "Amsthm";
 	static args: Record<string, unknown[]> = {
-		newtheorem: ["V", "g", "g", "o?"],
+		newtheorem: ["V", "s", "g", "o?", "g", "o?"],
 		theoremstyle: ["V", "g"],
 		qed: ["H"],
 		// Environment arguments - required for parser to handle optional arguments
@@ -89,9 +89,13 @@ export class Amsthm {
 	}
 
 	// Set the current theorem style
-	theoremstyle(styleName: string): unknown[] {
-		if (this.theoremStyles[styleName]) {
-			this.currentStyle = styleName;
+	theoremstyle(styleName: string | Node): unknown[] {
+		const styleNameStr = typeof styleName === "string" 
+			? styleName 
+			: styleName.nodeValue || styleName.textContent || "";
+		
+		if (this.theoremStyles[styleNameStr]) {
+			this.currentStyle = styleNameStr;
 		}
 		return [];
 	}
@@ -115,15 +119,17 @@ export class Amsthm {
 	 * For other environment names, \newtheorem will issue a warning and the environment
 	 * will not be available for use.
 	 *
-	 * @param envName - Name of the theorem environment (may include *)
-	 * @param sharedCounterOrDisplayName - Either shared counter name or display name
-	 * @param displayNameOrParentCounter - Either display name or parent counter
+	 * @param starred - Whether this is the starred version (\newtheorem*)
+	 * @param envName - Name of the theorem environment
+	 * @param sharedCounter - Optional shared counter name (from middle [counter] position)
+	 * @param displayName - Display name for the theorem
 	 * @param parentCounter - Optional parent counter for hierarchical numbering
 	 */
 	newtheorem(
-		envName: string | Node, 
-		sharedCounterOrDisplayName: string | Node,
-		displayNameOrParentCounter?: string | Node,
+		starred: boolean,
+		envName: string | Node,
+		sharedCounter: string | Node | undefined,
+		displayName: string | Node,
 		parentCounter?: string | Node
 	): unknown[] {
 		// Extract text content from DOM nodes
@@ -132,57 +138,43 @@ export class Amsthm {
 				? envName
 				: envName.nodeValue || envName.textContent || "";
 		
-		const arg2Str =
-			typeof sharedCounterOrDisplayName === "string"
-				? sharedCounterOrDisplayName
-				: sharedCounterOrDisplayName.nodeValue || sharedCounterOrDisplayName.textContent || "";
-		
-		const arg3Str = displayNameOrParentCounter
-			? typeof displayNameOrParentCounter === "string"
-				? displayNameOrParentCounter
-				: displayNameOrParentCounter.nodeValue || displayNameOrParentCounter.textContent || ""
+		const sharedCounterStr = sharedCounter
+			? typeof sharedCounter === "string"
+				? sharedCounter
+				: sharedCounter.nodeValue || sharedCounter.textContent || ""
 			: undefined;
 		
-		const arg4Str = parentCounter
+		const displayNameStr =
+			typeof displayName === "string"
+				? displayName
+				: displayName.nodeValue || displayName.textContent || "";
+		
+		const parentCounterStr = parentCounter
 			? typeof parentCounter === "string"
 				? parentCounter
 				: parentCounter.nodeValue || parentCounter.textContent || ""
 			: undefined;
 
 		// Handle starred version for unnumbered theorems
-		const isStarred = envNameStr.includes("*");
-		const actualEnvName = isStarred ? envNameStr.replace("*", "") : envNameStr;
-		const numbered = !isStarred;
+		const actualEnvName = envNameStr;
+		const numbered = !starred;
 
-		// Parse arguments to determine syntax variant
-		let displayName: string;
+		// Parse arguments based on new signature
 		let sharedWith: string | undefined;
 		let parentResetBy: string | undefined;
 		let counterName: string;
 
-		if (arg3Str && arg4Str) {
-			// \newtheorem{name}[counter]{display}[parent] - Full syntax (rare)
-			sharedWith = arg2Str;
-			displayName = arg3Str;
-			parentResetBy = arg4Str;
+		if (sharedCounterStr) {
+			// \newtheorem{name}[counter]{display} - Shared counter
+			sharedWith = sharedCounterStr;
 			counterName = sharedWith;
-		} else if (arg3Str) {
-			// Check if arg2 looks like a counter name (lowercase, existing environment)
-			if (this.theoremEnvironments[arg2Str] || Object.keys(Amsthm.environments).includes(arg2Str)) {
-				// \newtheorem{name}[counter]{display} - Shared counter
-				sharedWith = arg2Str;
-				displayName = arg3Str;
-				counterName = sharedWith;
-			} else {
-				// \newtheorem{name}{display}[parent] - Parent counter
-				displayName = arg2Str;
-				parentResetBy = arg3Str;
-				counterName = actualEnvName;
-			}
 		} else {
-			// \newtheorem{name}{display} - Simple numbered theorem
-			displayName = arg2Str;
+			// \newtheorem{name}{display} or \newtheorem{name}{display}[parent]
 			counterName = actualEnvName;
+		}
+
+		if (parentCounterStr) {
+			parentResetBy = parentCounterStr;
 		}
 
 		// Check if this environment is already pre-defined in static environments
@@ -194,7 +186,7 @@ export class Amsthm {
 			// Customize existing pre-defined environment
 			const environment: TheoremEnvironment = {
 				name: actualEnvName,
-				displayName: displayName,
+				displayName: displayNameStr,
 				counter: numbered ? counterName : undefined,
 				parentCounter: parentResetBy,
 				numbered: numbered,

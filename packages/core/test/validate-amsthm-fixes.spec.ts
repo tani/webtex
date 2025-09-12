@@ -5,15 +5,11 @@ test("Validate amsthm fixes - shared counters working", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
   
   // This tests the main issue: shared counter syntax \newtheorem{lemma}[theorem]{Lemma}
-  const input = `** test shared counters
-.
-\\documentclass{article}
+  const input = `\\documentclass{article}
 \\usepackage{amsthm}
-
+\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}[theorem]{Lemma}
-
-\\begin{document}
 \\begin{theorem}
 First theorem - should be number 1
 \\end{theorem}
@@ -25,8 +21,7 @@ First lemma - should be number 2 (shared counter)
 \\begin{theorem}
 Second theorem - should be number 3 (shared counter)
 \\end{theorem}
-\\end{document}
-.`;
+\\end{document}`;
 
   try {
     const doc = parse(input, { generator: generator }).htmlDocument();
@@ -57,14 +52,10 @@ Second theorem - should be number 3 (shared counter)
 test("Validate amsthm fixes - basic numbering works", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
   
-  const input = `** test basic numbering
-.
-\\documentclass{article}
+  const input = `\\documentclass{article}
 \\usepackage{amsthm}
-
-\\newtheorem{theorem}{Theorem}
-
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -72,8 +63,7 @@ First theorem
 \\begin{theorem}
 Second theorem
 \\end{theorem}
-\\end{document}
-.`;
+\\end{document}`;
 
   try {
     const doc = parse(input, { generator: generator }).htmlDocument();

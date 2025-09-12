@@ -4,16 +4,16 @@ import { HtmlGenerator, parse } from "../src/index";
 test("Amsthm theorem numbering - basic sequential numbering", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
   
-  const input = `
+const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
 \\begin{theorem}
 First theorem
 \\end{theorem}
 \\begin{theorem}
-Second theorem  
+Second theorem
 \\end{theorem}
 \\begin{theorem}
 Third theorem
@@ -35,10 +35,10 @@ test("Amsthm theorem numbering - multiple environment types", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
+\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}{Lemma}
 \\newtheorem{corollary}{Corollary}
-\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -69,10 +69,10 @@ test("Amsthm theorem numbering - shared counters", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
+\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}[theorem]{Lemma}
 \\newtheorem{corollary}[theorem]{Corollary}
-\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -103,8 +103,8 @@ test("Amsthm theorem numbering - hierarchical numbering with sections", async ()
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}[section]
 \\begin{document}
+\\newtheorem{theorem}{Theorem}[section]
 \\section{First Section}
 \\begin{theorem}
 First theorem in section 1
@@ -133,15 +133,15 @@ test("Amsthm theorem numbering - unnumbered theorems", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}
-\\newtheorem*{theorem*}{Theorem}
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
+\\newtheorem*{remark}{Theorem}
 \\begin{theorem}
 Numbered theorem
 \\end{theorem}
-\\begin{theorem*}
+\\begin{remark}
 Unnumbered theorem
-\\end{theorem*}
+\\end{remark}
 \\begin{theorem}
 Another numbered theorem
 \\end{theorem}
@@ -152,7 +152,7 @@ Another numbered theorem
   
   // Should have numbered and unnumbered versions
   expect(html).toContain("Theorem 1.");
-  expect(html).toContain("Theorem."); // Unnumbered
+  expect(html).toContain("Theorem."); // Unnumbered (remark with Theorem display name)
   expect(html).toContain("Theorem 2.");
 });
 
@@ -162,8 +162,8 @@ test("Amsthm theorem numbering - with optional titles", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
 \\begin{theorem}
 Theorem without title
 \\end{theorem}
@@ -207,13 +207,13 @@ test("Amsthm theorem styles", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
+\\begin{document}
 \\theoremstyle{plain}
 \\newtheorem{theorem}{Theorem}
 \\theoremstyle{definition}
 \\newtheorem{definition}{Definition}
 \\theoremstyle{remark}
 \\newtheorem{remark}{Remark}
-\\begin{document}
 \\begin{theorem}
 Plain style theorem
 \\end{theorem}

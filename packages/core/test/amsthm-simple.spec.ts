@@ -4,10 +4,10 @@ import { HtmlGenerator, parse } from "../src/index";
 test("Simple amsthm test - basic theorem", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
   
-  const input = `\\documentclass{article}
+const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -32,10 +32,10 @@ First theorem
 test("Simple amsthm test - check number counter", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });
   
-  const input = `\\documentclass{article}
+const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\newtheorem{theorem}{Theorem}
 \\begin{document}
+\\newtheorem{theorem}{Theorem}
 \\begin{theorem}
 First theorem
 \\end{theorem}

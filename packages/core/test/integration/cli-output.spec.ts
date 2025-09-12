@@ -3,10 +3,12 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import pkg from "../../package.json";
 import { create as cmd } from "../lib/cmd";
 
-const binFile = path.resolve(pkg.bin[pkg.name]);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const binFile = path.resolve(__dirname, "../../", pkg.bin[pkg.name]);
 const latexjs = cmd(binFile);
 
 // Helper to create and cleanup temp files
