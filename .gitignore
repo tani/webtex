@@ -1,2 +1,62 @@
+# Environment and tooling
 /.direnv/
 /.claude/
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+out/
+build/
+*.tsbuildinfo
+
+# Runtime and caches
+.uuid
+.vscode
+.lsmcp/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+test/test-results.xml
+test/screenshots/test-results.xml
+coverage/
+*.lcov
+
+# Generated content
+css/
+js/
+fonts/
+src/latex-parser.ts
+example/latexjs/
+example/webtex/
+*.stats.html
+website/
+
+# VS Code extension specific
+.vscode-test/
+*.vsix
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE files
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+*~
