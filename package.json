@@ -1,6 +1,6 @@
 {
   "name": "webtex-monorepo",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "WebTeX - LaTeX to HTML5 translator monorepo",
   "author": {
