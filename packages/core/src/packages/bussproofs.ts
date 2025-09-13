@@ -529,8 +529,22 @@ export class Bussproofs {
       }
     }
 
-    // Return all remaining elements in the stack
-    return stack.length > 0 ? stack : [];
+    // Return all remaining elements in the stack, wrapped in a single block div
+    if (stack.length > 0) {
+      const wrapper = this.g.create("div", undefined, "bussproofs-outer-wrapper");
+      (wrapper as HTMLElement).style.cssText = "display: block;";
+
+      for (const element of stack) {
+        const inlineBlock = this.g.create("div", undefined, "bussproofs-inner-wrapper");
+        (inlineBlock as HTMLElement).style.cssText = "display: inline-block; margin: 0 0.5em;";
+        inlineBlock.appendChild(element as Node); 
+        wrapper.appendChild(inlineBlock);
+      }
+
+      return [wrapper];
+    }
+
+    return [];
   }
 }
 
