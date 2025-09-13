@@ -40,7 +40,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist test/test-results.xml",
-    "compile": "bun run clean && npx tsx build.ts",
+    "compile": "npm run clean && npx tsx build.ts",
     "compile:check": "[ -d \"dist\" ] || npx tsx build.ts",
     "pretest": "npx tsx build.ts",
     "test": "vitest run",

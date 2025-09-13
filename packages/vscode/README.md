@@ -65,29 +65,29 @@ This extension doesn't currently contribute any VS Code settings.
 ### Setup
 
 1. Clone this repository (from the monorepo root)
-2. Run `bun install` to install dependencies
-3. Run `bun run compile` to compile the extension
+2. Run `npm install` to install dependencies
+3. Run `npm run compile` to compile the extension
 4. Press `F5` to run the extension in a new Extension Development Host window
 
 ### Building
 
-This package uses a custom Bun-based build system for optimal performance:
+This package uses a custom esbuild-based build system for optimal performance:
 
 ```bash
 # Development build with source maps
-bun run compile
+npm run compile
 
 # Clean build (removes output directory first)
-bun run compile:clean
+npm run compile:clean
 
 # Production build (minified, optimized for packaging)
-bun run compile:prod
+npm run compile:prod
 
 # Watch mode for development
-bun run compile:watch
+npm run compile:watch
 ```
 
-The build system uses Bun's native build API which is significantly faster than TypeScript compilation for small packages like VSCode extensions.
+The build system uses esbuild which is significantly faster than TypeScript compilation for small packages like VSCode extensions.
 
 **Note**: The build process automatically copies WebTeX core files from `../core/dist/` to the local `webtex/` directory, eliminating the need for `node_modules` dependencies in the packaged extension.
 

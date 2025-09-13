@@ -15,24 +15,24 @@ This file contains configuration and context for Claude Code to work effectively
 ## Development Commands
 
 ### Build Commands
-- `bun run build` - Clean build of the entire project
-- `bun run build:check` - Build only if `dist/` doesn't exist (efficient rebuilds)
-- `bun run clean` - Remove build artifacts
+- `npm run compile` - Clean build of the entire project
+- `npm run compile:check` - Build only if `dist/` doesn't exist (efficient rebuilds)
+- `npm run clean` - Remove build artifacts
 
 ### Testing Commands
-- `bun test` - Run all tests (includes prebuild check)
-- `bun test --watch` - Run tests in watch mode
-- `bun test test/api.ts` - API functionality tests
-- `bun test test/cli.ts` - Command-line interface tests
-- `bun test test/parsing.spec.ts` - LaTeX parsing tests
-- `bun test test/integration/` - Integration tests
-- `bun test test/visual/` - Visual regression tests
-- `bun test test/visual/screenshots.spec.ts` - Screenshot comparison tests
+- `npm test` - Run all tests (includes prebuild check)
+- `npm run test:watch` - Run tests in watch mode
+- `npm test test/api.spec.ts` - API functionality tests
+- `npm test test/cli.spec.ts` - Command-line interface tests
+- `npm test test/parsing.spec.ts` - LaTeX parsing tests
+- `npm test test/integration/` - Integration tests
+- `npm test test/visual/` - Visual regression tests
+- `npm test test/visual/screenshots.spec.ts` - Screenshot comparison tests
 
 ### Code Quality Commands
-- `bun run lint` - Run Biome linting and formatting
-- `bun run typecheck` - TypeScript type checking
-- `bun run format` - Format code with Biome
+- `npm run lint` - Run Biome linting and formatting
+- `npm run typecheck` - TypeScript type checking
+- `npm run format` - Format code with Biome
 
 ## Build System Architecture
 
@@ -149,10 +149,10 @@ function handleNodeType(type: 'text' | 'element' | 'comment'): void {
 
 Before committing ANY changes, run these commands in order:
 
-1. **`bun run lint`** - Fix all linting and formatting issues
-2. **`bun run typecheck`** - Resolve all TypeScript compilation errors
-3. **`bun run build`** - Ensure build process completes successfully  
-4. **`bun test`** - Verify all tests pass
+1. **`npm run lint`** - Fix all linting and formatting issues
+2. **`npm run typecheck`** - Resolve all TypeScript compilation errors
+3. **`npm run compile`** - Ensure build process completes successfully  
+4. **`npm test`** - Verify all tests pass
 
 **Commit only when all four steps pass without errors.**
 
@@ -185,10 +185,10 @@ The project includes comprehensive visual regression testing to ensure UI consis
 #### Setup Requirements
 ```bash
 # Install system dependencies (Linux/CI)
-bunx playwright install-deps
+npx playwright install-deps
 
 # Install browser binaries
-bunx playwright install
+npx playwright install
 ```
 
 #### Test Organization
@@ -199,8 +199,8 @@ bunx playwright install
 
 #### Running Visual Tests
 ```bash
-bun test test/visual/              # Run all visual tests
-bun test test/visual/screenshots.spec.ts   # Run screenshot comparison tests
+npm test test/visual/              # Run all visual tests
+npm test test/visual/screenshots.spec.ts   # Run screenshot comparison tests
 ```
 
 ### Test Structure
@@ -233,7 +233,7 @@ webtex/
 - **`vite.config.ts`** - Build configuration with custom PegJS plugin
 - **`tsconfig.json`** - TypeScript configuration with strict mode
 - **`biome.json`** - Linting and formatting rules
-- **`package.json`** - Dependencies and bun scripts
+- **`package.json`** - Dependencies and npm scripts
 
 ## Continuous Integration
 
@@ -246,12 +246,12 @@ The CI pipeline ensures code quality and prevents regressions:
 - **Ubuntu latest** - Stable Linux environment for consistent builds
 
 #### Caching Strategy
-- **Bun cache** - Speeds up dependency installation
+- **npm cache** - Speeds up dependency installation
 - **Playwright binaries** - Cached browser installations
 - **Build artifacts** - Optimized build caching between runs
 
 #### Quality Gates
-1. **Dependency installation** - `bun install` for reproducible installs
+1. **Dependency installation** - `npm ci` for reproducible installs
 2. **Linting** - Biome checks for code style and common issues
 3. **Type checking** - TypeScript compilation without emit
 4. **Building** - Full project build including asset processing
@@ -273,8 +273,8 @@ All steps must pass before code can be merged.
 - **Type generation** - `.d.ts` files generated for TypeScript consumers
 
 ### Development Workflow
-1. **Install dependencies** - `bun install`
-2. **Start development** - `bun run build:check && bun test --watch`
+1. **Install dependencies** - `npm install`
+2. **Start development** - `npm run compile:check && npm run test:watch`
 3. **Code changes** - Edit TypeScript files in `src/`
 4. **Quality check** - Run the 4-step quality workflow before committing
 5. **Commit** - Use conventional commit messages for changelog generation

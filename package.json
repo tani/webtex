@@ -11,22 +11,22 @@
     "packages/*"
   ],
   "scripts": {
-    "compile": "bun run compile:core && bun run compile:vscode",
-    "compile:core": "bun run --cwd packages/core compile",
-    "compile:vscode": "bun run --cwd packages/vscode compile",
-    "test": "bun run test:core",
-    "test:core": "bun run --cwd packages/core test",
-    "lint": "bun run lint:core && bun run lint:vscode",
-    "lint:core": "bun run --cwd packages/core lint",
-    "lint:vscode": "bun run --cwd packages/vscode lint",
-    "typecheck": "bun run typecheck:core && bun run typecheck:vscode",
-    "typecheck:core": "bun run --cwd packages/core typecheck",
-    "typecheck:vscode": "bun run --cwd packages/vscode typecheck",
-    "clean": "bun run clean:core && bun run clean:vscode",
-    "clean:core": "bun run --cwd packages/core clean",
-    "clean:vscode": "bun run --cwd packages/vscode clean",
-    "dev:core": "bun run --cwd packages/core test:watch",
-    "dev:vscode": "bun run --cwd packages/vscode watch"
+    "compile": "npm run compile:core && npm run compile:vscode",
+    "compile:core": "npm run -w packages/core compile",
+    "compile:vscode": "npm run -w packages/vscode compile",
+    "test": "npm run test:core",
+    "test:core": "npm run -w packages/core test",
+    "lint": "npm run lint:core && npm run lint:vscode",
+    "lint:core": "npm run -w packages/core lint",
+    "lint:vscode": "npm run -w packages/vscode lint",
+    "typecheck": "npm run typecheck:core && npm run typecheck:vscode",
+    "typecheck:core": "npm run -w packages/core typecheck",
+    "typecheck:vscode": "npm run -w packages/vscode typecheck",
+    "clean": "npm run clean:core && npm run clean:vscode",
+    "clean:core": "npm run -w packages/core clean",
+    "clean:vscode": "npm run -w packages/vscode clean",
+    "dev:core": "npm run -w packages/core test:watch",
+    "dev:vscode": "npm run -w packages/vscode watch"
   },
   "engines": {
     "node": ">= 22.0"

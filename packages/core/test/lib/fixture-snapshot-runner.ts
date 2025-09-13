@@ -196,7 +196,7 @@ export function runMigratedFixture(
               expect(normalizedOutput).toBe(normalizedExpected);
               // If fixture passes but snapshot fails, it means output changed
               throw new Error(
-                `Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: bun test --update-snapshots`,
+                `Snapshot verification failed but fixture assertion passed. Output may have changed intentionally. Update snapshots with: npm test -- --update-snapshots`,
               );
             } catch (_fixtureError) {
               // Both failed, throw original snapshot error

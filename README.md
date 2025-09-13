@@ -26,8 +26,8 @@ A JavaScript LaTeX to HTML5 translator monorepo - WebTeX fork with enhanced feat
 # Install as npm package
 npm install webtex
 
-# Or use with bun
-bun add webtex
+# Or use with yarn
+yarn add webtex
 ```
 
 ### Basic Usage
@@ -55,7 +55,7 @@ webtex input.tex output.html
 ### Prerequisites
 
 - **Node.js >= 22.0** (required)
-- **Bun** (recommended package manager)
+- **npm** (recommended package manager)
 - **VS Code** (for extension development)
 
 ### Setup
@@ -66,36 +66,36 @@ git clone https://github.com/tani/webtex.git
 cd webtex
 
 # Install dependencies
-bun install
+npm install
 
 # Build all packages
-bun run build
+npm run compile
 
 # Run tests
-bun run test
+npm test
 
 # Quality assurance (run before committing)
-bun run lint
-bun run typecheck
+npm run lint
+npm run typecheck
 ```
 
 ### Monorepo Commands
 
 ```bash
 # Core library development
-bun run build:core         # Build core package
-bun run test:core          # Test core package  
-bun run dev:core           # Watch mode for core
+npm run compile:core       # Build core package
+npm run test:core          # Test core package  
+npm run dev:core           # Watch mode for core
 
 # VS Code extension development
-bun run build:vscode       # Build extension
-bun run dev:vscode         # Watch mode for extension
-bun run test:vscode        # Test extension
+npm run compile:vscode     # Build extension
+npm run dev:vscode         # Watch mode for extension
+npm run test:vscode        # Test extension
 
 # All packages
-bun run build              # Build all packages
-bun run test               # Test all packages
-bun run clean              # Clean build artifacts
+npm run compile            # Build all packages
+npm test                   # Test all packages
+npm run clean              # Clean build artifacts
 ```
 
 ### Testing
@@ -104,17 +104,17 @@ The project includes comprehensive testing infrastructure:
 
 ```bash
 # Unit and integration tests
-bun test
+npm test
 
 # Visual regression tests (requires Playwright)
-bunx playwright install
-bun test test/visual/
+npx playwright install
+npm test test/visual/
 
 # API tests
-bun test test/api.ts
+npm test test/api.spec.ts
 
 # CLI tests  
-bun test test/cli.ts
+npm test test/cli.spec.ts
 ```
 
 ### Code Quality
@@ -122,10 +122,10 @@ bun test test/cli.ts
 Before committing, ensure all quality checks pass:
 
 ```bash
-bun run lint              # Biome linting and formatting
-bun run typecheck         # TypeScript type checking
-bun run build             # Build verification
-bun test                  # Full test suite
+npm run lint              # Biome linting and formatting
+npm run typecheck         # TypeScript type checking
+npm run compile           # Build verification
+npm test                  # Full test suite
 ```
 
 ## Architecture
@@ -140,7 +140,7 @@ bun test                  # Full test suite
 
 ### Workspace Structure
 
-This monorepo uses Bun workspaces for dependency management:
+This monorepo uses npm workspaces for dependency management:
 
 ```
 webtex/
@@ -153,14 +153,14 @@ webtex/
 │       ├── src/           # Extension source
 │       └── out/           # Built extension
 ├── .github/workflows/     # CI/CD configuration
-└── bun.lock              # Dependency lockfile
+└── package-lock.json     # Dependency lockfile
 ```
 
 ## Contributing
 
 1. **Fork the repository** and create a feature branch
 2. **Make changes** following the TypeScript coding standards
-3. **Run quality checks**: `bun run lint && bun run typecheck && bun run build && bun test`
+3. **Run quality checks**: `npm run lint && npm run typecheck && npm run compile && npm test`
 4. **Submit a pull request** with a clear description
 
 ### TypeScript Guidelines

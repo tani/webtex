@@ -1,5 +1,5 @@
-import { $ } from "bun";
+import { $ } from "zx";
 
 await $`mkdir -p latexjs webtex`;
-await $`bun x latex.js --pretty example.tex --assets=latexjs > latexjs/index.html`;
-await $`bun ../bin/webtex --pretty example.tex --assets=webtex > webtex/index.html`;
+await $`npx latex.js --pretty example.tex --assets=latexjs > latexjs/index.html`;
+await $`node ../bin/webtex --pretty example.tex --assets=webtex > webtex/index.html`;

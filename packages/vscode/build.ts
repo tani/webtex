@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import { $ } from "zx";
 
-// Handle __dirname in ES modules (with Bun compatibility)
+// Handle __dirname in ES modules
 interface ImportMeta {
   dir?: string;
 }
@@ -33,7 +33,7 @@ async function copyWebTexFiles() {
 
   if (!existsSync(coreDistPath)) {
     throw new Error(
-      "Core package dist directory not found. Please build the core package first with 'bun run compile:core'",
+      "Core package dist directory not found. Please build the core package first with 'npm run compile:core'",
     );
   }
 
