@@ -154,6 +154,7 @@ export interface BussproofsGenerator extends PackageGenerator {
   ): Element;
   createText(text: string): Text | undefined;
   createFragment(...args: unknown[]): unknown;
+  parseMath(math: string, display?: boolean): unknown;
 }
 
 const createContentParser = () => {
@@ -210,17 +211,55 @@ export class Bussproofs {
 
   /**
    * Re-process LaTeX content with webtex to get HTML elements
-   * For now, we'll use simple text processing as fallback
+   * Properly handles math expressions like $x$ and LaTeX commands
    */
   private processLatexContent(content: string): unknown[] {
-    // For the initial implementation, return the content as text
-    // TODO: Implement proper LaTeX parsing for command content
     if (!content.trim()) {
       return [];
     }
-    
-    const textNode = this.g.createText?.(content);
-    return textNode ? [textNode] : [content];
+
+    try {
+      // Handle different types of math delimiters and convert them to the format MathJax expects
+      const inlineMathMatch = content.match(/^\$(.+?)\$$/);
+      const inlineParenMathMatch = content.match(/^\\\((.+?)\\\)$/);
+      const displayMathMatch = content.match(/^\\\[(.+?)\\\]$/);
+      const containsLatexCommands =
+        /\\[a-zA-Z]+/.test(content) && !/^\$.*\$$/.test(content);
+
+      if (inlineMathMatch) {
+        // Inline math with $ delimiters - extract content and pass just the math content
+        const mathContent = inlineMathMatch[1];
+        const mathResult = this.g.parseMath(mathContent, false);
+        return mathResult ? [mathResult] : [];
+      } else if (inlineParenMathMatch) {
+        // Inline math with \( \) delimiters - extract content and pass just the math content
+        const mathContent = inlineParenMathMatch[1];
+        const mathResult = this.g.parseMath(mathContent, false);
+        return mathResult ? [mathResult] : [];
+      } else if (displayMathMatch) {
+        // Display math with \[ \] delimiters - extract content and pass just the math content
+        const mathContent = displayMathMatch[1];
+        const mathResult = this.g.parseMath(mathContent, true);
+        return mathResult ? [mathResult] : [];
+      } else if (containsLatexCommands) {
+        // Process as LaTeX content (may contain other commands)
+        const mathResult = this.g.parseMath(content, false);
+        return mathResult ? [mathResult] : [];
+      } else {
+        // Process as plain text
+        const textNode = this.g.createText?.(content);
+        return textNode ? [textNode] : [];
+      }
+    } catch (error) {
+      console.warn(
+        "Failed to process LaTeX content, falling back to text:",
+        content,
+        error,
+      );
+      // Fallback: return the content as text
+      const textNode = this.g.createText?.(content);
+      return textNode ? [textNode] : [content];
+    }
   }
 
   /**
@@ -229,15 +268,15 @@ export class Bussproofs {
   private createProofTree(
     premises: unknown[],
     conclusion: unknown,
-    premiseCount: number
+    premiseCount: number,
   ): Element {
     // Create the main grid container
     const gridContainer = this.g.create(
       "div",
       undefined,
-      `bussproofs-grid bussproofs-grid-${premiseCount}`
+      `bussproofs-grid bussproofs-grid-${premiseCount}`,
     );
-    
+
     // Set CSS grid properties
     const gridColumns = premiseCount * 2;
     (gridContainer as HTMLElement).style.cssText = `
@@ -247,7 +286,7 @@ export class Bussproofs {
       gap: 0;
       border: 1px dotted #ccc; /* Debug border */
     `;
-    
+
     // Add premise cells (top row)
     premises.forEach((premise, index) => {
       const premiseCell = this.g.create("div", premise, "bussproofs-premise");
@@ -259,9 +298,13 @@ export class Bussproofs {
       `;
       gridContainer.appendChild(premiseCell);
     });
-    
+
     // Add conclusion cell (bottom row, spanning all columns)
-    const conclusionCell = this.g.create("div", conclusion, "bussproofs-conclusion");
+    const conclusionCell = this.g.create(
+      "div",
+      conclusion,
+      "bussproofs-conclusion",
+    );
     (conclusionCell as HTMLElement).style.cssText = `
       grid-column: 1 / -1;
       grid-row: 2;
@@ -270,7 +313,7 @@ export class Bussproofs {
        border-top: 2px solid #000; /* Rule line */
     `;
     gridContainer.appendChild(conclusionCell);
-    
+
     return gridContainer;
   }
 
@@ -279,77 +322,94 @@ export class Bussproofs {
 
     const commands = parseCommands(proofContent);
     const stack: unknown[] = [];
-    
+
     for (const command of commands) {
       // Process the command's content with webtex
       const processedContent = this.processLatexContent(command.content);
-      const conclusionElement = processedContent.length > 0 
-        ? this.g.createFragment(...processedContent)
-        : this.g.createText?.(command.content) || command.content;
-      
+      const conclusionElement =
+        processedContent.length > 0
+          ? this.g.createFragment(...processedContent)
+          : this.g.createText?.(command.content) || command.content;
+
       switch (command.command) {
         case "AxiomC":
           // Push the processed content to stack
           stack.push(conclusionElement);
           break;
-          
+
         case "UnaryInfC":
           if (stack.length >= 1) {
             const premise1 = stack.pop();
-            const proofTree = this.createProofTree([premise1], conclusionElement, 1);
+            const proofTree = this.createProofTree(
+              [premise1],
+              conclusionElement,
+              1,
+            );
             stack.push(proofTree);
           } else {
-            console.warn('UnaryInfC: not enough premises in stack');
+            console.warn("UnaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
           break;
-          
+
         case "BinaryInfC":
           if (stack.length >= 2) {
             const premise2 = stack.pop();
             const premise1 = stack.pop();
-            const proofTree = this.createProofTree([premise1, premise2], conclusionElement, 2);
+            const proofTree = this.createProofTree(
+              [premise1, premise2],
+              conclusionElement,
+              2,
+            );
             stack.push(proofTree);
           } else {
-            console.warn('BinaryInfC: not enough premises in stack');
+            console.warn("BinaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
           break;
-          
+
         case "TrinaryInfC":
           if (stack.length >= 3) {
             const premise3 = stack.pop();
             const premise2 = stack.pop();
             const premise1 = stack.pop();
-            const proofTree = this.createProofTree([premise1, premise2, premise3], conclusionElement, 3);
+            const proofTree = this.createProofTree(
+              [premise1, premise2, premise3],
+              conclusionElement,
+              3,
+            );
             stack.push(proofTree);
           } else {
-            console.warn('TrinaryInfC: not enough premises in stack');
+            console.warn("TrinaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
           break;
-          
+
         case "QuaternaryInfC":
           if (stack.length >= 4) {
             const premise4 = stack.pop();
             const premise3 = stack.pop();
             const premise2 = stack.pop();
             const premise1 = stack.pop();
-            const proofTree = this.createProofTree([premise1, premise2, premise3, premise4], conclusionElement, 4);
+            const proofTree = this.createProofTree(
+              [premise1, premise2, premise3, premise4],
+              conclusionElement,
+              4,
+            );
             stack.push(proofTree);
           } else {
-            console.warn('QuaternaryInfC: not enough premises in stack');
+            console.warn("QuaternaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
           break;
-          
+
         default:
           console.warn(`Unknown bussproofs command: ${command.command}`);
           stack.push(conclusionElement);
           break;
       }
     }
-    
+
     // Return all remaining elements in the stack
     return stack.length > 0 ? stack : [];
   }

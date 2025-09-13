@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
-  parseCommands,
   type BussproofsCommand,
+  parseCommands,
 } from "../../src/packages/bussproofs";
 
 describe("bussproofs.parseCommands", () => {
@@ -38,7 +38,13 @@ describe("bussproofs.parseCommands", () => {
       { type: "axiom", command: "AxiomC", content: "A" },
       { type: "inference", command: "BinaryInfC", arity: 2, content: "B {C}" },
       { type: "axiom", command: "AxiomC", abbreviated: true, content: "D" },
-      { type: "inference", command: "UnaryInfC", arity: 1, abbreviated: true, content: "E" },
+      {
+        type: "inference",
+        command: "UnaryInfC",
+        arity: 1,
+        abbreviated: true,
+        content: "E",
+      },
       { type: "inference", command: "TrinaryInfC", arity: 3, content: "F" },
       { type: "inference", command: "QuinaryInfC", arity: 5, content: "G" },
     ];
