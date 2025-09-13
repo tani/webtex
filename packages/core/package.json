@@ -40,9 +40,9 @@
   },
   "scripts": {
     "clean": "rm -rf dist test/test-results.xml",
-    "compile": "bun run clean && bun run build.ts",
-    "compile:check": "[ -d \"dist\" ] || bun run build.ts",
-    "pretest": "bun run build.ts",
+    "compile": "bun run clean && npx tsx build.ts",
+    "compile:check": "[ -d \"dist\" ] || npx tsx build.ts",
+    "pretest": "npx tsx build.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
@@ -67,10 +67,13 @@
     "@biomejs/biome": "^2.2.3",
     "@types/he": "^1.2.3",
     "@types/node": "^24.3.1",
+    "esbuild": "^0.23.0",
     "latex.js": "^0.12.6",
     "peggy": "^5.0.6",
     "playwright": "^1.55.0",
-    "typescript": "^5.9.2"
+    "tsx": "^4.19.1",
+    "typescript": "^5.9.2",
+    "zx": "^8.0.0"
   },
   "repository": {
     "type": "git",

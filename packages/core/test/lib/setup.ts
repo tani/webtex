@@ -1,24 +1,32 @@
 // Global takeScreenshot function using Playwright
 
+import { afterAll } from "bun:test";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { chromium } from "playwright";
+import { type Browser, chromium, type Page } from "playwright";
 
 interface ScreenshotGlobal {
   takeScreenshot?: (html: string, filename: string) => Promise<void>;
 }
 
 const screenshotGlobal = globalThis as ScreenshotGlobal;
+let browser: Browser | undefined;
+let page: Page | undefined;
 
-screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
+screenshotGlobal.takeScreenshot = async (
+  html: string,
+  filename: string,
+): Promise<void> => {
   // Add .png extension if not present
   const screenshotPath = filename.endsWith(".png")
     ? filename
     : `${filename}.png`;
   console.log(`Taking screenshot for: ${screenshotPath}`);
 
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  if (!browser || !page) {
+    browser = await chromium.launch();
+    page = await browser.newPage();
+  }
 
   // Set up the page with CSS and HTML
   const fullHtml = `
@@ -43,6 +51,8 @@ screenshotGlobal.takeScreenshot = async (html: string, filename: string) => {
 
   // Take screenshot
   await page.screenshot({ path: screenshotPath, fullPage: true });
-
-  await browser.close();
 };
+
+afterAll(async () => {
+  await browser?.close();
+});

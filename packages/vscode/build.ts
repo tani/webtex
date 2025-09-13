@@ -1,15 +1,13 @@
-#!/usr/bin/env bun
-
 /**
- * Build script for VSCode extension using Bun's build API
+ * Build script for VSCode extension using esbuild
  * Optimized for small VSCode packages with minimal dependencies
  */
 
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-// Type declaration for Bun build API
-import { $, build } from "bun";
+import { build as esbuild } from "esbuild";
+import { $ } from "zx";
 
 // Handle __dirname in ES modules (with Bun compatibility)
 interface ImportMeta {
@@ -63,12 +61,13 @@ async function buildExtension(options: BuildOptions = {}) {
   await copyWebTexFiles();
 
   const buildConfig = {
-    entrypoints: ["./src/extension.ts"],
+    entryPoints: ["./src/extension.ts"],
     outdir: "./out",
-    target: "node" as const,
+    platform: "node" as const,
     format: "cjs" as const, // VSCode extensions need CommonJS
+    bundle: true,
     minify: production,
-    sourcemap: production ? ("none" as const) : ("inline" as const),
+    sourcemap: production ? false : "inline",
     external: [
       "vscode", // Always external - provided by VSCode runtime
       "mocha", // Test dependencies
@@ -78,74 +77,37 @@ async function buildExtension(options: BuildOptions = {}) {
     define: {
       "process.env.NODE_ENV": production ? '"production"' : '"development"',
     },
-    compile: true,
-  };
+    metafile: !production,
+  } as const;
 
   try {
     if (watch) {
       console.log("👀 Starting watch mode...");
-      // Note: Bun's watch API might evolve, this is a basic implementation
-      const watcher = require("node:fs").watch(
-        path.join(__dirname, "src"),
-        { recursive: true },
-        async (_eventType: string, filename: string) => {
-          if (filename?.endsWith(".ts") || filename?.endsWith(".js")) {
-            console.log(`📝 File changed: ${filename}, rebuilding...`);
-            await buildOnce();
-          }
-        },
-      );
-
-      // Initial build
-      await buildOnce();
-
+      const ctx = await esbuild.context(buildConfig);
+      await ctx.watch();
       console.log("✅ Watch mode started. Press Ctrl+C to stop.");
-
-      // Keep process alive
       process.on("SIGINT", () => {
         console.log("\n👋 Stopping watch mode...");
-        watcher.close();
+        ctx.dispose();
         process.exit(0);
       });
-
-      // Keep the process running
       await new Promise(() => {});
     } else {
-      await buildOnce();
+      const startTime = performance.now();
+      const result = await esbuild(buildConfig);
+      const duration = Math.round(performance.now() - startTime);
+      console.log(`✅ Build completed successfully in ${duration}ms`);
+      if (!production && result.metafile) {
+        console.log("📁 Output files:");
+        for (const output of Object.keys(result.metafile.outputs)) {
+          const relativePath = path.relative(__dirname, output);
+          console.log(`   ${relativePath}`);
+        }
+      }
     }
   } catch (error) {
     console.error("❌ Build failed:", error);
     process.exit(1);
-  }
-
-  async function buildOnce() {
-    const startTime = performance.now();
-
-    const result = await build(buildConfig);
-
-    if (result.success) {
-      const duration = Math.round(performance.now() - startTime);
-      const outputCount = result.outputs.length;
-      console.log(
-        `✅ Build completed successfully in ${duration}ms (${outputCount} files)`,
-      );
-
-      if (!production) {
-        console.log("📁 Output files:");
-        for (const output of result.outputs) {
-          const relativePath = path.relative(__dirname, output.path);
-          console.log(`   ${relativePath}`);
-        }
-      }
-    } else {
-      console.error("❌ Build failed");
-      if (result.logs.length > 0) {
-        for (const log of result.logs) {
-          console.error(log.message);
-        }
-      }
-      process.exit(1);
-    }
   }
 }
 
@@ -163,9 +125,9 @@ function parseArgs(): BuildOptions {
 }
 
 // Run if called directly
-if (import.meta.main) {
-  const options = parseArgs();
+const options = parseArgs();
+(async () => {
   await buildExtension(options);
-}
+})();
 
 export { buildExtension };

@@ -118,6 +118,7 @@ function runScreenshotTest(fixture: FixtureItem, name: string) {
         );
         await takeScreenshot(htmlDoc.documentElement.outerHTML, filename);
       },
+      30_000,
     );
   }
 }

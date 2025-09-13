@@ -60,19 +60,19 @@
   },
   "scripts": {
     "vscode:package": "vsce package --no-dependencies",
-    "vscode:prepublish": "bun run --cwd ../core compile && bun run compile:prod",
-    "compile": "bun run --cwd ../core compile && bun run build.ts",
-    "compile:clean": "bun run build.ts --clean",
-    "compile:prod": "bun run build.ts --production --clean",
-    "compile:watch": "bun run build.ts --watch",
-    "watch": "bun run compile:watch",
+    "vscode:prepublish": "bun run --cwd ../core compile && npx tsx build.ts --production --clean",
+    "compile": "bun run --cwd ../core compile && npx tsx build.ts",
+    "compile:clean": "npx tsx build.ts --clean",
+    "compile:prod": "npx tsx build.ts --production --clean",
+    "compile:watch": "npx tsx build.ts --watch",
+    "watch": "npx tsx build.ts --watch",
     "pretest": "bun run compile && npx tsc && bun run lint:skip",
     "lint": "biome check",
     "lint:skip": "echo 'Skipping lint for test run'",
     "lint:fix": "biome check --write",
     "format": "biome format --write",
     "format:check": "biome format",
-    "clean": "bun run build.ts --clean",
+    "clean": "npx tsx build.ts --clean",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -80,7 +80,10 @@
     "@types/node": "22.x",
     "@types/vscode": "^1.103.0",
     "@vscode/vsce": "^3.6.0",
-    "typescript": "^5.9.2"
+    "esbuild": "^0.23.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.9.2",
+    "zx": "^8.0.0"
   },
   "dependencies": {}
 }

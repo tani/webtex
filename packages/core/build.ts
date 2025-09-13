@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { $, build as bunBuild } from "bun";
-import { generate } from "peggy";
+import { build as esbuild } from "esbuild";
+import peggy from "peggy";
+import { $ } from "zx";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 
 // Build configuration
@@ -61,7 +62,7 @@ async function generateParser(): Promise<void> {
     const grammar = readFileSync(CONFIG.paths.grammarFile, "utf8");
 
     // Generate parser
-    const generatedParser = generate(grammar, {
+    const generatedParser = peggy.generate(grammar, {
       ...CONFIG.pegjs,
       plugins: [ignoreInfiniteLoop],
     });
@@ -114,7 +115,7 @@ function transformGeneratedParser(generatedParser: string): string {
 }
 
 /**
- * Bundle the application using Bun's bundler
+ * Bundle the application using esbuild
  */
 async function bundleApplication(): Promise<void> {
   log.step("Bundling application...");
@@ -122,24 +123,23 @@ async function bundleApplication(): Promise<void> {
 
   try {
     // Browser bundle
-    await bunBuild({
-      entrypoints: [CONFIG.paths.entrypoint],
-      outdir: CONFIG.paths.distDir,
+    await esbuild({
+      entryPoints: [CONFIG.paths.entrypoint],
+      outfile: `${CONFIG.paths.distDir}/webtex.browser.js`,
+      bundle: true,
       format: CONFIG.bundler.format,
-      target: "browser",
-      naming: {
-        entry: "webtex.browser.js",
-      },
+      platform: "browser",
     });
 
     // Node bundle
-    await bunBuild({
-      entrypoints: [CONFIG.paths.entrypoint],
-      outdir: CONFIG.paths.distDir,
+    await esbuild({
+      entryPoints: [CONFIG.paths.entrypoint],
+      outfile: `${CONFIG.paths.distDir}/webtex.node.js`,
+      bundle: true,
       format: CONFIG.bundler.format,
-      target: "node",
-      naming: {
-        entry: "webtex.node.js",
+      platform: "node",
+      banner: {
+        js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
       },
     });
 
@@ -181,7 +181,7 @@ async function generateTypeDeclarations(): Promise<void> {
   const start = Date.now();
 
   try {
-    await $`bun x tsc --emitDeclarationOnly --outDir ${CONFIG.paths.typesDir} --noEmit false`;
+    await $`npx tsc --emitDeclarationOnly --outDir ${CONFIG.paths.typesDir} --noEmit false`;
     log.timing("Generated TypeScript declarations", Date.now() - start);
   } catch (error) {
     throw new Error(`Failed to generate type declarations: ${error}`);
@@ -213,9 +213,6 @@ async function build(): Promise<void> {
   }
 }
 
-// Execute build if this script is run directly
-if (import.meta.main) {
-  build();
-}
+await build();
 
 export { build };
