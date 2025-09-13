@@ -151,17 +151,26 @@ export interface BussproofsGenerator extends PackageGenerator {
 }
 
 const createContentParser = () => {
-  const nonCommand = P.regexp(/[^\\]/).many();
-  const escapedOrNonCommand = P.alt(P.string("\\\\"), P.regexp(/\\[^A-Za-z]/));
+  // Match one or more non-backslash characters to ensure progress
+  const nonCommandChunk = P.regexp(/[^\\]+/);
+  const escapedOrNonCommand = P.alt(
+    // escaped backslash \\ or backslash followed by non-letter command, treat as text
+    P.string("\\\\"),
+    P.regexp(/\\[^A-Za-z]/),
+  );
+  // Consume unknown word-like commands (e.g., \foo) as plain text so parsing continues
+  const unknownWordCommand = P.regexp(/\\[A-Za-z]+/);
 
   return P.alt(
     bussproofsCommand.map((cmd) => ({ type: "command" as const, value: cmd })),
+    unknownWordCommand.map(() => ({ type: "text" as const, value: null })),
     escapedOrNonCommand.map(() => ({ type: "text" as const, value: null })),
-    nonCommand.map(() => ({ type: "text" as const, value: null })),
+    nonCommandChunk.map(() => ({ type: "text" as const, value: null })),
   ).many();
 };
 
-const parseCommands = (content: string): BussproofsCommand[] => {
+// Exported for unit testing
+export const parseCommands = (content: string): BussproofsCommand[] => {
   const commands: BussproofsCommand[] = [];
   const contentParser = createContentParser();
 
