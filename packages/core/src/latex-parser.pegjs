@@ -149,8 +149,7 @@ hmode_macro =
     escape
     m:(
       verbatim_env
-    / prooftree_env
-    / amsmath_env
+    / mathjax_env
     / &is_hmode     m:macro         { return m; }
     / &is_hmode_env e:h_environment { return e; }
 
@@ -177,8 +176,7 @@ vmode_macro =
     escape
     m:(
         verbatim_env
-      / prooftree_env
-      / amsmath_env
+      / mathjax_env
       / &is_vmode     m:macro       { g.break(); return m; }
       / &is_vmode_env e:environment { return e; }
       / vspace_vmode
@@ -737,8 +735,9 @@ prooftree_env "prooftree environment" =
     }
 
 // amsmath environments - capture content verbatim and delegate to amsmath package
-amsmath_env =
-    align_env
+mathjax_env =
+  prooftree_env
+  / align_env
   / align_star_env
   / gather_env
   / gather_star_env
