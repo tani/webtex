@@ -11,7 +11,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build:core && npm run build:vscode",
+    "build": "npm run build:core && npm run build:vscode && npm run build:app",
+    "build:app": "npm run -w packages/core build:app",
     "build:core": "npm run -w packages/core build",
     "build:vscode": "npm run -w packages/vscode build",
     "test": "npm run test:core",
