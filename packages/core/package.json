@@ -59,6 +59,7 @@
     "hyphenation.en-us": "*",
     "hypher": "^0.2.5",
     "katex": "^0.16.22",
+    "parsimmon": "^1.18.1",
     "prettier": "^3.6.2",
     "slugify": "^1.6.6",
     "svgdom": "^0.1.8"
