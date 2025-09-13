@@ -15,8 +15,8 @@ This file contains configuration and context for Claude Code to work effectively
 ## Development Commands
 
 ### Build Commands
-- `npm run compile` - Clean build of the entire project
-- `npm run compile:check` - Build only if `dist/` doesn't exist (efficient rebuilds)
+- `npm run build` - Clean build of the entire project
+- `npm run build:check` - Build only if `dist/` doesn't exist (efficient rebuilds)
 - `npm run clean` - Remove build artifacts
 
 ### Testing Commands
@@ -151,7 +151,7 @@ Before committing ANY changes, run these commands in order:
 
 1. **`npm run lint`** - Fix all linting and formatting issues
 2. **`npm run typecheck`** - Resolve all TypeScript compilation errors
-3. **`npm run compile`** - Ensure build process completes successfully  
+3. **`npm run build`** - Ensure build process completes successfully  
 4. **`npm test`** - Verify all tests pass
 
 **Commit only when all four steps pass without errors.**
@@ -274,7 +274,7 @@ All steps must pass before code can be merged.
 
 ### Development Workflow
 1. **Install dependencies** - `npm install`
-2. **Start development** - `npm run compile:check && npm run test:watch`
+2. **Start development** - `npm run build:check && npm run test:watch`
 3. **Code changes** - Edit TypeScript files in `src/`
 4. **Quality check** - Run the 4-step quality workflow before committing
 5. **Commit** - Use conventional commit messages for changelog generation

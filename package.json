@@ -11,9 +11,9 @@
     "packages/*"
   ],
   "scripts": {
-    "compile": "npm run compile:core && npm run compile:vscode",
-    "compile:core": "npm run -w packages/core compile",
-    "compile:vscode": "npm run -w packages/vscode compile",
+    "build": "npm run build:core && npm run build:vscode",
+    "build:core": "npm run -w packages/core build",
+    "build:vscode": "npm run -w packages/vscode build",
     "test": "npm run test:core",
     "test:core": "npm run -w packages/core test",
     "lint": "npm run lint:core && npm run lint:vscode",
