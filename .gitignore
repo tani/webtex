@@ -30,7 +30,7 @@ coverage/
 *.lcov
 
 # Generated content
-css/
+public/
 js/
 fonts/
 src/latex-parser.ts

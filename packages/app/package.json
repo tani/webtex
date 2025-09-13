@@ -15,7 +15,7 @@
     "dev": "npm run sync-css && vite --host",
     "build": "npm run sync-css && vite build",
     "preview": "vite preview --host",
-    "sync-css": "rm -rf public/css/ && cp -r ../core/dist/css/ public/css/",
+    "sync-css": "rm -rf public/css/ && cp -r ../core/src/css/ public/css/",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
     "lint:fix": "biome check --write",
