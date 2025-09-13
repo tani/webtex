@@ -571,7 +571,8 @@ export class Bussproofs {
         undefined,
         "bussproofs-outer-wrapper",
       );
-      (wrapper as HTMLElement).style.cssText = "display: block;";
+      (wrapper as HTMLElement).style.cssText =
+        "display: block; text-align: center;";
 
       for (const element of stack) {
         const inlineBlock = this.g.create(
