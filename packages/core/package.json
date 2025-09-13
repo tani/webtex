@@ -43,12 +43,13 @@
     "compile": "bun run clean && npx tsx build.ts",
     "compile:check": "[ -d \"dist\" ] || npx tsx build.ts",
     "pretest": "npx tsx build.ts",
-    "test": "bun test",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "format": "biome format --write",
-    "format:check": "biome format"
+    "format:check": "biome format",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@svgdotjs/svg.js": "3.x",
@@ -73,6 +74,7 @@
     "playwright": "^1.55.0",
     "tsx": "^4.19.1",
     "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
     "zx": "^8.0.0"
   },
   "repository": {

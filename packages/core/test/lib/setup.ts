@@ -1,9 +1,9 @@
 // Global takeScreenshot function using Playwright
 
-import { afterAll } from "bun:test";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { type Browser, chromium, type Page } from "playwright";
+import { afterAll } from "vitest";
 
 interface ScreenshotGlobal {
   takeScreenshot?: (html: string, filename: string) => Promise<void>;

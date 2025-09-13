@@ -1,5 +1,5 @@
-import { describe } from "bun:test";
 import path from "node:path";
+import { describe } from "vitest";
 import { migrateFixtureFile } from "./lib/fixture-snapshot-runner";
 
 describe("LaTeX.js Parsing Tests", () => {

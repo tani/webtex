@@ -1,5 +1,5 @@
-import { expect, test } from "bun:test";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
+import { expect, test } from "vitest";
 import {
   document,
   HtmlGenerator,

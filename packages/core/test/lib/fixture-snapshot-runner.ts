@@ -1,9 +1,9 @@
-import { expect, test } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import slugify from "slugify";
+import { expect, test } from "vitest";
 import {
   document,
   HtmlGenerator,

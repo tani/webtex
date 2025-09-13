@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../src/index";
 
 test("Debug amsthm - multiple theorem styles from fixture", async () => {

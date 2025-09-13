@@ -1,4 +1,4 @@
-import { describe, expect, it, spyOn } from "bun:test";
+import { describe, expect, it, vi } from "vitest";
 import { document, HtmlGenerator, parse, window } from "../src/index.ts";
 
 void window;
@@ -6,7 +6,9 @@ void document;
 
 describe("Unknown package handling", () => {
   it("warns and continues when package is missing", () => {
-    const warnSpy = spyOn(console, "warn").mockImplementation((): void => {});
+    const warnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation((): void => {});
     const generator = new HtmlGenerator({ hyphenate: false });
     parse(
       "\\documentclass{article}\\usepackage{unknown}\\begin{document}\\end{document}",

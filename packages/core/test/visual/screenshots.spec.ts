@@ -1,4 +1,4 @@
-import { describe, test } from "bun:test";
+import { describe, test } from "vitest";
 import "../lib/setup";
 import fs from "node:fs";
 import path from "node:path";

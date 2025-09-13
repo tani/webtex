@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import { HtmlGenerator, parse } from "../src/index";
 
 test("Amsthm theorem numbering - basic sequential numbering", async () => {
