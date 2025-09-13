@@ -39,9 +39,8 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf dist app/dist",
+    "clean": "rm -rf dist",
     "build": "npm run clean && npx tsx build.ts",
-    "build:app": "npm run build && cp -r dist app/dist",
     "pretest": "npx tsx build.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

@@ -16,6 +16,7 @@ A JavaScript LaTeX to HTML5 translator monorepo - WebTeX fork with enhanced feat
 ## Packages
 
 - **[packages/core](packages/core)** - WebTeX core library (`webtex`) for LaTeX to HTML5 translation
+- **[packages/app](packages/app)** - Web-based live preview application (`webtex-app`) 
 - **[packages/vscode](packages/vscode)** - VS Code extension (`webtex-preview`) for live LaTeX preview
 
 ## Quick Start
