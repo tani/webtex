@@ -70,4 +70,37 @@ describe("bussproofs.parseCommands", () => {
     const result = parseCommands(content);
     expect(result).toEqual([]);
   });
+
+  test("extracts label commands correctly", () => {
+    const content = String.raw`
+      \AxiomC{A}
+      \RightLabel{MP}
+      \LeftLabel{Cut}
+      \RL{$\to_E$}
+      \LL{Hyp}
+      \UnaryInfC{B}
+    `;
+    const result = parseCommands(content);
+
+    const expected: BussproofsCommand[] = [
+      { type: "axiom", command: "AxiomC", content: "A" },
+      { type: "label", command: "RightLabel", content: "MP" },
+      { type: "label", command: "LeftLabel", content: "Cut" },
+      {
+        type: "label",
+        command: "RightLabel",
+        abbreviated: true,
+        content: String.raw`$\to_E$`,
+      },
+      {
+        type: "label",
+        command: "LeftLabel",
+        abbreviated: true,
+        content: "Hyp",
+      },
+      { type: "inference", command: "UnaryInfC", arity: 1, content: "B" },
+    ];
+
+    expect(result).toEqual(expected);
+  });
 });

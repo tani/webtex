@@ -2,7 +2,7 @@ import P from "parsimmon";
 import type { PackageGenerator } from "../interfaces";
 
 export interface BussproofsCommand {
-  type: "axiom" | "inference";
+  type: "axiom" | "inference" | "label";
   command: string;
   arity?: number;
   abbreviated?: boolean;
@@ -34,7 +34,7 @@ export class BussproofsSyntaxError extends Error {
 }
 
 const createCommand = (
-  type: "axiom" | "inference",
+  type: "axiom" | "inference" | "label",
   command: string,
   content: string,
   arity?: number,
@@ -70,14 +70,15 @@ const commandParser = (
   commandName: string,
   fullName: string,
   arity?: number,
+  type?: "axiom" | "inference" | "label",
 ) => {
   const isAbbreviated = commandName !== fullName;
-  const type = arity === undefined ? "axiom" : "inference";
+  const commandType = type || (arity === undefined ? "axiom" : "inference");
 
   return P.seq(P.string(`\\${commandName}`), whitespace, bracedContent).map(
     ([, , content]) =>
       createCommand(
-        type as "axiom" | "inference",
+        commandType,
         fullName,
         content,
         arity,
@@ -102,6 +103,32 @@ const unaryInfAbbreviated = commandParser("UIC", "UnaryInfC", 1);
 const binaryInfAbbreviated = commandParser("BIC", "BinaryInfC", 2);
 const trinaryInfAbbreviated = commandParser("TIC", "TrinaryInfC", 3);
 
+// Label commands
+const rightLabelCommand = commandParser(
+  "RightLabel",
+  "RightLabel",
+  undefined,
+  "label",
+);
+const leftLabelCommand = commandParser(
+  "LeftLabel",
+  "LeftLabel",
+  undefined,
+  "label",
+);
+const rightLabelAbbreviated = commandParser(
+  "RL",
+  "RightLabel",
+  undefined,
+  "label",
+);
+const leftLabelAbbreviated = commandParser(
+  "LL",
+  "LeftLabel",
+  undefined,
+  "label",
+);
+
 const bussproofsCommand = P.alt(
   axiomCommand,
   unaryInfCommand,
@@ -113,6 +140,10 @@ const bussproofsCommand = P.alt(
   unaryInfAbbreviated,
   binaryInfAbbreviated,
   trinaryInfAbbreviated,
+  rightLabelCommand,
+  leftLabelCommand,
+  rightLabelAbbreviated,
+  leftLabelAbbreviated,
 );
 
 export const parse = (input: string): BussproofsCommand => {
@@ -269,6 +300,8 @@ export class Bussproofs {
     premises: unknown[],
     conclusion: unknown,
     premiseCount: number,
+    leftLabel?: unknown,
+    rightLabel?: unknown,
   ): Element {
     // Create the main grid container
     const gridContainer = this.g.create(
@@ -277,40 +310,86 @@ export class Bussproofs {
       `bussproofs-grid bussproofs-grid-${premiseCount}`,
     );
 
-    // Set CSS grid properties
-    const gridColumns = premiseCount * 2;
+    // Set CSS grid properties - include columns for labels
+    const premiseColumns = premiseCount * 2;
+    const totalColumns =
+      (leftLabel ? 1 : 0) + premiseColumns + (rightLabel ? 1 : 0);
+
+    let gridTemplateColumns = "";
+    if (leftLabel) gridTemplateColumns += "auto ";
+    gridTemplateColumns += `repeat(${premiseColumns}, auto)`;
+    if (rightLabel) gridTemplateColumns += " auto";
+
     (gridContainer as HTMLElement).style.cssText = `
       display: grid;
-      grid-template-columns: repeat(${gridColumns}, auto);
+      grid-template-columns: ${gridTemplateColumns};
       grid-template-rows: auto auto;
-      gap: 0;
-      border: 1px dotted #ccc; /* Debug border */
+      gap: 0 0.5em;
+      width: fit-content;
     `;
+
+    // Add left label (spans both rows)
+    if (leftLabel) {
+      const leftLabelCell = this.g.create(
+        "div",
+        leftLabel,
+        "bussproofs-left-label",
+      );
+      (leftLabelCell as HTMLElement).style.cssText = `
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        display: flex;
+        align-items: end;
+        justify-content: flex-end;
+        padding-bottom: 0.5em;
+      `;
+      gridContainer.appendChild(leftLabelCell);
+    }
 
     // Add premise cells (top row)
     premises.forEach((premise, index) => {
       const premiseCell = this.g.create("div", premise, "bussproofs-premise");
+      const columnStart = (leftLabel ? 1 : 0) + index * 2 + 1;
       (premiseCell as HTMLElement).style.cssText = `
-        grid-column: ${index * 2 + 1} / span 2;
+        grid-column: ${columnStart} / span 2;
         grid-row: 1;
         text-align: center;
-        border: 1px dotted #999; /* Debug border for each cell */
       `;
       gridContainer.appendChild(premiseCell);
     });
 
-    // Add conclusion cell (bottom row, spanning all columns)
+    // Add right label (spans both rows)
+    if (rightLabel) {
+      const rightLabelCell = this.g.create(
+        "div",
+        rightLabel,
+        "bussproofs-right-label",
+      );
+      (rightLabelCell as HTMLElement).style.cssText = `
+        grid-column: ${totalColumns};
+        grid-row: 1 / span 2;
+        display: flex;
+        align-items: end;
+        justify-content: flex-start;
+        padding-bottom: 0.5em;
+      `;
+      gridContainer.appendChild(rightLabelCell);
+    }
+
+    // Add conclusion cell (bottom row, spanning premise columns only)
     const conclusionCell = this.g.create(
       "div",
       conclusion,
       "bussproofs-conclusion",
     );
+    const conclusionStart = leftLabel ? 2 : 1;
+    const conclusionEnd = conclusionStart + premiseColumns;
     (conclusionCell as HTMLElement).style.cssText = `
-      grid-column: 1 / -1;
+      grid-column: ${conclusionStart} / ${conclusionEnd};
       grid-row: 2;
       text-align: center;
-      border: 1px dotted #999; /* Debug border */
-      border-top: 2px solid #000; /* Rule line */
+      border-top: 1px solid #000; /* Rule line */
+      padding: 0 1em;
     `;
     gridContainer.appendChild(conclusionCell);
 
@@ -323,7 +402,27 @@ export class Bussproofs {
     const commands = parseCommands(proofContent);
     const stack: unknown[] = [];
 
+    // Label storage - labels apply to the next inference rule
+    let currentLeftLabel: unknown = null;
+    let currentRightLabel: unknown = null;
+
     for (const command of commands) {
+      // Handle label commands
+      if (command.type === "label") {
+        const processedLabelContent = this.processLatexContent(command.content);
+        const labelElement =
+          processedLabelContent.length > 0
+            ? this.g.createFragment(...processedLabelContent)
+            : this.g.createText?.(command.content) || command.content;
+
+        if (command.command === "RightLabel") {
+          currentRightLabel = labelElement;
+        } else if (command.command === "LeftLabel") {
+          currentLeftLabel = labelElement;
+        }
+        continue;
+      }
+
       // Process the command's content with webtex
       const processedContent = this.processLatexContent(command.content);
       const conclusionElement =
@@ -344,12 +443,17 @@ export class Bussproofs {
               [premise1],
               conclusionElement,
               1,
+              currentLeftLabel,
+              currentRightLabel,
             );
             stack.push(proofTree);
           } else {
             console.warn("UnaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
+          // Reset labels after use
+          currentLeftLabel = null;
+          currentRightLabel = null;
           break;
 
         case "BinaryInfC":
@@ -360,12 +464,17 @@ export class Bussproofs {
               [premise1, premise2],
               conclusionElement,
               2,
+              currentLeftLabel,
+              currentRightLabel,
             );
             stack.push(proofTree);
           } else {
             console.warn("BinaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
+          // Reset labels after use
+          currentLeftLabel = null;
+          currentRightLabel = null;
           break;
 
         case "TrinaryInfC":
@@ -377,12 +486,17 @@ export class Bussproofs {
               [premise1, premise2, premise3],
               conclusionElement,
               3,
+              currentLeftLabel,
+              currentRightLabel,
             );
             stack.push(proofTree);
           } else {
             console.warn("TrinaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
+          // Reset labels after use
+          currentLeftLabel = null;
+          currentRightLabel = null;
           break;
 
         case "QuaternaryInfC":
@@ -395,12 +509,17 @@ export class Bussproofs {
               [premise1, premise2, premise3, premise4],
               conclusionElement,
               4,
+              currentLeftLabel,
+              currentRightLabel,
             );
             stack.push(proofTree);
           } else {
             console.warn("QuaternaryInfC: not enough premises in stack");
             stack.push(conclusionElement);
           }
+          // Reset labels after use
+          currentLeftLabel = null;
+          currentRightLabel = null;
           break;
 
         default:
