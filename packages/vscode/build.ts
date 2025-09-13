@@ -55,6 +55,8 @@ async function buildExtension(options: BuildOptions = {}) {
   if (clean) {
     console.log("🧹 Cleaning directories...");
     await $`rm -rf out webtex`;
+    console.log("✅ Clean completed successfully");
+    return;
   }
 
   // Copy WebTeX core files
