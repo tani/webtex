@@ -24,12 +24,5 @@
   },
   "include": ["src/**/*"],
   "files": ["test/types/globals.d.ts", "src/types/external.d.ts"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "docs",
-    "website",
-    "**/*.d.ts",
-    "src/bussproofs.ts"
-  ]
+  "exclude": ["node_modules", "dist", "docs", "website", "**/*.d.ts"]
 }

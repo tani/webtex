@@ -6,10 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": true,
-    "ignore": [
-      "packages/core/src/bussproofs.ts"
-    ]
+    "ignoreUnknown": true
   },
   "formatter": {
     "enabled": true,

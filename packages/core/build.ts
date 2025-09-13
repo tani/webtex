@@ -9,8 +9,6 @@ const CONFIG = {
   paths: {
     grammarFile: "src/latex-parser.pegjs",
     parserOutput: "src/latex-parser.ts",
-    bussproofsGrammarFile: "src/bussproofs.pegjs",
-    bussproofsParserOutput: "src/bussproofs.ts",
     distDir: "dist",
     typesDir: "dist/types",
     entrypoint: "src/index.ts",
@@ -79,96 +77,6 @@ async function generateParser(): Promise<void> {
   } catch (error) {
     throw new Error(`Failed to generate parser: ${error}`);
   }
-}
-
-/**
- * Generate Bussproofs parser from PegJS grammar
- */
-async function generateBussproofsParser(): Promise<void> {
-  log.step("Generating Bussproofs parser from PegJS grammar...");
-  const start = Date.now();
-
-  try {
-    // Check if bussproofs grammar file exists
-    if (!existsSync(CONFIG.paths.bussproofsGrammarFile)) {
-      log.info("Skipping bussproofs parser generation - grammar file not found");
-      return;
-    }
-
-    // Read grammar file
-    const grammar = readFileSync(CONFIG.paths.bussproofsGrammarFile, "utf8");
-
-    // Generate parser
-    const generatedParser = peggy.generate(grammar, {
-      ...CONFIG.pegjs,
-      exportVar: "bussproofsParser",
-      plugins: [ignoreInfiniteLoop],
-    });
-
-    // Apply transformations for bussproofs parser
-    const transformedParser = transformBussproofsParser(generatedParser);
-
-    // Write parser file
-    writeFileSync(CONFIG.paths.bussproofsParserOutput, transformedParser);
-
-    log.timing("Generated Bussproofs parser", Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to generate bussproofs parser: ${error}`);
-  }
-}
-
-/**
- * Apply necessary transformations to the bussproofs parser
- */
-function transformBussproofsParser(generatedParser: string): string {
-  let fixedParser = generatedParser
-    // Fix SyntaxError inheritance for global context
-    .replace(
-      /class peg\$SyntaxError extends SyntaxError/g,
-      "class peg$SyntaxError extends globalThis.SyntaxError",
-    )
-    // Add any types to fix TypeScript errors
-    .replace(/\(([^)]*)\) =>/g, (match, params) => {
-      const typedParams = params.split(',').map((param: string) => {
-        const trimmed = param.trim();
-        if (trimmed && !trimmed.includes(':')) {
-          return `${trimmed}: any`;
-        }
-        return trimmed;
-      }).join(', ');
-      return `(${typedParams}) =>`;
-    })
-    // Add type annotations for common variables
-    .replace(/let peg\$result/g, 'let peg$result: any')
-    .replace(/let bussproofsParser/g, 'let bussproofsParser: any')
-    .replace(/function peg\$parse([^(]*)\(/g, 'function peg$parse$1(');
-
-  // Add TypeScript export for the parser
-  const tsExport = `
-// Generated Bussproofs Parser from bussproofs.pegjs
-// This file is auto-generated - do not edit manually
-/* eslint-disable */
-// @ts-nocheck
-
-export interface BussproofsCommand {
-  type: "axiom" | "inference";
-  command: string;
-  arity?: number;
-  abbreviated?: boolean;
-  content: string;
-}
-
-export interface BussproofsParser {
-  parse(input: string): BussproofsCommand;
-}
-
-`;
-
-  return (
-    tsExport +
-    fixedParser +
-    "\n\nconst parser = bussproofsParser as BussproofsParser;\nexport default parser;\n"
-  );
 }
 
 /**
@@ -290,7 +198,6 @@ async function build(): Promise<void> {
   try {
     await cleanDist();
     await generateParser();
-    await generateBussproofsParser();
     await bundleApplication();
     await copyStaticAssets();
     await generateTypeDeclarations();
