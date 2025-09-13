@@ -281,7 +281,7 @@ export class Bussproofs {
     const gridColumns = premiseCount * 2;
     (gridContainer as HTMLElement).style.cssText = `
       display: grid;
-      grid-template-columns: repeat(${gridColumns}, 1fr);
+      grid-template-columns: repeat(${gridColumns}, auto);
       grid-template-rows: auto auto;
       gap: 0;
       border: 1px dotted #ccc; /* Debug border */
@@ -310,7 +310,7 @@ export class Bussproofs {
       grid-row: 2;
       text-align: center;
       border: 1px dotted #999; /* Debug border */
-       border-top: 2px solid #000; /* Rule line */
+      border-top: 2px solid #000; /* Rule line */
     `;
     gridContainer.appendChild(conclusionCell);
 
