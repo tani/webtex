@@ -66,7 +66,7 @@ This extension doesn't currently contribute any VS Code settings.
 
 1. Clone this repository (from the monorepo root)
 2. Run `npm install` to install dependencies
-3. Run `npm run compile` to compile the extension
+3. Run `npm run build` to compile the extension
 4. Press `F5` to run the extension in a new Extension Development Host window
 
 ### Building
@@ -75,16 +75,18 @@ This package uses a custom esbuild-based build system for optimal performance:
 
 ```bash
 # Development build with source maps
-npm run compile
+npm run build
 
 # Clean build (removes output directory first)
-npm run compile:clean
+npm run build:clean
 
 # Production build (minified, optimized for packaging)
-npm run compile:prod
+npm run build:prod
 
 # Watch mode for development
-npm run compile:watch
+npm run build:watch
+# or
+npm run watch
 ```
 
 The build system uses esbuild which is significantly faster than TypeScript compilation for small packages like VSCode extensions.

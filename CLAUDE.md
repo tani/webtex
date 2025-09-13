@@ -6,7 +6,7 @@ This file contains configuration and context for Claude Code to work effectively
 
 **LaTeX.js** is a JavaScript LaTeX to HTML5 translator that converts LaTeX documents into HTML while preserving formatting and mathematical expressions. It provides a complete LaTeX-to-web pipeline with support for:
 
-- Mathematical expressions via MathJax integration
+- Mathematical expressions via KaTeX integration
 - Document classes (article, book, report)
 - LaTeX packages (amsthm, graphicx, hyperref, etc.)
 - Visual regression testing with Playwright

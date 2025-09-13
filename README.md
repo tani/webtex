@@ -6,7 +6,7 @@ A JavaScript LaTeX to HTML5 translator monorepo - WebTeX fork with enhanced feat
 
 ## Features
 
-- **Complete LaTeX-to-web pipeline** with support for mathematical expressions via MathJax
+- **Complete LaTeX-to-web pipeline** with support for mathematical expressions via KaTeX
 - **Document classes** - article, book, report 
 - **LaTeX packages** - amsthm, graphicx, hyperref, and more
 - **Visual regression testing** with Playwright for UI consistency
@@ -69,7 +69,7 @@ cd webtex
 npm install
 
 # Build all packages
-npm run compile
+npm run build
 
 # Run tests
 npm test
@@ -83,17 +83,16 @@ npm run typecheck
 
 ```bash
 # Core library development
-npm run compile:core       # Build core package
+npm run build:core         # Build core package
 npm run test:core          # Test core package  
 npm run dev:core           # Watch mode for core
 
 # VS Code extension development
-npm run compile:vscode     # Build extension
+npm run build:vscode       # Build extension
 npm run dev:vscode         # Watch mode for extension
-npm run test:vscode        # Test extension
 
 # All packages
-npm run compile            # Build all packages
+npm run build              # Build all packages
 npm test                   # Test all packages
 npm run clean              # Clean build artifacts
 ```
@@ -124,7 +123,7 @@ Before committing, ensure all quality checks pass:
 ```bash
 npm run lint              # Biome linting and formatting
 npm run typecheck         # TypeScript type checking
-npm run compile           # Build verification
+npm run build             # Build verification
 npm test                  # Full test suite
 ```
 
@@ -160,7 +159,7 @@ webtex/
 
 1. **Fork the repository** and create a feature branch
 2. **Make changes** following the TypeScript coding standards
-3. **Run quality checks**: `npm run lint && npm run typecheck && npm run compile && npm test`
+3. **Run quality checks**: `npm run lint && npm run typecheck && npm run build && npm test`
 4. **Submit a pull request** with a clear description
 
 ### TypeScript Guidelines
@@ -177,5 +176,5 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Related Projects
 
 - [LaTeX.js](https://github.com/michael-brade/LaTeX.js) - Original LaTeX.js project
-- [MathJax](https://www.mathjax.org/) - Mathematical notation rendering
+- [KaTeX](https://katex.org/) - Mathematical notation rendering
 - [Playwright](https://playwright.dev/) - End-to-end testing framework

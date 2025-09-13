@@ -9,7 +9,7 @@
 ## 🌟 Features
 
 - **📝 Complete LaTeX Support**: Comprehensive LaTeX document processing with high fidelity output
-- **🧮 Advanced Mathematics**: Full MathJax integration for complex mathematical expressions
+- **🧮 Advanced Mathematics**: Full KaTeX integration for complex mathematical expressions
 - **🎨 Authentic Styling**: CSS that faithfully reproduces LaTeX typography and layout
 - **🔧 Modern Tooling**: Built with TypeScript, esbuild bundler, and modern development practices
 - **⚡ High Performance**: Optimized build system and efficient parsing
@@ -95,7 +95,7 @@ WebTeX is a comprehensive modernization of the original LaTeX.js project with si
 | **Legacy tooling** | **Modern ecosystem** (Biome, Vitest) |
 
 ### 📊 **Mathematical Rendering**
-- **Enhanced MathJax Integration**: Upgraded to MathJax 3.x with ESM support
+- **KaTeX Integration**: Fast, high-quality mathematical rendering with KaTeX
 - **Improved Math Packages**: Better support for `amsmath`, `amsfonts`, `amssymb`
 - **Advanced Features**: Support for `bussproofs` package for proof trees
 
@@ -172,18 +172,18 @@ Options:
 git clone https://github.com/tani/webtex.git
 cd webtex
 npm install
-npm run compile
+npm run build
 ```
 
 ### Development Scripts
 ```bash
-npm run compile       # Full production build
-npm run compile:check # Build only if dist/ doesn't exist  
-npm run test:watch   # Development mode
-npm test             # Run all tests
-npm run test:watch   # Run tests in watch mode
-npm run lint         # Code linting and formatting
-npm run typecheck    # TypeScript type checking
+npm run build         # Full production build
+npm run build:check   # Build only if dist/ doesn't exist  
+npm run test:watch    # Development mode with tests
+npm test              # Run all tests
+npm run test:watch    # Run tests in watch mode
+npm run lint          # Code linting and formatting
+npm run typecheck     # TypeScript type checking
 ```
 
 ### Testing
@@ -233,7 +233,7 @@ WebTeX represents a significant evolution while maintaining compatibility:
 
 1. **Language Migration**: LiveScript → JavaScript → TypeScript
 2. **Build System**: Rollup → esbuild with modern tooling
-3. **Mathematics**: Enhanced MathJax 3.x integration  
+3. **Mathematics**: Enhanced KaTeX integration
 4. **Type Safety**: Comprehensive TypeScript implementation
 5. **Testing**: Modern test framework with visual regression
 6. **Web Integration**: Enhanced HTML generation and iframe support
@@ -242,7 +242,7 @@ WebTeX represents a significant evolution while maintaining compatibility:
 
 **Related Projects**:
 - [LaTeX.js](https://github.com/michael-brade/LaTeX.js) - Original project
-- [MathJax](https://github.com/mathjax/MathJax) - Mathematics rendering
+- [KaTeX](https://github.com/KaTeX/KaTeX) - Mathematics rendering
 - [esbuild](https://esbuild.github.io/) - Build tooling
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
 
