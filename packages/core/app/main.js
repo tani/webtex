@@ -1,5 +1,5 @@
 // WebTeX Live Preview App
-import { HtmlGenerator, parse as latexParse } from "../dist/webtex.browser.js";
+import { HtmlGenerator, parse as latexParse } from "./dist/webtex.browser.js";
 
 class WebTeXLivePreview {
   constructor() {
