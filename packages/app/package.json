@@ -15,7 +15,7 @@
     "dev": "npm run sync-css && vite --host",
     "build": "npm run sync-css && vite build",
     "preview": "vite preview --host",
-    "sync-css": "mkdir -p public/css && if [ -d ../core/dist/css ] && [ -n \"$(ls -A ../core/dist/css 2>/dev/null)\" ]; then cp -r ../core/dist/css/* public/css/; else echo 'Warning: No CSS files found in core package'; fi",
+    "sync-css": "mkdir -p public/css && cp -r ../core/dist/css/* public/css/",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
     "lint:fix": "biome check --write",
