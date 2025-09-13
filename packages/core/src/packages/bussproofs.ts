@@ -147,7 +147,13 @@ export const parse = (input: string): BussproofsCommand => {
 export const SyntaxError = BussproofsSyntaxError;
 
 export interface BussproofsGenerator extends PackageGenerator {
-  parseMath(math: string, display?: boolean): unknown;
+  create(
+    type: string | ((...args: unknown[]) => unknown),
+    content?: unknown,
+    className?: string,
+  ): Element;
+  createText(text: string): Text | undefined;
+  createFragment(...args: unknown[]): unknown;
 }
 
 const createContentParser = () => {
@@ -202,13 +208,150 @@ export class Bussproofs {
     this.g = generator;
   }
 
+  /**
+   * Re-process LaTeX content with webtex to get HTML elements
+   * For now, we'll use simple text processing as fallback
+   */
+  private processLatexContent(content: string): unknown[] {
+    // For the initial implementation, return the content as text
+    // TODO: Implement proper LaTeX parsing for command content
+    if (!content.trim()) {
+      return [];
+    }
+    
+    const textNode = this.g.createText?.(content);
+    return textNode ? [textNode] : [content];
+  }
+
+  /**
+   * Create a CSS grid-based proof tree layout
+   */
+  private createProofTree(
+    premises: unknown[],
+    conclusion: unknown,
+    premiseCount: number
+  ): Element {
+    // Create the main grid container
+    const gridContainer = this.g.create(
+      "div",
+      undefined,
+      `bussproofs-grid bussproofs-grid-${premiseCount}`
+    );
+    
+    // Set CSS grid properties
+    const gridColumns = premiseCount * 2;
+    (gridContainer as HTMLElement).style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(${gridColumns}, 1fr);
+      grid-template-rows: auto auto;
+      gap: 0;
+      border: 1px dotted #ccc; /* Debug border */
+    `;
+    
+    // Add premise cells (top row)
+    premises.forEach((premise, index) => {
+      const premiseCell = this.g.create("div", premise, "bussproofs-premise");
+      (premiseCell as HTMLElement).style.cssText = `
+        grid-column: ${index * 2 + 1} / span 2;
+        grid-row: 1;
+        text-align: center;
+        border: 1px dotted #999; /* Debug border for each cell */
+      `;
+      gridContainer.appendChild(premiseCell);
+    });
+    
+    // Add conclusion cell (bottom row, spanning all columns)
+    const conclusionCell = this.g.create("div", conclusion, "bussproofs-conclusion");
+    (conclusionCell as HTMLElement).style.cssText = `
+      grid-column: 1 / -1;
+      grid-row: 2;
+      text-align: center;
+      border: 1px dotted #999; /* Debug border */
+       border-top: 2px solid #000; /* Rule line */
+    `;
+    gridContainer.appendChild(conclusionCell);
+    
+    return gridContainer;
+  }
+
   prooftree(content: unknown): unknown[] {
     const proofContent = typeof content === "string" ? content : "";
 
-    parseCommands(proofContent);
-
-    const proof = `\\begin{prooftree}${proofContent}\\end{prooftree}`;
-    return [this.g.parseMath(proof, true)];
+    const commands = parseCommands(proofContent);
+    const stack: unknown[] = [];
+    
+    for (const command of commands) {
+      // Process the command's content with webtex
+      const processedContent = this.processLatexContent(command.content);
+      const conclusionElement = processedContent.length > 0 
+        ? this.g.createFragment(...processedContent)
+        : this.g.createText?.(command.content) || command.content;
+      
+      switch (command.command) {
+        case "AxiomC":
+          // Push the processed content to stack
+          stack.push(conclusionElement);
+          break;
+          
+        case "UnaryInfC":
+          if (stack.length >= 1) {
+            const premise1 = stack.pop();
+            const proofTree = this.createProofTree([premise1], conclusionElement, 1);
+            stack.push(proofTree);
+          } else {
+            console.warn('UnaryInfC: not enough premises in stack');
+            stack.push(conclusionElement);
+          }
+          break;
+          
+        case "BinaryInfC":
+          if (stack.length >= 2) {
+            const premise2 = stack.pop();
+            const premise1 = stack.pop();
+            const proofTree = this.createProofTree([premise1, premise2], conclusionElement, 2);
+            stack.push(proofTree);
+          } else {
+            console.warn('BinaryInfC: not enough premises in stack');
+            stack.push(conclusionElement);
+          }
+          break;
+          
+        case "TrinaryInfC":
+          if (stack.length >= 3) {
+            const premise3 = stack.pop();
+            const premise2 = stack.pop();
+            const premise1 = stack.pop();
+            const proofTree = this.createProofTree([premise1, premise2, premise3], conclusionElement, 3);
+            stack.push(proofTree);
+          } else {
+            console.warn('TrinaryInfC: not enough premises in stack');
+            stack.push(conclusionElement);
+          }
+          break;
+          
+        case "QuaternaryInfC":
+          if (stack.length >= 4) {
+            const premise4 = stack.pop();
+            const premise3 = stack.pop();
+            const premise2 = stack.pop();
+            const premise1 = stack.pop();
+            const proofTree = this.createProofTree([premise1, premise2, premise3, premise4], conclusionElement, 4);
+            stack.push(proofTree);
+          } else {
+            console.warn('QuaternaryInfC: not enough premises in stack');
+            stack.push(conclusionElement);
+          }
+          break;
+          
+        default:
+          console.warn(`Unknown bussproofs command: ${command.command}`);
+          stack.push(conclusionElement);
+          break;
+      }
+    }
+    
+    // Return all remaining elements in the stack
+    return stack.length > 0 ? stack : [];
   }
 }
 
