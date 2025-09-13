@@ -129,6 +129,8 @@ async function bundleApplication(): Promise<void> {
       bundle: true,
       format: CONFIG.bundler.format,
       platform: "browser",
+      minify: true,
+      sourcemap: true,
     });
 
     // Node bundle
@@ -138,6 +140,8 @@ async function bundleApplication(): Promise<void> {
       bundle: true,
       format: CONFIG.bundler.format,
       platform: "node",
+      minify: true,
+      sourcemap: true,
       banner: {
         js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
       },
