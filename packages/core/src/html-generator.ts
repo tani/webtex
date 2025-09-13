@@ -2,13 +2,7 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import juice from "juice";
-import { liteAdaptor } from "mathjax-full/js/adaptors/liteAdaptor.js";
-import { RegisterHTMLHandler } from "mathjax-full/js/handlers/html.js";
-import { AllPackages } from "mathjax-full/js/input/tex/AllPackages.js";
-import { TeX } from "mathjax-full/js/input/tex.js";
-import { mathjax } from "mathjax-full/js/mathjax.js";
-import { SVG as MJSVG } from "mathjax-full/js/output/svg.js";
+import katex from "katex";
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -669,28 +663,43 @@ export class HtmlGenerator extends Generator {
   }
 
   public parseMath(math: string, display?: boolean): DocumentFragment {
-    const adaptor = liteAdaptor();
-    RegisterHTMLHandler(adaptor);
+    try {
+      const html = katex.renderToString(math, {
+        displayMode: !!display,
+        throwOnError: false,
+        output: "htmlAndMathml",
+      });
 
-    const tex = new TeX({ packages: AllPackages });
-    const svg = new MJSVG({ fontCache: "none" });
-    const documentHandler = mathjax.document("", {
-      InputJax: tex,
-      OutputJax: svg,
-    });
-    const html = adaptor.outerHTML(
-      documentHandler.convert(math, { display: !!display }),
-    );
-    const css = adaptor.outerHTML(
-      documentHandler.outputJax.styleSheet(documentHandler.document),
-    );
-    const div = document.createElement("div");
-    div.innerHTML = juice(`${html}${css}`);
-    const fragment = document.createDocumentFragment();
-    while (div.firstChild) {
-      fragment.appendChild(div.firstChild);
+      // Create a temporary div to parse the HTML
+      const div = document.createElement("div");
+      div.innerHTML = html;
+
+      // Extract MathML elements - KaTeX generates both HTML and MathML
+      const mathmlElements = div.querySelectorAll("math");
+
+      // Create fragment and add MathML elements
+      const fragment = document.createDocumentFragment();
+
+      if (mathmlElements.length > 0) {
+        // Use MathML if available
+        Array.from(mathmlElements).forEach((mathml) => {
+          fragment.appendChild(mathml.cloneNode(true));
+        });
+      } else {
+        // Fallback to HTML if no MathML found
+        while (div.firstChild) {
+          fragment.appendChild(div.firstChild);
+        }
+      }
+
+      return fragment;
+    } catch (_error) {
+      // Fallback: return the original math as text
+      const textNode = document.createTextNode(math);
+      const fragment = document.createDocumentFragment();
+      fragment.appendChild(textNode);
+      return fragment;
     }
-    return fragment;
   }
 
   public addAttribute(el: Element, attrs: string): void {
