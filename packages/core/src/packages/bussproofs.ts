@@ -1,13 +1,49 @@
 import P from "parsimmon";
 import type { PackageGenerator } from "../interfaces";
 
+// Type definitions
+export type CommandType = "axiom" | "inference" | "label";
+export type InferenceArity = 1 | 2 | 3 | 4 | 5;
+
 export interface BussproofsCommand {
-  type: "axiom" | "inference" | "label";
+  type: CommandType;
   command: string;
-  arity?: number;
+  arity?: InferenceArity;
   abbreviated?: boolean;
   content: string;
 }
+
+// Parser configuration constants
+const PARSER_PATTERNS = {
+  WHITESPACE: /\s*/,
+  NON_BRACE_CHAR: /[^{}]/,
+  NON_COMMAND_CHUNK: /[^\\]+/,
+  ESCAPED_OR_NON_COMMAND: /\\[^A-Za-z]/,
+  UNKNOWN_WORD_COMMAND: /\\[A-Za-z]+/,
+  LATEX_COMMANDS: /\\[a-zA-Z]+/,
+  INLINE_MATH_DOLLAR: /^\$(.+?)\$$/,
+  INLINE_MATH_PAREN: /^\\\((.+?)\\\)$/,
+  DISPLAY_MATH_BRACKET: /^\\\[(.+?)\\\]$/,
+} as const;
+
+// Command definitions for better maintainability
+interface CommandDefinition {
+  name: string;
+  abbrev: string | null;
+  type: CommandType;
+  arity?: InferenceArity;
+}
+
+const COMMAND_DEFINITIONS: readonly CommandDefinition[] = [
+  { name: "AxiomC", abbrev: "AXC", type: "axiom" },
+  { name: "UnaryInfC", abbrev: "UIC", type: "inference", arity: 1 },
+  { name: "BinaryInfC", abbrev: "BIC", type: "inference", arity: 2 },
+  { name: "TrinaryInfC", abbrev: "TIC", type: "inference", arity: 3 },
+  { name: "QuaternaryInfC", abbrev: null, type: "inference", arity: 4 },
+  { name: "QuinaryInfC", abbrev: null, type: "inference", arity: 5 },
+  { name: "RightLabel", abbrev: "RL", type: "label" },
+  { name: "LeftLabel", abbrev: "LL", type: "label" },
+] as const;
 
 export interface Location {
   start: { offset: number; line: number; column: number };
@@ -34,10 +70,10 @@ export class BussproofsSyntaxError extends Error {
 }
 
 const createCommand = (
-  type: "axiom" | "inference" | "label",
+  type: CommandType,
   command: string,
   content: string,
-  arity?: number,
+  arity?: InferenceArity,
   abbreviated?: boolean,
 ): BussproofsCommand => ({
   type,
@@ -47,7 +83,8 @@ const createCommand = (
   ...(abbreviated !== undefined && { abbreviated }),
 });
 
-const whitespace = P.regexp(/\s*/);
+// Basic parser components
+const whitespace = P.regexp(PARSER_PATTERNS.WHITESPACE);
 const openBrace = P.string("{");
 const closeBrace = P.string("}");
 
@@ -69,8 +106,8 @@ const bracedContent = P.seq(openBrace, rawBraceContent, closeBrace).map(
 const commandParser = (
   commandName: string,
   fullName: string,
-  arity?: number,
-  type?: "axiom" | "inference" | "label",
+  arity?: InferenceArity,
+  type?: CommandType,
 ) => {
   const isAbbreviated = commandName !== fullName;
   const commandType = type || (arity === undefined ? "axiom" : "inference");
@@ -87,64 +124,26 @@ const commandParser = (
   );
 };
 
-const axiomCommand = commandParser("AxiomC", "AxiomC");
-const unaryInfCommand = commandParser("UnaryInfC", "UnaryInfC", 1);
-const binaryInfCommand = commandParser("BinaryInfC", "BinaryInfC", 2);
-const trinaryInfCommand = commandParser("TrinaryInfC", "TrinaryInfC", 3);
-const quaternaryInfCommand = commandParser(
-  "QuaternaryInfC",
-  "QuaternaryInfC",
-  4,
-);
-const quinaryInfCommand = commandParser("QuinaryInfC", "QuinaryInfC", 5);
+// Generate command parsers from configuration
+const createCommandParsers = () => {
+  const parsers: P.Parser<BussproofsCommand>[] = [];
 
-const axiomAbbreviated = commandParser("AXC", "AxiomC");
-const unaryInfAbbreviated = commandParser("UIC", "UnaryInfC", 1);
-const binaryInfAbbreviated = commandParser("BIC", "BinaryInfC", 2);
-const trinaryInfAbbreviated = commandParser("TIC", "TrinaryInfC", 3);
+  for (const def of COMMAND_DEFINITIONS) {
+    // Full name parser
+    parsers.push(commandParser(def.name, def.name, def.arity, def.type));
 
-// Label commands
-const rightLabelCommand = commandParser(
-  "RightLabel",
-  "RightLabel",
-  undefined,
-  "label",
-);
-const leftLabelCommand = commandParser(
-  "LeftLabel",
-  "LeftLabel",
-  undefined,
-  "label",
-);
-const rightLabelAbbreviated = commandParser(
-  "RL",
-  "RightLabel",
-  undefined,
-  "label",
-);
-const leftLabelAbbreviated = commandParser(
-  "LL",
-  "LeftLabel",
-  undefined,
-  "label",
-);
+    // Abbreviated parser (if available)
+    if (def.abbrev) {
+      parsers.push(commandParser(def.abbrev, def.name, def.arity, def.type));
+    }
+  }
 
-const bussproofsCommand = P.alt(
-  axiomCommand,
-  unaryInfCommand,
-  binaryInfCommand,
-  trinaryInfCommand,
-  quaternaryInfCommand,
-  quinaryInfCommand,
-  axiomAbbreviated,
-  unaryInfAbbreviated,
-  binaryInfAbbreviated,
-  trinaryInfAbbreviated,
-  rightLabelCommand,
-  leftLabelCommand,
-  rightLabelAbbreviated,
-  leftLabelAbbreviated,
-);
+  return parsers;
+};
+
+const allCommandParsers = createCommandParsers();
+
+const bussproofsCommand = P.alt(...allCommandParsers);
 
 export const parse = (input: string): BussproofsCommand => {
   const result = bussproofsCommand.parse(input);
@@ -190,14 +189,14 @@ export interface BussproofsGenerator extends PackageGenerator {
 
 const createContentParser = () => {
   // Match one or more non-backslash characters to ensure progress
-  const nonCommandChunk = P.regexp(/[^\\]+/);
+  const nonCommandChunk = P.regexp(PARSER_PATTERNS.NON_COMMAND_CHUNK);
   const escapedOrNonCommand = P.alt(
     // escaped backslash \\ or backslash followed by non-letter command, treat as text
     P.string("\\\\"),
-    P.regexp(/\\[^A-Za-z]/),
+    P.regexp(PARSER_PATTERNS.ESCAPED_OR_NON_COMMAND),
   );
   // Consume unknown word-like commands (e.g., \foo) as plain text so parsing continues
-  const unknownWordCommand = P.regexp(/\\[A-Za-z]+/);
+  const unknownWordCommand = P.regexp(PARSER_PATTERNS.UNKNOWN_WORD_COMMAND);
 
   return P.alt(
     bussproofsCommand.map((cmd) => ({ type: "command" as const, value: cmd })),
@@ -209,6 +208,10 @@ const createContentParser = () => {
 
 // Exported for unit testing
 export const parseCommands = (content: string): BussproofsCommand[] => {
+  if (!content || typeof content !== "string") {
+    return [];
+  }
+
   const commands: BussproofsCommand[] = [];
   const contentParser = createContentParser();
 
@@ -220,12 +223,38 @@ export const parseCommands = (content: string): BussproofsCommand[] => {
           commands.push(item.value);
         }
       }
+    } else {
+      console.warn(
+        "Failed to parse content for bussproofs commands:",
+        result.expected,
+      );
     }
-  } catch {
-    console.warn("Failed to parse content for bussproofs commands");
+  } catch (error) {
+    console.warn("Failed to parse content for bussproofs commands:", error);
   }
 
   return commands;
+};
+
+// CSS styling utilities
+
+const applyStyles = (element: HTMLElement, styles: string): void => {
+  element.style.cssText = styles;
+};
+
+const calculateGridColumns = (
+  premiseCount: number,
+  hasLeftLabel: boolean,
+  hasRightLabel: boolean,
+): string => {
+  const premiseColumns = premiseCount * 2;
+  let gridTemplateColumns = "";
+
+  if (hasLeftLabel) gridTemplateColumns += "auto ";
+  gridTemplateColumns += `repeat(${premiseColumns}, auto)`;
+  if (hasRightLabel) gridTemplateColumns += " auto";
+
+  return gridTemplateColumns;
 };
 
 export class Bussproofs {
@@ -303,6 +332,12 @@ export class Bussproofs {
     leftLabel?: unknown,
     rightLabel?: unknown,
   ): Element {
+    const hasLeftLabel = Boolean(leftLabel);
+    const hasRightLabel = Boolean(rightLabel);
+    const premiseColumns = premiseCount * 2;
+    const totalColumns =
+      (hasLeftLabel ? 1 : 0) + premiseColumns + (hasRightLabel ? 1 : 0);
+
     // Create the main grid container
     const gridContainer = this.g.create(
       "div",
@@ -310,23 +345,19 @@ export class Bussproofs {
       `bussproofs-grid bussproofs-grid-${premiseCount}`,
     );
 
-    // Set CSS grid properties - include columns for labels
-    const premiseColumns = premiseCount * 2;
-    const totalColumns =
-      (leftLabel ? 1 : 0) + premiseColumns + (rightLabel ? 1 : 0);
-
-    let gridTemplateColumns = "";
-    if (leftLabel) gridTemplateColumns += "auto ";
-    gridTemplateColumns += `repeat(${premiseColumns}, auto)`;
-    if (rightLabel) gridTemplateColumns += " auto";
-
-    (gridContainer as HTMLElement).style.cssText = `
-      display: grid;
-      grid-template-columns: ${gridTemplateColumns};
-      grid-template-rows: auto auto;
-      gap: 0 0.5em;
-      width: fit-content;
-    `;
+    const gridTemplateColumns = calculateGridColumns(
+      premiseCount,
+      hasLeftLabel,
+      hasRightLabel,
+    );
+    applyStyles(
+      gridContainer as HTMLElement,
+      `display: grid;
+       grid-template-columns: ${gridTemplateColumns};
+       grid-template-rows: auto auto;
+       gap: 0 0.5em;
+       width: fit-content;`,
+    );
 
     // Add left label (spans both rows)
     if (leftLabel) {
@@ -335,26 +366,28 @@ export class Bussproofs {
         leftLabel,
         "bussproofs-left-label",
       );
-      (leftLabelCell as HTMLElement).style.cssText = `
-        grid-column: 1;
-        grid-row: 1 / span 2;
-        display: flex;
-        align-items: end;
-        justify-content: flex-end;
-        padding-bottom: 0.5em;
-      `;
+      applyStyles(
+        leftLabelCell as HTMLElement,
+        `grid-column: 1;
+         grid-row: 1 / span 2;
+         display: flex;
+         align-items: end;
+         justify-content: flex-end;
+         padding-bottom: 0.5em;`,
+      );
       gridContainer.appendChild(leftLabelCell);
     }
 
     // Add premise cells (top row)
     premises.forEach((premise, index) => {
       const premiseCell = this.g.create("div", premise, "bussproofs-premise");
-      const columnStart = (leftLabel ? 1 : 0) + index * 2 + 1;
-      (premiseCell as HTMLElement).style.cssText = `
-        grid-column: ${columnStart} / span 2;
-        grid-row: 1;
-        text-align: center;
-      `;
+      const columnStart = (hasLeftLabel ? 1 : 0) + index * 2 + 1;
+      applyStyles(
+        premiseCell as HTMLElement,
+        `grid-column: ${columnStart} / span 2;
+         grid-row: 1;
+         text-align: center;`,
+      );
       gridContainer.appendChild(premiseCell);
     });
 
@@ -365,14 +398,15 @@ export class Bussproofs {
         rightLabel,
         "bussproofs-right-label",
       );
-      (rightLabelCell as HTMLElement).style.cssText = `
-        grid-column: ${totalColumns};
-        grid-row: 1 / span 2;
-        display: flex;
-        align-items: end;
-        justify-content: flex-start;
-        padding-bottom: 0.5em;
-      `;
+      applyStyles(
+        rightLabelCell as HTMLElement,
+        `grid-column: ${totalColumns};
+         grid-row: 1 / span 2;
+         display: flex;
+         align-items: end;
+         justify-content: flex-start;
+         padding-bottom: 0.5em;`,
+      );
       gridContainer.appendChild(rightLabelCell);
     }
 
@@ -382,15 +416,16 @@ export class Bussproofs {
       conclusion,
       "bussproofs-conclusion",
     );
-    const conclusionStart = leftLabel ? 2 : 1;
+    const conclusionStart = hasLeftLabel ? 2 : 1;
     const conclusionEnd = conclusionStart + premiseColumns;
-    (conclusionCell as HTMLElement).style.cssText = `
-      grid-column: ${conclusionStart} / ${conclusionEnd};
-      grid-row: 2;
-      text-align: center;
-      border-top: 1px solid #000; /* Rule line */
-      padding: 0 1em;
-    `;
+    applyStyles(
+      conclusionCell as HTMLElement,
+      `grid-column: ${conclusionStart} / ${conclusionEnd};
+       grid-row: 2;
+       text-align: center;
+       border-top: 1px solid #000;
+       padding: 0 1em;`,
+    );
     gridContainer.appendChild(conclusionCell);
 
     return gridContainer;
