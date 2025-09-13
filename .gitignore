@@ -24,8 +24,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Testing
-test/test-results.xml
-test/screenshots/test-results.xml
+packages/core/test/test-results.xml
+packages/core/test/visual/screenshots/test-results.xml
 coverage/
 *.lcov
 

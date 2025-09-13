@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { document, HtmlGenerator, parse, window } from "../src/index.ts";
+import { document, HtmlGenerator, parse, window } from "../../src/index.ts";
 
 void window;
 void document;

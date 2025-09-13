@@ -111,7 +111,7 @@ function runScreenshotTest(fixture: FixtureItem, name: string) {
         htmlDoc.head.appendChild(favicon);
         const filename = path.join(
           __dirname,
-          "../screenshots",
+          "screenshots",
           slugify(`${name} ${fixture.header}`, {
             remove: /[*+~()'"!:@,{}\\]/g,
           }),

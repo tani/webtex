@@ -22,9 +22,9 @@ This file contains configuration and context for Claude Code to work effectively
 ### Testing Commands
 - `npm test` - Run all tests (includes prebuild check)
 - `npm run test:watch` - Run tests in watch mode
-- `npm test test/api.spec.ts` - API functionality tests
-- `npm test test/cli.spec.ts` - Command-line interface tests
-- `npm test test/parsing.spec.ts` - LaTeX parsing tests
+- `npm test test/unit/api.spec.ts` - API functionality tests
+- `npm test test/unit/cli.spec.ts` - Command-line interface tests
+- `npm test test/unit/parsing.spec.ts` - LaTeX parsing tests
 - `npm test test/integration/` - Integration tests
 - `npm test test/visual/` - Visual regression tests
 - `npm test test/visual/screenshots.spec.ts` - Screenshot comparison tests

@@ -6,11 +6,15 @@ import { describe, expect, test } from "vitest";
 
 describe("LaTeX.js API test", () => {
   test("node module API", async () => {
-    const node = spawnProcess("node", [path.join(__dirname, "api/node.js")], {
-      env: {
-        PATH: process.env.PATH,
+    const node = spawnProcess(
+      "node",
+      [path.join(__dirname, "../fixtures/api/node.js")],
+      {
+        env: {
+          PATH: process.env.PATH,
+        },
       },
-    });
+    );
 
     const result = await new Promise<string>((resolve, reject) => {
       let stdout = "";
@@ -41,11 +45,15 @@ describe("LaTeX.js API test", () => {
   });
 
   test("node ES6 module API", async () => {
-    const node = spawnProcess("node", [path.join(__dirname, "api/node.mjs")], {
-      env: {
-        PATH: process.env.PATH,
+    const node = spawnProcess(
+      "node",
+      [path.join(__dirname, "../fixtures/api/node.mjs")],
+      {
+        env: {
+          PATH: process.env.PATH,
+        },
       },
-    });
+    );
 
     const result = await new Promise<string>((resolve, reject) => {
       let stdout = "";
@@ -76,7 +84,9 @@ describe("LaTeX.js API test", () => {
   });
 
   test("fs document API", async () => {
-    const file = await fs.readFile(path.join(__dirname, "api/file.html"));
+    const file = await fs.readFile(
+      path.join(__dirname, "../fixtures/api/file.html"),
+    );
     expect(file.toString()).toBe(
       '<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div></body></html>' +
         EOL,
@@ -84,7 +94,9 @@ describe("LaTeX.js API test", () => {
   });
 
   test("fs DOM API", async () => {
-    const file = await fs.readFile(path.join(__dirname, "api/dom.html"));
+    const file = await fs.readFile(
+      path.join(__dirname, "../fixtures/api/dom.html"),
+    );
     expect(file.toString()).toBe(
       `<div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hi, this is a line of text.</p></div>${EOL}`,
     );

@@ -3,8 +3,8 @@ import fs from "node:fs";
 import { EOL, tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
-import pkg from "../package.json";
-import { create as cmd } from "./lib/cmd";
+import pkg from "../../package.json";
+import { create as cmd } from "../lib/cmd";
 
 const binFile = path.resolve(pkg.bin[pkg.name]);
 const latexjs = cmd(binFile);

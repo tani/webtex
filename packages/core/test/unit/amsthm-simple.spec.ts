@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { HtmlGenerator, parse } from "../src/index";
+import { HtmlGenerator, parse } from "../../src/index";
 
 test("Simple amsthm test - basic theorem", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });

@@ -194,7 +194,7 @@ WebTeX includes comprehensive testing:
 - **API Tests**: Public interface validation
 
 ```bash
-npm test test/api.spec.ts        # API functionality tests
+npm test test/unit/api.spec.ts        # API functionality tests
 npm test test/visual/             # Visual regression tests  
 npm test test/integration/        # Integration tests
 ```

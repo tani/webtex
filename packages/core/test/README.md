@@ -4,10 +4,12 @@ Simple, maintainable test suite for LaTeX.js using Vitest with snapshot testing 
 
 ## Test Organization
 
-### Core Test Suites
-- **`api.ts`** - Node.js API compatibility tests (4 tests)
-- **`cli.ts`** - Command-line interface tests (6 tests) 
+### Unit Tests (`/unit/`)
+- **`api.spec.ts`** - Node.js API compatibility tests (4 tests)
+- **`cli.spec.ts`** - Command-line interface tests (6 tests)
 - **`parsing.spec.ts`** - Consolidated LaTeX parsing tests (144 tests)
+- **`amsthm-*.spec.ts`** - Theorem environment tests
+- **`unknown-package.spec.ts`**, `validate-amsthm-fixes.spec.ts`
 
 ### Integration Tests (`/integration/`)
 High-level feature and output testing:
@@ -35,11 +37,11 @@ npm test -- --coverage     # With coverage
 
 ### Granular Test Execution
 ```bash
-npm test test/api.spec.ts            # API tests only
-npm test test/cli.spec.ts             # CLI tests only
-npm test test/parsing.spec.ts         # LaTeX parsing tests
-npm test test/integration/            # Integration tests
-npm test test/visual/                 # Visual/screenshot tests
+npm test test/unit/api.spec.ts            # API tests only
+npm test test/unit/cli.spec.ts            # CLI tests only
+npm test test/unit/parsing.spec.ts        # LaTeX parsing tests
+npm test test/integration/                # Integration tests
+npm test test/visual/                     # Visual/screenshot tests
 npm test test/visual/screenshots.spec.ts  # Screenshot tests only
 ```
 
@@ -51,7 +53,7 @@ npm test -- --update-snapshots                  # Update ALL snapshots in projec
 
 ### Individual Test Categories
 ```bash
-npm test test/parsing.spec.ts                      # All parsing tests
+npm test test/unit/parsing.spec.ts                 # All parsing tests
 npm test test/integration/core-features.spec.ts    # Core feature tests
 npm test test/integration/cli-output.spec.ts       # CLI output tests
 ```
@@ -90,17 +92,27 @@ All LaTeX parsing tests now use **snapshot testing** which:
 
 ```
 test/
-├── parsing.spec.ts       # Consolidated LaTeX parsing tests (144 tests)
-├── api.ts               # API tests (4 tests)
-├── cli.ts               # CLI tests (6 tests)
-├── integration/         # High-level integration tests (27 tests)
-│   ├── __snapshots__/   # Integration snapshots
-│   ├── core-features.spec.ts # Comprehensive LaTeX features
-│   └── cli-output.spec.ts    # CLI output testing
-├── visual/              # Visual regression tests (33 tests)
-│   └── screenshots.spec.ts   # Screenshot testing
-├── fixtures/            # LaTeX test files (.tex)
-└── lib/                 # Test utilities and helpers
+├── unit/                  # Core unit tests
+│   ├── api.spec.ts
+│   ├── cli.spec.ts
+│   ├── parsing.spec.ts
+│   ├── amsthm-numbering.spec.ts
+│   ├── amsthm-simple.spec.ts
+│   ├── debug-amsthm.spec.ts
+│   ├── unknown-package.spec.ts
+│   ├── validate-amsthm-fixes.spec.ts
+│   └── __snapshots__/
+├── integration/           # High-level integration tests
+│   ├── __snapshots__/
+│   ├── core-features.spec.ts
+│   └── cli-output.spec.ts
+├── visual/                # Visual regression tests
+│   ├── screenshots.spec.ts
+│   └── screenshots/
+├── fixtures/              # LaTeX test files (.tex)
+├── lib/                   # Test utilities and helpers
+├── scripts/               # Auxiliary test scripts
+└── types/                 # Type declarations for tests
 ```
 
 ## Snapshot Best Practices

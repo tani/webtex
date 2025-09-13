@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { HtmlGenerator, parse } from "../src/index";
+import { HtmlGenerator, parse } from "../../src/index";
 
 test("Amsthm theorem numbering - basic sequential numbering", async () => {
   const generator = new HtmlGenerator({ hyphenate: false });

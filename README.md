@@ -111,10 +111,10 @@ npx playwright install
 npm test test/visual/
 
 # API tests
-npm test test/api.spec.ts
+npm test test/unit/api.spec.ts
 
 # CLI tests  
-npm test test/cli.spec.ts
+npm test test/unit/cli.spec.ts
 ```
 
 ### Code Quality
