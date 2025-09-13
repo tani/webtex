@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@svgdotjs/svg.js": "3.x",
+    "@types/parsimmon": "^1.10.9",
     "gunshi": "^0.26.3",
     "he": "^1.2.0",
     "hyphenation.de": "*",
