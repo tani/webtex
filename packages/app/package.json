@@ -12,9 +12,9 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "npm run sync-css && vite --host",
-    "build": "npm run sync-css && vite build",
-    "preview": "vite preview --host",
+    "dev": "npm run sync-css && npm run build && npx http-server dist -p 3000 -o",
+    "build": "npm run clean && npm run sync-css && npx tsx build.ts",
+    "clean": "rm -rf dist",
     "sync-css": "mkdir -p public/css/ && cp -r ../core/src/css/* public/css/",
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
@@ -25,9 +25,12 @@
     "webtex": "file:../core"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "typescript": "^5.6.3",
-    "vite": "^6.0.1"
+    "@biomejs/biome": "^2.2.3",
+    "esbuild": "^0.25.9",
+    "http-server": "^14.1.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.9.2",
+    "zx": "^8.0.0"
   },
   "files": [
     "dist"
