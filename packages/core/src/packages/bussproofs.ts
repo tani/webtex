@@ -373,7 +373,7 @@ export class Bussproofs {
          display: flex;
          align-items: end;
          justify-content: flex-end;
-         padding-bottom: 0.5em;`,
+         padding-bottom: 0.8em;`,
       );
       gridContainer.appendChild(leftLabelCell);
     }
@@ -405,7 +405,7 @@ export class Bussproofs {
          display: flex;
          align-items: end;
          justify-content: flex-start;
-         padding-bottom: 0.5em;`,
+         padding-bottom: 0.8em;`,
       );
       gridContainer.appendChild(rightLabelCell);
     }
