@@ -60,7 +60,7 @@
   },
   "scripts": {
     "vscode:package": "vsce package --no-dependencies",
-    "vscode:prepublish": "npm run --prefix ../core build && npx tsx build.ts --production --clean",
+    "vscode:prepublish": "npm run --prefix ../core build && npx tsx build.ts --clean && npx tsx build.ts --production",
     "build": "npm run --prefix ../core build && npx tsx build.ts",
     "build:clean": "npx tsx build.ts --clean",
     "build:prod": "npx tsx build.ts --production --clean",
