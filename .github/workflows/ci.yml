@@ -44,7 +44,7 @@ jobs:
         run: npm run typecheck
 
       - name: Build all packages
-        run: npm run compile
+        run: npm run build
 
       - name: Test core package
         run: npm run test:core
