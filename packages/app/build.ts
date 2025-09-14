@@ -1,58 +1,58 @@
 #!/usr/bin/env tsx
-import { $, fs, path } from 'zx'
-import { build } from 'esbuild'
+import { build } from "esbuild";
+import { fs, path } from "zx";
 
 // Build configuration
-const srcDir = 'src'
-const distDir = 'dist'
-const publicDir = 'public'
+const srcDir = "src";
+const distDir = "dist";
+const publicDir = "public";
 
-console.log('🔨 Building WebTeX App...')
+console.log("🔨 Building WebTeX App...");
 
 // Clean dist directory
-console.log('🧹 Cleaning distribution directory...')
-await fs.remove(distDir)
-await fs.ensureDir(distDir)
+console.log("🧹 Cleaning distribution directory...");
+await fs.remove(distDir);
+await fs.ensureDir(distDir);
 
 // Copy HTML file and process it
-console.log('📄 Processing HTML file...')
-const htmlContent = await fs.readFile(path.join(srcDir, 'index.html'), 'utf-8')
+console.log("📄 Processing HTML file...");
+const htmlContent = await fs.readFile(path.join(srcDir, "index.html"), "utf-8");
 const processedHtml = htmlContent
   .replace(/src="\.\/main\.js"/g, 'src="./assets/main.js"')
-  .replace(/href="\.\/styles\.css"/g, 'href="./assets/styles.css"')
+  .replace(/href="\.\/styles\.css"/g, 'href="./assets/styles.css"');
 
-await fs.writeFile(path.join(distDir, 'index.html'), processedHtml)
+await fs.writeFile(path.join(distDir, "index.html"), processedHtml);
 
 // Bundle JavaScript
-console.log('📦 Bundling JavaScript...')
+console.log("📦 Bundling JavaScript...");
 await build({
-  entryPoints: [path.join(srcDir, 'main.js')],
+  entryPoints: [path.join(srcDir, "main.js")],
   bundle: true,
-  outfile: path.join(distDir, 'assets', 'main.js'),
-  format: 'esm',
-  target: 'es2020',
+  outfile: path.join(distDir, "assets", "main.js"),
+  format: "esm",
+  target: "es2020",
   minify: true,
   sourcemap: true,
   external: [],
   define: {
-    'process.env.NODE_ENV': '"production"'
-  }
-})
+    "process.env.NODE_ENV": '"production"',
+  },
+});
 
 // Bundle CSS
-console.log('🎨 Processing CSS...')
+console.log("🎨 Processing CSS...");
 await build({
-  entryPoints: [path.join(srcDir, 'styles.css')],
+  entryPoints: [path.join(srcDir, "styles.css")],
   bundle: true,
-  outfile: path.join(distDir, 'assets', 'styles.css'),
+  outfile: path.join(distDir, "assets", "styles.css"),
   minify: true,
-  sourcemap: true
-})
+  sourcemap: true,
+});
 
 // Copy public assets
-console.log('📁 Copying public assets...')
+console.log("📁 Copying public assets...");
 if (await fs.pathExists(publicDir)) {
-  await fs.copy(publicDir, distDir, { overwrite: true })
+  await fs.copy(publicDir, distDir, { overwrite: true });
 }
 
-console.log('✅ Build completed successfully!')
+console.log("✅ Build completed successfully!");
