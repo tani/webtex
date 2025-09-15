@@ -4,6 +4,7 @@ import type { PackageGenerator } from "../interfaces";
 // Type definitions
 export type CommandType = "axiom" | "inference" | "label";
 export type InferenceArity = 1 | 2 | 3 | 4 | 5;
+export type LabelType = "left" | "right";
 
 export interface BussproofsCommand {
   type: CommandType;
@@ -24,6 +25,27 @@ const PARSER_PATTERNS = {
   INLINE_MATH_DOLLAR: /^\$(.+?)\$$/,
   INLINE_MATH_PAREN: /^\\\((.+?)\\\)$/,
   DISPLAY_MATH_BRACKET: /^\\\[(.+?)\\\]$/,
+} as const;
+
+// CSS constants
+const CSS_CONSTANTS = {
+  GRID_GAP: "0 0.5em",
+  LABEL_PADDING_BOTTOM: "0.8em",
+  CONCLUSION_PADDING: "0 1em",
+  BORDER_STYLE: "1px solid #000",
+  WRAPPER_MARGIN: "0 0.5em",
+  COLUMN_SPAN: 2,
+} as const;
+
+// CSS class names
+const CSS_CLASSES = {
+  GRID: "bussproofs-grid",
+  OUTER_WRAPPER: "bussproofs-outer-wrapper",
+  INNER_WRAPPER: "bussproofs-inner-wrapper",
+  LEFT_LABEL: "bussproofs-left-label",
+  RIGHT_LABEL: "bussproofs-right-label",
+  PREMISE: "bussproofs-premise",
+  CONCLUSION: "bussproofs-conclusion",
 } as const;
 
 // Command definitions for better maintainability
@@ -247,15 +269,62 @@ const calculateGridColumns = (
   hasLeftLabel: boolean,
   hasRightLabel: boolean,
 ): string => {
-  const premiseColumns = premiseCount * 2;
-  let gridTemplateColumns = "";
+  const premiseColumns = premiseCount * CSS_CONSTANTS.COLUMN_SPAN;
+  const parts: string[] = [];
 
-  if (hasLeftLabel) gridTemplateColumns += "auto ";
-  gridTemplateColumns += `repeat(${premiseColumns}, auto)`;
-  if (hasRightLabel) gridTemplateColumns += " auto";
+  if (hasLeftLabel) parts.push("auto");
+  parts.push(`repeat(${premiseColumns}, auto)`);
+  if (hasRightLabel) parts.push("auto");
 
-  return gridTemplateColumns;
+  return parts.join(" ");
 };
+
+// Style generators
+const createGridStyles = (columns: string): string =>
+  `display: grid;
+   grid-template-columns: ${columns};
+   grid-template-rows: auto auto;
+   gap: ${CSS_CONSTANTS.GRID_GAP};
+   width: fit-content;`;
+
+const createLabelStyles = (
+  column: string | number,
+  alignment: "left" | "right",
+): string =>
+  `grid-column: ${column};
+   grid-row: 1 / span 2;
+   display: flex;
+   align-items: end;
+   justify-content: ${alignment === "left" ? "flex-end" : "flex-start"};
+   padding-bottom: ${CSS_CONSTANTS.LABEL_PADDING_BOTTOM};`;
+
+const createPremiseStyles = (columnStart: number): string =>
+  `grid-column: ${columnStart} / span ${CSS_CONSTANTS.COLUMN_SPAN};
+   grid-row: 1;
+   justify-content: center;
+   display: flex;
+   align-items: end;`;
+
+const createConclusionStyles = (start: number, end: number): string =>
+  `grid-column: ${start} / ${end};
+   grid-row: 2;
+   text-align: center;
+   border-top: ${CSS_CONSTANTS.BORDER_STYLE};
+   padding: ${CSS_CONSTANTS.CONCLUSION_PADDING};`;
+
+const createWrapperStyles = (): string =>
+  `display: flex;
+   justify-content: center;
+   align-items: end;`;
+
+const createInnerWrapperStyles = (): string =>
+  `display: inline-block; margin: ${CSS_CONSTANTS.WRAPPER_MARGIN};`;
+
+// Label storage interface
+interface LabelStorage {
+  left: unknown | null;
+  right: unknown | null;
+}
 
 export class Bussproofs {
   static displayName = "Bussproofs";
@@ -334,7 +403,7 @@ export class Bussproofs {
   ): Element {
     const hasLeftLabel = Boolean(leftLabel);
     const hasRightLabel = Boolean(rightLabel);
-    const premiseColumns = premiseCount * 2;
+    const premiseColumns = premiseCount * CSS_CONSTANTS.COLUMN_SPAN;
     const totalColumns =
       (hasLeftLabel ? 1 : 0) + premiseColumns + (hasRightLabel ? 1 : 0);
 
@@ -342,7 +411,7 @@ export class Bussproofs {
     const gridContainer = this.g.create(
       "div",
       undefined,
-      `bussproofs-grid bussproofs-grid-${premiseCount}`,
+      `${CSS_CLASSES.GRID} ${CSS_CLASSES.GRID}-${premiseCount}`,
     );
 
     const gridTemplateColumns = calculateGridColumns(
@@ -352,11 +421,7 @@ export class Bussproofs {
     );
     applyStyles(
       gridContainer as HTMLElement,
-      `display: grid;
-       grid-template-columns: ${gridTemplateColumns};
-       grid-template-rows: auto auto;
-       gap: 0 0.5em;
-       width: fit-content;`,
+      createGridStyles(gridTemplateColumns),
     );
 
     // Add left label (spans both rows)
@@ -364,32 +429,18 @@ export class Bussproofs {
       const leftLabelCell = this.g.create(
         "div",
         leftLabel,
-        "bussproofs-left-label",
+        CSS_CLASSES.LEFT_LABEL,
       );
-      applyStyles(
-        leftLabelCell as HTMLElement,
-        `grid-column: 1;
-         grid-row: 1 / span 2;
-         display: flex;
-         align-items: end;
-         justify-content: flex-end;
-         padding-bottom: 0.8em;`,
-      );
+      applyStyles(leftLabelCell as HTMLElement, createLabelStyles(1, "left"));
       gridContainer.appendChild(leftLabelCell);
     }
 
     // Add premise cells (top row)
     premises.forEach((premise, index) => {
-      const premiseCell = this.g.create("div", premise, "bussproofs-premise");
-      const columnStart = (hasLeftLabel ? 1 : 0) + index * 2 + 1;
-      applyStyles(
-        premiseCell as HTMLElement,
-        `grid-column: ${columnStart} / span 2;
-         grid-row: 1;
-         justify-content: center;
-         display: flex;
-         align-items: end;`,
-      );
+      const premiseCell = this.g.create("div", premise, CSS_CLASSES.PREMISE);
+      const columnStart =
+        (hasLeftLabel ? 1 : 0) + index * CSS_CONSTANTS.COLUMN_SPAN + 1;
+      applyStyles(premiseCell as HTMLElement, createPremiseStyles(columnStart));
       gridContainer.appendChild(premiseCell);
     });
 
@@ -398,16 +449,11 @@ export class Bussproofs {
       const rightLabelCell = this.g.create(
         "div",
         rightLabel,
-        "bussproofs-right-label",
+        CSS_CLASSES.RIGHT_LABEL,
       );
       applyStyles(
         rightLabelCell as HTMLElement,
-        `grid-column: ${totalColumns};
-         grid-row: 1 / span 2;
-         display: flex;
-         align-items: end;
-         justify-content: flex-start;
-         padding-bottom: 0.8em;`
+        createLabelStyles(totalColumns, "right"),
       );
       gridContainer.appendChild(rightLabelCell);
     }
@@ -416,21 +462,68 @@ export class Bussproofs {
     const conclusionCell = this.g.create(
       "div",
       conclusion,
-      "bussproofs-conclusion",
+      CSS_CLASSES.CONCLUSION,
     );
     const conclusionStart = hasLeftLabel ? 2 : 1;
     const conclusionEnd = conclusionStart + premiseColumns;
     applyStyles(
       conclusionCell as HTMLElement,
-      `grid-column: ${conclusionStart} / ${conclusionEnd};
-       grid-row: 2;
-       text-align: center;
-       border-top: 1px solid #000;
-       padding: 0 1em;`,
+      createConclusionStyles(conclusionStart, conclusionEnd),
     );
     gridContainer.appendChild(conclusionCell);
 
     return gridContainer;
+  }
+
+  /**
+   * Process an inference command with the given arity
+   */
+  private processInference(
+    stack: unknown[],
+    conclusionElement: unknown,
+    arity: number,
+    labels: LabelStorage,
+  ): void {
+    if (stack.length >= arity) {
+      const premises: unknown[] = [];
+      for (let i = 0; i < arity; i++) {
+        const premise = stack.pop();
+        if (premise !== undefined) {
+          premises.unshift(premise);
+        }
+      }
+      const proofTree = this.createProofTree(
+        premises,
+        conclusionElement,
+        arity,
+        labels.left,
+        labels.right,
+      );
+      stack.push(proofTree);
+    } else {
+      console.warn(
+        `${this.getInferenceName(arity)}: not enough premises in stack`,
+      );
+      stack.push(conclusionElement);
+    }
+    // Reset labels after use
+    labels.left = null;
+    labels.right = null;
+  }
+
+  /**
+   * Get the name of an inference command based on its arity
+   */
+  private getInferenceName(arity: number): string {
+    const names = [
+      "",
+      "UnaryInfC",
+      "BinaryInfC",
+      "TrinaryInfC",
+      "QuaternaryInfC",
+      "QuinaryInfC",
+    ];
+    return names[arity] || `${arity}-aryInfC`;
   }
 
   prooftree(content: unknown): unknown[] {
@@ -440,8 +533,10 @@ export class Bussproofs {
     const stack: unknown[] = [];
 
     // Label storage - labels apply to the next inference rule
-    let currentLeftLabel: unknown = null;
-    let currentRightLabel: unknown = null;
+    const labels: LabelStorage = {
+      left: null,
+      right: null,
+    };
 
     for (const command of commands) {
       // Handle label commands
@@ -453,9 +548,9 @@ export class Bussproofs {
             : this.g.createText?.(command.content) || command.content;
 
         if (command.command === "RightLabel") {
-          currentRightLabel = labelElement;
+          labels.right = labelElement;
         } else if (command.command === "LeftLabel") {
-          currentLeftLabel = labelElement;
+          labels.left = labelElement;
         }
         continue;
       }
@@ -474,89 +569,23 @@ export class Bussproofs {
           break;
 
         case "UnaryInfC":
-          if (stack.length >= 1) {
-            const premise1 = stack.pop();
-            const proofTree = this.createProofTree(
-              [premise1],
-              conclusionElement,
-              1,
-              currentLeftLabel,
-              currentRightLabel,
-            );
-            stack.push(proofTree);
-          } else {
-            console.warn("UnaryInfC: not enough premises in stack");
-            stack.push(conclusionElement);
-          }
-          // Reset labels after use
-          currentLeftLabel = null;
-          currentRightLabel = null;
+          this.processInference(stack, conclusionElement, 1, labels);
           break;
 
         case "BinaryInfC":
-          if (stack.length >= 2) {
-            const premise2 = stack.pop();
-            const premise1 = stack.pop();
-            const proofTree = this.createProofTree(
-              [premise1, premise2],
-              conclusionElement,
-              2,
-              currentLeftLabel,
-              currentRightLabel,
-            );
-            stack.push(proofTree);
-          } else {
-            console.warn("BinaryInfC: not enough premises in stack");
-            stack.push(conclusionElement);
-          }
-          // Reset labels after use
-          currentLeftLabel = null;
-          currentRightLabel = null;
+          this.processInference(stack, conclusionElement, 2, labels);
           break;
 
         case "TrinaryInfC":
-          if (stack.length >= 3) {
-            const premise3 = stack.pop();
-            const premise2 = stack.pop();
-            const premise1 = stack.pop();
-            const proofTree = this.createProofTree(
-              [premise1, premise2, premise3],
-              conclusionElement,
-              3,
-              currentLeftLabel,
-              currentRightLabel,
-            );
-            stack.push(proofTree);
-          } else {
-            console.warn("TrinaryInfC: not enough premises in stack");
-            stack.push(conclusionElement);
-          }
-          // Reset labels after use
-          currentLeftLabel = null;
-          currentRightLabel = null;
+          this.processInference(stack, conclusionElement, 3, labels);
           break;
 
         case "QuaternaryInfC":
-          if (stack.length >= 4) {
-            const premise4 = stack.pop();
-            const premise3 = stack.pop();
-            const premise2 = stack.pop();
-            const premise1 = stack.pop();
-            const proofTree = this.createProofTree(
-              [premise1, premise2, premise3, premise4],
-              conclusionElement,
-              4,
-              currentLeftLabel,
-              currentRightLabel,
-            );
-            stack.push(proofTree);
-          } else {
-            console.warn("QuaternaryInfC: not enough premises in stack");
-            stack.push(conclusionElement);
-          }
-          // Reset labels after use
-          currentLeftLabel = null;
-          currentRightLabel = null;
+          this.processInference(stack, conclusionElement, 4, labels);
+          break;
+
+        case "QuinaryInfC":
+          this.processInference(stack, conclusionElement, 5, labels);
           break;
 
         default:
@@ -571,22 +600,17 @@ export class Bussproofs {
       const wrapper = this.g.create(
         "div",
         undefined,
-        "bussproofs-outer-wrapper",
+        CSS_CLASSES.OUTER_WRAPPER,
       );
-      (wrapper as HTMLElement).style.cssText =
-        `display: flex;
-         justify-content: center;
-         align-items: end;
-        `;
+      applyStyles(wrapper as HTMLElement, createWrapperStyles());
 
       for (const element of stack) {
         const inlineBlock = this.g.create(
           "div",
           undefined,
-          "bussproofs-inner-wrapper",
+          CSS_CLASSES.INNER_WRAPPER,
         );
-        (inlineBlock as HTMLElement).style.cssText =
-          "display: inline-block; margin: 0 0.5em;";
+        applyStyles(inlineBlock as HTMLElement, createInnerWrapperStyles());
         inlineBlock.appendChild(element as Node);
         wrapper.appendChild(inlineBlock);
       }
