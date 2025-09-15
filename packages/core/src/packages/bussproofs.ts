@@ -386,7 +386,9 @@ export class Bussproofs {
         premiseCell as HTMLElement,
         `grid-column: ${columnStart} / span 2;
          grid-row: 1;
-         text-align: center;`,
+         justify-content: center;
+         display: flex;
+         align-items: end;`,
       );
       gridContainer.appendChild(premiseCell);
     });
@@ -572,7 +574,10 @@ export class Bussproofs {
         "bussproofs-outer-wrapper",
       );
       (wrapper as HTMLElement).style.cssText =
-        "display: block; text-align: center;";
+        `display: flex;
+         justify-content: center;
+         align-items: end;
+        `;
 
       for (const element of stack) {
         const inlineBlock = this.g.create(
