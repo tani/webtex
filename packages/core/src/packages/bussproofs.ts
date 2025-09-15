@@ -407,7 +407,7 @@ export class Bussproofs {
          display: flex;
          align-items: end;
          justify-content: flex-start;
-         padding-bottom: 0.8em;`,
+         padding-bottom: 0.8em;`
       );
       gridContainer.appendChild(rightLabelCell);
     }
