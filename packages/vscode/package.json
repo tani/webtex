@@ -2,7 +2,7 @@
   "name": "webtex-preview",
   "displayName": "WebTeX Preview",
   "description": "Live Previewer for LaTeX",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "publisher": "masaya",
   "repository": {
     "type": "git",
@@ -11,12 +11,8 @@
   "engines": {
     "vscode": "^1.103.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onLanguage:latex"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["onLanguage:latex"],
   "main": "./out/extension.js",
   "browser": "./out/extension.js",
   "icon": "webtex.png",

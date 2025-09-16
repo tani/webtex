@@ -1,7 +1,7 @@
 {
   "name": "webtex",
   "description": "JavaScript LaTeX to HTML5 translator - WebTeX fork with enhanced features",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "author": {
     "name": "tani",
     "email": "ta2gch@gmail.com"
@@ -28,10 +28,7 @@
     }
   },
   "browser": "./dist/webtex.browser.js",
-  "files": [
-    "bin/",
-    "dist/"
-  ],
+  "files": ["bin/", "dist/"],
   "imports": {
     "#window": {
       "node": "./src/window.node.ts",
