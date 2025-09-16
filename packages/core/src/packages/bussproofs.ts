@@ -27,15 +27,6 @@ const PARSER_PATTERNS = {
   DISPLAY_MATH_BRACKET: /^\\\[(.+?)\\\]$/,
 } as const;
 
-// CSS constants
-const CSS_CONSTANTS = {
-  HORIZONTAL_GAP: "0.5em",
-  LABEL_PADDING_BOTTOM: "0.8em",
-  CONCLUSION_PADDING: "0 1em",
-  BORDER_STYLE: "1px solid #000",
-  WRAPPER_MARGIN: "0 0.5em",
-} as const;
-
 // CSS class names
 const CSS_CLASSES = {
   GRID: "bussproofs-grid",
@@ -45,6 +36,8 @@ const CSS_CLASSES = {
   RIGHT_LABEL: "bussproofs-right-label",
   PREMISE: "bussproofs-premise",
   CONCLUSION: "bussproofs-conclusion",
+  PROOF_COLUMN: "bussproofs-proof-column",
+  PREMISES_ROW: "bussproofs-premises-row",
 } as const;
 
 // Command definitions for better maintainability
@@ -257,55 +250,6 @@ export const parseCommands = (content: string): BussproofsCommand[] => {
   return commands;
 };
 
-// CSS styling utilities
-
-const applyStyles = (element: HTMLElement, styles: string): void => {
-  element.style.cssText = styles;
-};
-
-const createLabelStyles = (alignment: "left" | "right"): string =>
-  `display: flex;
-   align-items: flex-end;
-   justify-content: ${alignment === "left" ? "flex-end" : "flex-start"};
-   padding-bottom: ${CSS_CONSTANTS.LABEL_PADDING_BOTTOM};`;
-
-const createContainerStyles = (): string =>
-  `display: flex;
-   align-items: flex-end;
-   justify-content: center;
-   gap: ${CSS_CONSTANTS.HORIZONTAL_GAP};
-   width: fit-content;`;
-
-const createProofColumnStyles = (): string =>
-  `display: flex;
-   flex-direction: column;
-   align-items: stretch;
-   width: fit-content;`;
-
-const createPremisesRowStyles = (): string =>
-  `display: flex;
-   align-items: flex-end;
-   justify-content: center;
-   gap: ${CSS_CONSTANTS.HORIZONTAL_GAP};`;
-
-const createPremiseStyles = (): string =>
-  `display: flex;
-   align-items: flex-end;
-   justify-content: center;`;
-
-const createConclusionStyles = (): string =>
-  `text-align: center;
-   border-top: ${CSS_CONSTANTS.BORDER_STYLE};
-   padding: ${CSS_CONSTANTS.CONCLUSION_PADDING};`;
-
-const createWrapperStyles = (): string =>
-  `display: flex;
-   justify-content: center;
-   align-items: end;`;
-
-const createInnerWrapperStyles = (): string =>
-  `display: inline-block; margin: ${CSS_CONSTANTS.WRAPPER_MARGIN};`;
-
 // Label storage interface
 interface LabelStorage {
   left: unknown | null;
@@ -390,27 +334,29 @@ export class Bussproofs {
       `${CSS_CLASSES.GRID} ${CSS_CLASSES.GRID}-${premiseCount}`,
     );
 
-    applyStyles(flexContainer as HTMLElement, createContainerStyles());
-
     if (leftLabel) {
       const leftLabelCell = this.g.create(
         "div",
         leftLabel,
         CSS_CLASSES.LEFT_LABEL,
       );
-      applyStyles(leftLabelCell as HTMLElement, createLabelStyles("left"));
       flexContainer.appendChild(leftLabelCell);
     }
 
-    const proofColumn = this.g.create("div");
-    applyStyles(proofColumn as HTMLElement, createProofColumnStyles());
+    const proofColumn = this.g.create(
+      "div",
+      undefined,
+      CSS_CLASSES.PROOF_COLUMN,
+    );
 
-    const premisesRow = this.g.create("div");
-    applyStyles(premisesRow as HTMLElement, createPremisesRowStyles());
+    const premisesRow = this.g.create(
+      "div",
+      undefined,
+      CSS_CLASSES.PREMISES_ROW,
+    );
 
     premises.forEach((premise) => {
       const premiseCell = this.g.create("div", premise, CSS_CLASSES.PREMISE);
-      applyStyles(premiseCell as HTMLElement, createPremiseStyles());
       premisesRow.appendChild(premiseCell);
     });
 
@@ -421,7 +367,6 @@ export class Bussproofs {
       conclusion,
       CSS_CLASSES.CONCLUSION,
     );
-    applyStyles(conclusionCell as HTMLElement, createConclusionStyles());
     proofColumn.appendChild(conclusionCell);
 
     flexContainer.appendChild(proofColumn);
@@ -432,7 +377,6 @@ export class Bussproofs {
         rightLabel,
         CSS_CLASSES.RIGHT_LABEL,
       );
-      applyStyles(rightLabelCell as HTMLElement, createLabelStyles("right"));
       flexContainer.appendChild(rightLabelCell);
     }
 
@@ -566,7 +510,6 @@ export class Bussproofs {
         undefined,
         CSS_CLASSES.OUTER_WRAPPER,
       );
-      applyStyles(wrapper as HTMLElement, createWrapperStyles());
 
       for (const element of stack) {
         const inlineBlock = this.g.create(
@@ -574,7 +517,6 @@ export class Bussproofs {
           undefined,
           CSS_CLASSES.INNER_WRAPPER,
         );
-        applyStyles(inlineBlock as HTMLElement, createInnerWrapperStyles());
         inlineBlock.appendChild(element as Node);
         wrapper.appendChild(inlineBlock);
       }
