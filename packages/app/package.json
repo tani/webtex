@@ -32,7 +32,9 @@
     "typescript": "^5.9.2",
     "zx": "^8.0.0"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "latex",
     "html",

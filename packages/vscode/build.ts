@@ -6,7 +6,7 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { build as esbuild } from "esbuild";
+import * as esbuild from "esbuild";
 import { $ } from "zx";
 
 // Handle __dirname in ES modules
@@ -62,14 +62,15 @@ async function buildExtension(options: BuildOptions = {}) {
   // Copy WebTeX core files
   await copyWebTexFiles();
 
-  const buildConfig = {
+  // Build configuration for the extension
+  const extensionConfig = {
     entryPoints: ["./src/extension.ts"],
     outdir: "./out",
     platform: "node" as const,
     format: "cjs" as const, // VSCode extensions need CommonJS
     bundle: true,
     minify: production,
-    sourcemap: production ? false : "inline",
+    sourcemap: production ? false : ("inline" as const),
     external: [
       "vscode", // Always external - provided by VSCode runtime
       "mocha", // Test dependencies
@@ -80,30 +81,58 @@ async function buildExtension(options: BuildOptions = {}) {
       "process.env.NODE_ENV": production ? '"production"' : '"development"',
     },
     metafile: !production,
-  } as const;
+  };
+
+  // Build configuration for the preview script (runs in webview)
+  const previewConfig = {
+    entryPoints: ["./src/preview.ts"],
+    outfile: "./media/preview.js",
+    platform: "browser" as const,
+    format: "iife" as const, // IIFE for browser execution
+    bundle: true,
+    minify: production,
+    sourcemap: production ? false : ("inline" as const),
+    define: {
+      "process.env.NODE_ENV": production ? '"production"' : '"development"',
+    },
+    metafile: !production,
+  };
 
   try {
     if (watch) {
       console.log("👀 Starting watch mode...");
-      const ctx = await esbuild.context(buildConfig);
-      await ctx.watch();
+      const extensionCtx = await esbuild.context(extensionConfig);
+      const previewCtx = await esbuild.context(previewConfig);
+      await Promise.all([extensionCtx.watch(), previewCtx.watch()]);
       console.log("✅ Watch mode started. Press Ctrl+C to stop.");
       process.on("SIGINT", () => {
         console.log("\n👋 Stopping watch mode...");
-        ctx.dispose();
+        extensionCtx.dispose();
+        previewCtx.dispose();
         process.exit(0);
       });
       await new Promise(() => {});
     } else {
       const startTime = performance.now();
-      const result = await esbuild(buildConfig);
+      const [extensionResult, previewResult] = await Promise.all([
+        esbuild.build(extensionConfig),
+        esbuild.build(previewConfig),
+      ]);
       const duration = Math.round(performance.now() - startTime);
       console.log(`✅ Build completed successfully in ${duration}ms`);
-      if (!production && result.metafile) {
+      if (!production) {
         console.log("📁 Output files:");
-        for (const output of Object.keys(result.metafile.outputs)) {
-          const relativePath = path.relative(__dirname, output);
-          console.log(`   ${relativePath}`);
+        if (extensionResult.metafile) {
+          for (const output of Object.keys(extensionResult.metafile.outputs)) {
+            const relativePath = path.relative(__dirname, output);
+            console.log(`   ${relativePath}`);
+          }
+        }
+        if (previewResult.metafile) {
+          for (const output of Object.keys(previewResult.metafile.outputs)) {
+            const relativePath = path.relative(__dirname, output);
+            console.log(`   ${relativePath}`);
+          }
         }
       }
     }

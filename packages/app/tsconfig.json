@@ -13,6 +13,6 @@
     "noImplicitAny": false,
     "strictNullChecks": false
   },
-  "include": ["src/**/*.js", "src/**/*.ts"],
+  "include": ["src/**/*.js", "src/**/*.ts", "build.ts"],
   "exclude": ["node_modules", "dist", "../core/dist"]
 }

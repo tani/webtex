@@ -84,7 +84,6 @@ class WebTeXPreviewPanel {
   private readonly _extensionUri: vscode.Uri;
   private _currentUri: vscode.Uri | undefined;
   private _disposables: vscode.Disposable[] = [];
-  private _updateTimer: NodeJS.Timeout | undefined;
   private _htmlInitialized = false;
 
   public static createOrShow(
@@ -130,7 +129,7 @@ class WebTeXPreviewPanel {
       WebTeXPreviewPanel.currentPanel &&
       WebTeXPreviewPanel.currentPanel._currentUri?.toString() === uri.toString()
     ) {
-      WebTeXPreviewPanel.currentPanel._queueUpdate();
+      WebTeXPreviewPanel.currentPanel._update();
     }
   }
 
@@ -165,7 +164,6 @@ class WebTeXPreviewPanel {
               : "WebTeX conversion error";
 
           const startLine1 = Number(error?.location?.start?.line) || 1;
-          const _endLine1 = Number(error?.location?.end?.line) || startLine1;
           const endCol1 = Number(error?.location?.end?.column) || 1;
 
           const text = await getLatexContent(this._currentUri);
@@ -235,13 +233,6 @@ class WebTeXPreviewPanel {
         x.dispose();
       }
     }
-  }
-
-  private _queueUpdate(delay = 200) {
-    if (this._updateTimer) {
-      clearTimeout(this._updateTimer);
-    }
-    this._updateTimer = setTimeout(() => this._update(), delay);
   }
 
   private async _update() {

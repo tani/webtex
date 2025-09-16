@@ -11,8 +11,12 @@
   "engines": {
     "vscode": "^1.103.0"
   },
-  "categories": ["Other"],
-  "activationEvents": ["onLanguage:latex"],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:latex"
+  ],
   "main": "./out/extension.js",
   "browser": "./out/extension.js",
   "icon": "webtex.png",
@@ -80,5 +84,8 @@
     "tsx": "^4.19.1",
     "typescript": "^5.9.2",
     "zx": "^8.0.0"
+  },
+  "dependencies": {
+    "morphdom": "^2.7.7"
   }
 }

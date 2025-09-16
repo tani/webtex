@@ -28,7 +28,10 @@
     }
   },
   "browser": "./dist/webtex.browser.js",
-  "files": ["bin/", "dist/"],
+  "files": [
+    "bin/",
+    "dist/"
+  ],
   "imports": {
     "#window": {
       "node": "./src/window.node.ts",
