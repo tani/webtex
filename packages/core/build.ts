@@ -4,7 +4,6 @@ import peggy from "peggy";
 import { $ } from "zx";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 
-// Build configuration
 const CONFIG = {
   paths: {
     grammarFile: "src/latex-parser.pegjs",
@@ -23,10 +22,7 @@ const CONFIG = {
     format: "bare" as const,
     trace: false,
   },
-  staticAssets: [
-    { src: "src/css", dest: "dist/css" },
-    { src: "node_modules/katex/dist", dest: "dist/katex" },
-  ],
+  staticAssets: [{ src: "src/css", dest: "dist/css" }],
 } as const;
 
 // Logging utilities

@@ -36,8 +36,6 @@ he.decode.options.strict = true;
 const blockRegex =
   /^(address|blockquote|body|center|dir|div|dl|fieldset|form|h[1-6]|hr|isindex|menu|noframes|noscript|ol|p|pre|table|ul|dd|dt|frameset|li|tbody|td|tfoot|th|thead|tr|html)$/i;
 
-const KATEX_STYLESHEET_PATH = "katex/katex.min.css" as const;
-
 const create = (type: string, classes?: string): HTMLElement => {
   const el = document.createElement(type);
   if (classes) {
@@ -151,11 +149,6 @@ export class HtmlGenerator extends Generator {
       },
       options,
     );
-
-    const userStyles = Array.isArray(this._options.styles)
-      ? this._options.styles.filter((style) => style !== KATEX_STYLESHEET_PATH)
-      : [];
-    this._options.styles = [KATEX_STYLESHEET_PATH, ...userStyles];
 
     if (this._options.hyphenate) {
       this._h = new Hypher(
@@ -677,12 +670,26 @@ export class HtmlGenerator extends Generator {
         output: "htmlAndMathml",
       });
 
-      const container = document.createElement("div");
-      container.innerHTML = html;
+      // Create a temporary div to parse the HTML
+      const div = document.createElement("div");
+      div.innerHTML = html;
 
+      // Extract MathML elements - KaTeX generates both HTML and MathML
+      const mathmlElements = div.querySelectorAll("math");
+
+      // Create fragment and add MathML elements
       const fragment = document.createDocumentFragment();
-      while (container.firstChild) {
-        fragment.appendChild(container.firstChild);
+
+      if (mathmlElements.length > 0) {
+        // Use MathML if available
+        Array.from(mathmlElements).forEach((mathml) => {
+          fragment.appendChild(mathml.cloneNode(true));
+        });
+      } else {
+        // Fallback to HTML if no MathML found
+        while (div.firstChild) {
+          fragment.appendChild(div.firstChild);
+        }
       }
 
       return fragment;

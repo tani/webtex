@@ -33,6 +33,6 @@ exports[`LaTeX.js CLI Output Snapshots > math LaTeX compilation snapshot > math-
 exports[`LaTeX.js CLI Output Snapshots > simple LaTeX compilation snapshot > simple-latex-compilation.html 1`] = `"<!DOCTYPE html> <html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><p data-source-line="1" data-source-column="1">Hello <span data-source-line="1" data-source-column="8" class="latex">L<span class="a" data-source-line="1" data-source-column="8">a</span>T<span class="e" data-source-line="1" data-source-column="8">e</span>X</span>​ world!</p></div></body></html>"`;
 
 exports[`LaTeX.js CLI Output Snapshots > version output snapshot > cli-version-output.txt 1`] = `
-"0.11.0
+"0.12.0
 "
 `;

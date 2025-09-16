@@ -2,7 +2,7 @@
   "name": "webtex-preview",
   "displayName": "WebTeX Preview",
   "description": "Live Previewer for LaTeX",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "publisher": "masaya",
   "repository": {
     "type": "git",
