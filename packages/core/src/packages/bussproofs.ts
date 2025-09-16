@@ -29,12 +29,11 @@ const PARSER_PATTERNS = {
 
 // CSS constants
 const CSS_CONSTANTS = {
-  GRID_GAP: "0 0.5em",
+  HORIZONTAL_GAP: "0.5em",
   LABEL_PADDING_BOTTOM: "0.8em",
   CONCLUSION_PADDING: "0 1em",
   BORDER_STYLE: "1px solid #000",
   WRAPPER_MARGIN: "0 0.5em",
-  COLUMN_SPAN: 2,
 } as const;
 
 // CSS class names
@@ -264,51 +263,38 @@ const applyStyles = (element: HTMLElement, styles: string): void => {
   element.style.cssText = styles;
 };
 
-const calculateGridColumns = (
-  premiseCount: number,
-  hasLeftLabel: boolean,
-  hasRightLabel: boolean,
-): string => {
-  const premiseColumns = premiseCount * CSS_CONSTANTS.COLUMN_SPAN;
-  const parts: string[] = [];
-
-  if (hasLeftLabel) parts.push("auto");
-  parts.push(`repeat(${premiseColumns}, auto)`);
-  if (hasRightLabel) parts.push("auto");
-
-  return parts.join(" ");
-};
-
-// Style generators
-const createGridStyles = (columns: string): string =>
-  `display: grid;
-   grid-template-columns: ${columns};
-   grid-template-rows: auto auto;
-   gap: ${CSS_CONSTANTS.GRID_GAP};
-   width: fit-content;`;
-
-const createLabelStyles = (
-  column: string | number,
-  alignment: "left" | "right",
-): string =>
-  `grid-column: ${column};
-   grid-row: 1 / span 2;
-   display: flex;
-   align-items: end;
+const createLabelStyles = (alignment: "left" | "right"): string =>
+  `display: flex;
+   align-items: flex-end;
    justify-content: ${alignment === "left" ? "flex-end" : "flex-start"};
    padding-bottom: ${CSS_CONSTANTS.LABEL_PADDING_BOTTOM};`;
 
-const createPremiseStyles = (columnStart: number): string =>
-  `grid-column: ${columnStart} / span ${CSS_CONSTANTS.COLUMN_SPAN};
-   grid-row: 1;
+const createContainerStyles = (): string =>
+  `display: flex;
+   align-items: flex-end;
    justify-content: center;
-   display: flex;
-   align-items: end;`;
+   gap: ${CSS_CONSTANTS.HORIZONTAL_GAP};
+   width: fit-content;`;
 
-const createConclusionStyles = (start: number, end: number): string =>
-  `grid-column: ${start} / ${end};
-   grid-row: 2;
-   text-align: center;
+const createProofColumnStyles = (): string =>
+  `display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   width: fit-content;`;
+
+const createPremisesRowStyles = (): string =>
+  `display: flex;
+   align-items: flex-end;
+   justify-content: center;
+   gap: ${CSS_CONSTANTS.HORIZONTAL_GAP};`;
+
+const createPremiseStyles = (): string =>
+  `display: flex;
+   align-items: flex-end;
+   justify-content: center;`;
+
+const createConclusionStyles = (): string =>
+  `text-align: center;
    border-top: ${CSS_CONSTANTS.BORDER_STYLE};
    padding: ${CSS_CONSTANTS.CONCLUSION_PADDING};`;
 
@@ -391,9 +377,6 @@ export class Bussproofs {
     }
   }
 
-  /**
-   * Create a CSS grid-based proof tree layout
-   */
   private createProofTree(
     premises: unknown[],
     conclusion: unknown,
@@ -401,78 +384,59 @@ export class Bussproofs {
     leftLabel?: unknown,
     rightLabel?: unknown,
   ): Element {
-    const hasLeftLabel = Boolean(leftLabel);
-    const hasRightLabel = Boolean(rightLabel);
-    const premiseColumns = premiseCount * CSS_CONSTANTS.COLUMN_SPAN;
-    const totalColumns =
-      (hasLeftLabel ? 1 : 0) + premiseColumns + (hasRightLabel ? 1 : 0);
-
-    // Create the main grid container
-    const gridContainer = this.g.create(
+    const flexContainer = this.g.create(
       "div",
       undefined,
       `${CSS_CLASSES.GRID} ${CSS_CLASSES.GRID}-${premiseCount}`,
     );
 
-    const gridTemplateColumns = calculateGridColumns(
-      premiseCount,
-      hasLeftLabel,
-      hasRightLabel,
-    );
-    applyStyles(
-      gridContainer as HTMLElement,
-      createGridStyles(gridTemplateColumns),
-    );
+    applyStyles(flexContainer as HTMLElement, createContainerStyles());
 
-    // Add left label (spans both rows)
     if (leftLabel) {
       const leftLabelCell = this.g.create(
         "div",
         leftLabel,
         CSS_CLASSES.LEFT_LABEL,
       );
-      applyStyles(leftLabelCell as HTMLElement, createLabelStyles(1, "left"));
-      gridContainer.appendChild(leftLabelCell);
+      applyStyles(leftLabelCell as HTMLElement, createLabelStyles("left"));
+      flexContainer.appendChild(leftLabelCell);
     }
 
-    // Add premise cells (top row)
-    premises.forEach((premise, index) => {
+    const proofColumn = this.g.create("div");
+    applyStyles(proofColumn as HTMLElement, createProofColumnStyles());
+
+    const premisesRow = this.g.create("div");
+    applyStyles(premisesRow as HTMLElement, createPremisesRowStyles());
+
+    premises.forEach((premise) => {
       const premiseCell = this.g.create("div", premise, CSS_CLASSES.PREMISE);
-      const columnStart =
-        (hasLeftLabel ? 1 : 0) + index * CSS_CONSTANTS.COLUMN_SPAN + 1;
-      applyStyles(premiseCell as HTMLElement, createPremiseStyles(columnStart));
-      gridContainer.appendChild(premiseCell);
+      applyStyles(premiseCell as HTMLElement, createPremiseStyles());
+      premisesRow.appendChild(premiseCell);
     });
 
-    // Add right label (spans both rows)
+    proofColumn.appendChild(premisesRow);
+
+    const conclusionCell = this.g.create(
+      "div",
+      conclusion,
+      CSS_CLASSES.CONCLUSION,
+    );
+    applyStyles(conclusionCell as HTMLElement, createConclusionStyles());
+    proofColumn.appendChild(conclusionCell);
+
+    flexContainer.appendChild(proofColumn);
+
     if (rightLabel) {
       const rightLabelCell = this.g.create(
         "div",
         rightLabel,
         CSS_CLASSES.RIGHT_LABEL,
       );
-      applyStyles(
-        rightLabelCell as HTMLElement,
-        createLabelStyles(totalColumns, "right"),
-      );
-      gridContainer.appendChild(rightLabelCell);
+      applyStyles(rightLabelCell as HTMLElement, createLabelStyles("right"));
+      flexContainer.appendChild(rightLabelCell);
     }
 
-    // Add conclusion cell (bottom row, spanning premise columns only)
-    const conclusionCell = this.g.create(
-      "div",
-      conclusion,
-      CSS_CLASSES.CONCLUSION,
-    );
-    const conclusionStart = hasLeftLabel ? 2 : 1;
-    const conclusionEnd = conclusionStart + premiseColumns;
-    applyStyles(
-      conclusionCell as HTMLElement,
-      createConclusionStyles(conclusionStart, conclusionEnd),
-    );
-    gridContainer.appendChild(conclusionCell);
-
-    return gridContainer;
+    return flexContainer;
   }
 
   /**
