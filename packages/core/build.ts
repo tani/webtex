@@ -23,7 +23,10 @@ const CONFIG = {
     format: "bare" as const,
     trace: false,
   },
-  staticAssets: [{ src: "src/css", dest: "dist/css" }],
+  staticAssets: [
+    { src: "src/css", dest: "dist/css" },
+    { src: "node_modules/katex/dist", dest: "dist/katex" },
+  ],
 } as const;
 
 // Logging utilities

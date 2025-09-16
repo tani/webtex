@@ -282,6 +282,13 @@ class WebTeXPreviewPanel {
       "article.css",
     );
     const webtexArticleCssUri = webview.asWebviewUri(webtexArticleCssPath);
+    const katexCssPath = vscode.Uri.joinPath(
+      this._extensionUri,
+      "webtex",
+      "katex",
+      "katex.min.css",
+    );
+    const katexCssUri = webview.asWebviewUri(katexCssPath);
     const webtexBrowserPath = vscode.Uri.joinPath(
       this._extensionUri,
       "webtex",
@@ -313,11 +320,12 @@ class WebTeXPreviewPanel {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}' ${webview.cspSource};">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource}; img-src ${webview.cspSource} https:; script-src 'nonce-${nonce}' ${webview.cspSource};">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebTeX Preview</title>
     <link href="${webtexBaseCssUri}" rel="stylesheet">
     <link href="${webtexArticleCssUri}" rel="stylesheet">
+    <link href="${katexCssUri}" rel="stylesheet">
     <link href="${styleUri}" rel="stylesheet">
 </head>
 <body id="content">
