@@ -1,6 +1,6 @@
 {
   "name": "webtex-app",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "description": "WebTeX Live Preview - Interactive LaTeX to HTML5 converter",
   "type": "module",
   "author": {
