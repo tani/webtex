@@ -27,6 +27,25 @@ const PARSER_PATTERNS = {
   DISPLAY_MATH_BRACKET: /^\\\[(.+?)\\\]$/,
 } as const;
 
+const MATH_PATTERNS: readonly { regex: RegExp; display: boolean }[] = [
+  { regex: PARSER_PATTERNS.INLINE_MATH_DOLLAR, display: false },
+  { regex: PARSER_PATTERNS.INLINE_MATH_PAREN, display: false },
+  { regex: PARSER_PATTERNS.DISPLAY_MATH_BRACKET, display: true },
+];
+
+const INFERENCE_ARITY: Partial<Record<string, InferenceArity>> = {
+  UnaryInfC: 1,
+  BinaryInfC: 2,
+  TrinaryInfC: 3,
+  QuaternaryInfC: 4,
+  QuinaryInfC: 5,
+};
+
+const LABEL_TARGET: Partial<Record<string, LabelType>> = {
+  LeftLabel: "left",
+  RightLabel: "right",
+};
+
 // CSS class names
 const CSS_CLASSES = {
   GRID: "bussproofs-grid",
@@ -139,23 +158,23 @@ const commandParser = (
 };
 
 // Generate command parsers from configuration
-const createCommandParsers = () => {
-  const parsers: P.Parser<BussproofsCommand>[] = [];
-
-  for (const def of COMMAND_DEFINITIONS) {
-    // Full name parser
-    parsers.push(commandParser(def.name, def.name, def.arity, def.type));
-
-    // Abbreviated parser (if available)
-    if (def.abbrev) {
-      parsers.push(commandParser(def.abbrev, def.name, def.arity, def.type));
+const allCommandParsers: P.Parser<BussproofsCommand>[] =
+  COMMAND_DEFINITIONS.flatMap((def) => {
+    const fullNameParser = commandParser(
+      def.name,
+      def.name,
+      def.arity,
+      def.type,
+    );
+    if (!def.abbrev) {
+      return [fullNameParser];
     }
-  }
 
-  return parsers;
-};
-
-const allCommandParsers = createCommandParsers();
+    return [
+      fullNameParser,
+      commandParser(def.abbrev, def.name, def.arity, def.type),
+    ];
+  });
 
 const bussproofsCommand = P.alt(...allCommandParsers);
 
@@ -201,7 +220,21 @@ export interface BussproofsGenerator extends PackageGenerator {
   parseMath(math: string, display?: boolean): unknown;
 }
 
-const createContentParser = () => {
+interface CommandToken {
+  type: "command";
+  value: BussproofsCommand;
+}
+
+interface TextToken {
+  type: "text";
+}
+
+type ContentToken = CommandToken | TextToken;
+
+const isCommandToken = (token: ContentToken): token is CommandToken =>
+  token.type === "command";
+
+const createContentParser = (): P.Parser<ContentToken[]> => {
   // Match one or more non-backslash characters to ensure progress
   const nonCommandChunk = P.regexp(PARSER_PATTERNS.NON_COMMAND_CHUNK);
   const escapedOrNonCommand = P.alt(
@@ -211,50 +244,41 @@ const createContentParser = () => {
   );
   // Consume unknown word-like commands (e.g., \foo) as plain text so parsing continues
   const unknownWordCommand = P.regexp(PARSER_PATTERNS.UNKNOWN_WORD_COMMAND);
+  const textToken = (): TextToken => ({ type: "text" });
 
-  return P.alt(
+  return P.alt<ContentToken>(
     bussproofsCommand.map((cmd) => ({ type: "command" as const, value: cmd })),
-    unknownWordCommand.map(() => ({ type: "text" as const, value: null })),
-    escapedOrNonCommand.map(() => ({ type: "text" as const, value: null })),
-    nonCommandChunk.map(() => ({ type: "text" as const, value: null })),
+    unknownWordCommand.map(() => textToken()),
+    escapedOrNonCommand.map(() => textToken()),
+    nonCommandChunk.map(() => textToken()),
   ).many();
 };
 
 // Exported for unit testing
 export const parseCommands = (content: string): BussproofsCommand[] => {
-  if (!content || typeof content !== "string") {
+  if (typeof content !== "string" || content.length === 0) {
     return [];
   }
 
-  const commands: BussproofsCommand[] = [];
-  const contentParser = createContentParser();
-
   try {
-    const result = contentParser.parse(content);
-    if (result.status) {
-      for (const item of result.value) {
-        if (item.type === "command" && item.value) {
-          commands.push(item.value);
-        }
-      }
-    } else {
+    const result = createContentParser().parse(content);
+    if (!result.status) {
       console.warn(
         "Failed to parse content for bussproofs commands:",
         result.expected,
       );
+      return [];
     }
+
+    return result.value.filter(isCommandToken).map((item) => item.value);
   } catch (error) {
     console.warn("Failed to parse content for bussproofs commands:", error);
+    return [];
   }
-
-  return commands;
 };
 
 // Label storage interface
-interface LabelStorage {
-  left: unknown | null;
-  right: unknown | null;
-}
+type LabelStorage = Record<LabelType, unknown | null>;
 
 export class Bussproofs {
   static displayName = "Bussproofs";
@@ -268,46 +292,24 @@ export class Bussproofs {
     this.g = generator;
   }
 
-  /**
-   * Re-process LaTeX content with webtex to get HTML elements
-   * Properly handles math expressions like $x$ and LaTeX commands
-   */
-  private processLatexContent(content: string): unknown[] {
-    if (!content.trim()) {
+  private renderLatexSegments(content: string): unknown[] {
+    const trimmed = content.trim();
+    if (trimmed.length === 0) {
       return [];
     }
 
     try {
-      // Handle different types of math delimiters and convert them to the format MathJax expects
-      const inlineMathMatch = content.match(/^\$(.+?)\$$/);
-      const inlineParenMathMatch = content.match(/^\\\((.+?)\\\)$/);
-      const displayMathMatch = content.match(/^\\\[(.+?)\\\]$/);
-      const containsLatexCommands =
-        /\\[a-zA-Z]+/.test(content) && !/^\$.*\$$/.test(content);
+      for (const { regex, display } of MATH_PATTERNS) {
+        const match = trimmed.match(regex);
+        if (match) {
+          const mathResult = this.g.parseMath(match[1], display);
+          return mathResult ? [mathResult] : [];
+        }
+      }
 
-      if (inlineMathMatch) {
-        // Inline math with $ delimiters - extract content and pass just the math content
-        const mathContent = inlineMathMatch[1];
-        const mathResult = this.g.parseMath(mathContent, false);
+      if (PARSER_PATTERNS.LATEX_COMMANDS.test(trimmed)) {
+        const mathResult = this.g.parseMath(trimmed, false);
         return mathResult ? [mathResult] : [];
-      } else if (inlineParenMathMatch) {
-        // Inline math with \( \) delimiters - extract content and pass just the math content
-        const mathContent = inlineParenMathMatch[1];
-        const mathResult = this.g.parseMath(mathContent, false);
-        return mathResult ? [mathResult] : [];
-      } else if (displayMathMatch) {
-        // Display math with \[ \] delimiters - extract content and pass just the math content
-        const mathContent = displayMathMatch[1];
-        const mathResult = this.g.parseMath(mathContent, true);
-        return mathResult ? [mathResult] : [];
-      } else if (containsLatexCommands) {
-        // Process as LaTeX content (may contain other commands)
-        const mathResult = this.g.parseMath(content, false);
-        return mathResult ? [mathResult] : [];
-      } else {
-        // Process as plain text
-        const textNode = this.g.createText?.(content);
-        return textNode ? [textNode] : [];
       }
     } catch (error) {
       console.warn(
@@ -315,72 +317,54 @@ export class Bussproofs {
         content,
         error,
       );
-      // Fallback: return the content as text
-      const textNode = this.g.createText?.(content);
-      return textNode ? [textNode] : [content];
     }
+
+    return [];
+  }
+
+  private createContentNode(content: string): unknown {
+    const fragments = this.renderLatexSegments(content);
+    if (fragments.length > 0) {
+      return this.g.createFragment(...fragments);
+    }
+
+    return this.g.createText?.(content) ?? content;
+  }
+
+  private createDiv(className: string, content?: unknown): Element {
+    return this.g.create("div", content, className);
   }
 
   private createProofTree(
     premises: unknown[],
     conclusion: unknown,
     premiseCount: number,
-    leftLabel?: unknown,
-    rightLabel?: unknown,
+    labels: LabelStorage,
   ): Element {
-    const flexContainer = this.g.create(
-      "div",
-      undefined,
+    const grid = this.createDiv(
       `${CSS_CLASSES.GRID} ${CSS_CLASSES.GRID}-${premiseCount}`,
     );
 
-    if (leftLabel) {
-      const leftLabelCell = this.g.create(
-        "div",
-        leftLabel,
-        CSS_CLASSES.LEFT_LABEL,
-      );
-      flexContainer.appendChild(leftLabelCell);
+    if (labels.left != null) {
+      grid.appendChild(this.createDiv(CSS_CLASSES.LEFT_LABEL, labels.left));
     }
 
-    const proofColumn = this.g.create(
-      "div",
-      undefined,
-      CSS_CLASSES.PROOF_COLUMN,
-    );
+    const column = this.createDiv(CSS_CLASSES.PROOF_COLUMN);
+    const premisesRow = this.createDiv(CSS_CLASSES.PREMISES_ROW);
 
-    const premisesRow = this.g.create(
-      "div",
-      undefined,
-      CSS_CLASSES.PREMISES_ROW,
-    );
-
-    premises.forEach((premise) => {
-      const premiseCell = this.g.create("div", premise, CSS_CLASSES.PREMISE);
-      premisesRow.appendChild(premiseCell);
-    });
-
-    proofColumn.appendChild(premisesRow);
-
-    const conclusionCell = this.g.create(
-      "div",
-      conclusion,
-      CSS_CLASSES.CONCLUSION,
-    );
-    proofColumn.appendChild(conclusionCell);
-
-    flexContainer.appendChild(proofColumn);
-
-    if (rightLabel) {
-      const rightLabelCell = this.g.create(
-        "div",
-        rightLabel,
-        CSS_CLASSES.RIGHT_LABEL,
-      );
-      flexContainer.appendChild(rightLabelCell);
+    for (const premise of premises) {
+      premisesRow.appendChild(this.createDiv(CSS_CLASSES.PREMISE, premise));
     }
 
-    return flexContainer;
+    column.appendChild(premisesRow);
+    column.appendChild(this.createDiv(CSS_CLASSES.CONCLUSION, conclusion));
+    grid.appendChild(column);
+
+    if (labels.right != null) {
+      grid.appendChild(this.createDiv(CSS_CLASSES.RIGHT_LABEL, labels.right));
+    }
+
+    return grid;
   }
 
   /**
@@ -391,47 +375,24 @@ export class Bussproofs {
     conclusionElement: unknown,
     arity: number,
     labels: LabelStorage,
+    commandName: string,
   ): void {
-    if (stack.length >= arity) {
-      const premises: unknown[] = [];
-      for (let i = 0; i < arity; i++) {
-        const premise = stack.pop();
-        if (premise !== undefined) {
-          premises.unshift(premise);
-        }
-      }
+    if (stack.length < arity) {
+      console.warn(`${commandName}: not enough premises in stack`);
+      stack.push(conclusionElement);
+    } else {
+      const premises = stack.splice(-arity);
       const proofTree = this.createProofTree(
         premises,
         conclusionElement,
         arity,
-        labels.left,
-        labels.right,
+        labels,
       );
       stack.push(proofTree);
-    } else {
-      console.warn(
-        `${this.getInferenceName(arity)}: not enough premises in stack`,
-      );
-      stack.push(conclusionElement);
     }
-    // Reset labels after use
+
     labels.left = null;
     labels.right = null;
-  }
-
-  /**
-   * Get the name of an inference command based on its arity
-   */
-  private getInferenceName(arity: number): string {
-    const names = [
-      "",
-      "UnaryInfC",
-      "BinaryInfC",
-      "TrinaryInfC",
-      "QuaternaryInfC",
-      "QuinaryInfC",
-    ];
-    return names[arity] || `${arity}-aryInfC`;
   }
 
   prooftree(content: unknown): unknown[] {
@@ -447,84 +408,50 @@ export class Bussproofs {
     };
 
     for (const command of commands) {
-      // Handle label commands
       if (command.type === "label") {
-        const processedLabelContent = this.processLatexContent(command.content);
-        const labelElement =
-          processedLabelContent.length > 0
-            ? this.g.createFragment(...processedLabelContent)
-            : this.g.createText?.(command.content) || command.content;
-
-        if (command.command === "RightLabel") {
-          labels.right = labelElement;
-        } else if (command.command === "LeftLabel") {
-          labels.left = labelElement;
+        const labelType = LABEL_TARGET[command.command];
+        if (labelType) {
+          labels[labelType] = this.createContentNode(command.content);
         }
         continue;
       }
 
-      // Process the command's content with webtex
-      const processedContent = this.processLatexContent(command.content);
-      const conclusionElement =
-        processedContent.length > 0
-          ? this.g.createFragment(...processedContent)
-          : this.g.createText?.(command.content) || command.content;
+      const conclusionElement = this.createContentNode(command.content);
 
-      switch (command.command) {
-        case "AxiomC":
-          // Push the processed content to stack
-          stack.push(conclusionElement);
-          break;
-
-        case "UnaryInfC":
-          this.processInference(stack, conclusionElement, 1, labels);
-          break;
-
-        case "BinaryInfC":
-          this.processInference(stack, conclusionElement, 2, labels);
-          break;
-
-        case "TrinaryInfC":
-          this.processInference(stack, conclusionElement, 3, labels);
-          break;
-
-        case "QuaternaryInfC":
-          this.processInference(stack, conclusionElement, 4, labels);
-          break;
-
-        case "QuinaryInfC":
-          this.processInference(stack, conclusionElement, 5, labels);
-          break;
-
-        default:
-          console.warn(`Unknown bussproofs command: ${command.command}`);
-          stack.push(conclusionElement);
-          break;
+      if (command.type === "axiom") {
+        stack.push(conclusionElement);
+        continue;
       }
-    }
 
-    // Return all remaining elements in the stack, wrapped in a single block div
-    if (stack.length > 0) {
-      const wrapper = this.g.create(
-        "div",
-        undefined,
-        CSS_CLASSES.OUTER_WRAPPER,
-      );
-
-      for (const element of stack) {
-        const inlineBlock = this.g.create(
-          "div",
-          undefined,
-          CSS_CLASSES.INNER_WRAPPER,
+      const arity = INFERENCE_ARITY[command.command];
+      if (arity !== undefined) {
+        this.processInference(
+          stack,
+          conclusionElement,
+          arity,
+          labels,
+          command.command,
         );
-        inlineBlock.appendChild(element as Node);
-        wrapper.appendChild(inlineBlock);
+        continue;
       }
 
-      return [wrapper];
+      console.warn(`Unknown bussproofs command: ${command.command}`);
+      stack.push(conclusionElement);
     }
 
-    return [];
+    if (stack.length === 0) {
+      return [];
+    }
+
+    const wrapper = this.createDiv(CSS_CLASSES.OUTER_WRAPPER);
+
+    for (const element of stack) {
+      const inlineBlock = this.createDiv(CSS_CLASSES.INNER_WRAPPER);
+      inlineBlock.appendChild(element as Node);
+      wrapper.appendChild(inlineBlock);
+    }
+
+    return [wrapper];
   }
 }
 
