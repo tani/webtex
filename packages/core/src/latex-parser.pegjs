@@ -743,6 +743,7 @@ mathjax_env =
   / gather_star_env
   / equation_env
   / equation_star_env
+  / displaymath_env
   / multline_env
   / multline_star_env
   / eqnarray_env
@@ -799,6 +800,15 @@ equation_star_env "equation* environment" =
     {
         g.break();
         return g.createFragment(g.macro("equation*", [v]));
+    }
+
+displaymath_env "displaymath environment" =
+    begin begin_group "displaymath" end_group
+        v:$((!"\\end{displaymath" .)*)
+    "\\end{displaymath}" _
+    {
+        g.break();
+        return g.createFragment(g.macro("displaymath", [v]));
     }
 
 multline_env "multline environment" =
