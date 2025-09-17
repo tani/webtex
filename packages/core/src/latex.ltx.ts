@@ -149,6 +149,10 @@ const providedPackages = [
   "comment",
 ];
 
+type MathCapableGenerator = Generator & {
+  parseMath?: (math: string, display?: boolean) => Node | DocumentFragment;
+};
+
 export class LaTeX {
   public static symbols = symbols;
   public static args: Record<string, unknown[]> = {};
@@ -325,6 +329,7 @@ export class LaTeX {
     // Environment commands
     args.titlepage = ["V"];
     args.quote = args.quotation = args.verse = ["V"];
+    args.displaymath = ["V"];
     args.itemize = ["V", "X", "items"];
     args.enumerate = ["V", "X", "enumitems"];
     args.description = ["V", "X", "items"];
@@ -838,6 +843,26 @@ export class LaTeX {
 
   public endverse(): void {
     this.g.endlist();
+  }
+
+  // Math environments
+  public displaymath(content?: unknown): unknown[] {
+    const mathContent = typeof content === "string" ? content : "";
+    const mathGenerator = this.g as MathCapableGenerator;
+
+    if (typeof mathGenerator.parseMath === "function") {
+      const mathNode = mathGenerator.parseMath(mathContent, true);
+      if (mathNode !== undefined && mathNode !== null) {
+        return [mathNode];
+      }
+      return [];
+    }
+
+    if (mathContent.length > 0) {
+      return [this.g.createText(mathContent)];
+    }
+
+    return [];
   }
 
   // List environments
