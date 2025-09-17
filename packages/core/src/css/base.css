@@ -926,11 +926,13 @@ span.latex > .e {
   gap: 0.5em;
 }
 
+/*
 .bussproofs-premise {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
+  justify-content: center; 
 }
+*/
 
 .bussproofs-conclusion {
   text-align: center;
