@@ -609,10 +609,19 @@ export abstract class Generator<TNode extends Node = Node> {
   }
 
   public theLength(id: string): TNode {
-    const img = this.create(this.img, undefined, "the") as Node as HTMLImageElement;
+    const img = this.create(
+      this.img,
+      undefined,
+      "the",
+    ) as Node as HTMLImageElement;
     img.setAttribute("data-display-var", id);
-    img.setAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E");
-    img.setAttribute("onload", `
+    img.setAttribute(
+      "src",
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
+    );
+    img.setAttribute(
+      "onload",
+      `
       window.addEventListener("load", () => {
         const newSpan = document.createElement('span'); 
         const varName = '--' + this.dataset.displayVar;
@@ -620,7 +629,8 @@ export abstract class Generator<TNode extends Node = Node> {
         newSpan.textContent = computedStyle.getPropertyValue(varName).trim();
         this.replaceWith(newSpan);
       });
-    `);
+    `,
+    );
     return img as unknown as TNode;
   }
 
