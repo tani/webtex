@@ -613,11 +613,13 @@ export abstract class Generator<TNode extends Node = Node> {
     img.setAttribute("data-display-var", id);
     img.setAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E");
     img.setAttribute("onload", `
-      const newSpan = document.createElement('span'); 
-      const varName = '--' + this.dataset.displayVar;
-      const computedStyle = getComputedStyle(document.documentElement);
-      newSpan.textContent = computedStyle.getPropertyValue(varName).trim();
-      this.replaceWith(newSpan);
+      window.addEventListener("load", () => {
+        const newSpan = document.createElement('span'); 
+        const varName = '--' + this.dataset.displayVar;
+        const computedStyle = getComputedStyle(document.documentElement);
+        newSpan.textContent = computedStyle.getPropertyValue(varName).trim();
+        this.replaceWith(newSpan);
+      });
     `);
     return img as unknown as TNode;
   }
