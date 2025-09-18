@@ -887,11 +887,6 @@ span.latex > .e {
   margin-left: 0.5em;
 }
 
-/* Display length values without JavaScript */
-.the::before {
-  content: attr(data-length);
-}
-
 /* Bussproofs package */
 .bussproofs-outer-wrapper {
   display: flex;
