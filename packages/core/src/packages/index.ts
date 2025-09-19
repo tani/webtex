@@ -8,6 +8,7 @@ import { Graphics } from "./graphics";
 import { Graphicx } from "./graphicx";
 import { Hyperref } from "./hyperref";
 import { Latexsym } from "./latexsym";
+import { Minted } from "./minted";
 import { Multicol } from "./multicol";
 import { Stix } from "./stix";
 import { Textcomp } from "./textcomp";
@@ -26,6 +27,7 @@ export default {
   graphicx: Graphicx,
   hyperref: Hyperref,
   latexsym: Latexsym,
+  minted: Minted,
   multicol: Multicol,
   stix: Stix,
   textcomp: Textcomp,

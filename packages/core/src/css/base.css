@@ -949,3 +949,14 @@ span.latex > .e {
 .bussproofs-right-label {
   justify-content: flex-start;
 }
+
+/* minted */
+.minted-with-line-numbers .line::before {
+  content: attr(data-line-number);
+  display: inline-block;
+  width: 2em;
+  margin-right: 1em;
+  color: #999;
+  text-align: right;
+  user-select: none;
+}

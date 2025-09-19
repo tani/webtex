@@ -149,6 +149,7 @@ hmode_macro =
     escape
     m:(
       verbatim_env
+    / minted_env
     / mathjax_env
     / &is_hmode     m:macro         { return m; }
     / &is_hmode_env e:h_environment { return e; }
@@ -176,6 +177,7 @@ vmode_macro =
     escape
     m:(
         verbatim_env
+      / minted_env
       / mathjax_env
       / &is_vmode     m:macro       { g.break(); return m; }
       / &is_vmode_env e:environment { return e; }
@@ -722,6 +724,20 @@ verbatim_env "verbatim environment" =
         if (s) v = v.replace(/ /g, g.visp);
         g.break();
         return g.create(g.verbatim, g.create(g.verb, g.createVerbatim(v)));
+    }
+
+minted_env "minted environment" =
+    begin begin_group "minted" s:"*"? end_group
+        opts:keyval_optgroup?
+        lang:arg_group
+        v:$((!"\\end{minted" .)*)
+    "\\end{minted" e:"*"? "}" _
+    {
+        e === s || error(`minted environment is missing its end delimiter`);
+        g.break();
+        const macro = s ? "minted*" : "minted";
+        const options = opts ?? new Map();
+        return g.createFragment(g.macro(macro, [options, lang, v]));
     }
 
 // prooftree - capture content verbatim and delegate to bussproofs package

@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`minted package > applies line numbers when requested 1`] = `
+"<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><pre class="shiki github-light minted-block minted-with-line-numbers" style="background-color:#fff;color:#24292e" tabindex="0" data-language="python"><code><span class="line" data-line-number="1"><span style="color:#D73A49">def</span><span style="color:#6F42C1"> greet</span><span style="color:#24292E">(name):</span></span>
+<span class="line" data-line-number="2"><span style="color:#005CC5">    print</span><span style="color:#24292E">(</span><span style="color:#D73A49">f</span><span style="color:#032F62">&quot;Hello, </span><span style="color:#005CC5">{</span><span style="color:#24292E">name</span><span style="color:#005CC5">}</span><span style="color:#032F62">!&quot;</span><span style="color:#24292E">)</span></span>
+<span class="line" data-line-number="3"></span>
+<span class="line" data-line-number="4"><span style="color:#D73A49">if</span><span style="color:#005CC5"> __name__</span><span style="color:#D73A49"> ==</span><span style="color:#032F62"> &quot;__main__&quot;</span><span style="color:#24292E">:</span></span>
+<span class="line" data-line-number="5"><span style="color:#24292E">    greet(</span><span style="color:#032F62">&quot;WebTeX&quot;</span><span style="color:#24292E">)</span></span></code></pre></div></body></html>"
+`;
+
+exports[`minted package > renders highlighted code block 1`] = `
+"<html style="--size: 13.284px; --textwidth: 56.162%; --marginleftwidth: 21.919%; --marginrightwidth: 21.919%; --marginparwidth: 48.892%; --marginparsep: 14.612px; --marginparpush: 6.642px;"><head><title>untitled</title><meta charset="UTF-8"></meta><link type="text/css" rel="stylesheet" href="css/article.css"></head><body><div class="body" data-source-line="1" data-source-column="1"><pre class="shiki github-light minted-block" style="background-color:#fff;color:#24292e" tabindex="0" data-language="javascript"><code><span class="line"><span style="color:#D73A49">const</span><span style="color:#005CC5"> answer</span><span style="color:#D73A49"> =</span><span style="color:#005CC5"> 42</span><span style="color:#24292E">;</span></span>
+<span class="line"><span style="color:#24292E">console.</span><span style="color:#6F42C1">log</span><span style="color:#24292E">(answer);</span></span></code></pre></div></body></html>"
+`;

@@ -7,7 +7,9 @@
     "name": "tani",
     "email": "ta2gch@gmail.com"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "npm run build:core && npm run build:vscode && npm run build:app",
     "build:app": "npm run -w packages/app build",
@@ -45,5 +47,8 @@
   "bugs": {
     "url": "https://github.com/tani/webtex/issues"
   },
-  "homepage": "https://github.com/tani/webtex"
+  "homepage": "https://github.com/tani/webtex",
+  "dependencies": {
+    "shiki": "^3.12.2"
+  }
 }
