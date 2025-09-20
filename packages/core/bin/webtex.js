@@ -20,7 +20,7 @@ import {
   he,
   parse as latexParse,
   window,
-} from "../dist/webtex.node.js";
+} from "../dist/node/index.js";
 
 const info = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf8"),

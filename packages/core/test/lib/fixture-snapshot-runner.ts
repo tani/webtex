@@ -9,7 +9,7 @@ import {
   HtmlGenerator,
   parse,
   window,
-} from "../../dist/webtex.node.js";
+} from "../../dist/node/index.js";
 import { type FixtureItem, load as loadFixture } from "./load-fixtures";
 
 function resetSvgIds() {

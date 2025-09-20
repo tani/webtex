@@ -121,26 +121,30 @@ async function bundleApplication(): Promise<void> {
   const start = Date.now();
 
   try {
-    // Browser bundle
+    // Browser bundle with code splitting
     await esbuild({
       entryPoints: [CONFIG.paths.entrypoint],
-      outfile: `${CONFIG.paths.distDir}/webtex.browser.js`,
+      outdir: `${CONFIG.paths.distDir}/browser`,
       bundle: true,
       format: CONFIG.bundler.format,
       platform: "browser",
       minify: true,
       sourcemap: true,
+      splitting: true,
+      chunkNames: "chunks/[name]-[hash]",
     });
 
-    // Node bundle
+    // Node bundle with code splitting
     await esbuild({
       entryPoints: [CONFIG.paths.entrypoint],
-      outfile: `${CONFIG.paths.distDir}/webtex.node.js`,
+      outdir: `${CONFIG.paths.distDir}/node`,
       bundle: true,
       format: CONFIG.bundler.format,
       platform: "node",
       minify: true,
       sourcemap: true,
+      splitting: true,
+      chunkNames: "chunks/[name]-[hash]",
       banner: {
         js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
       },

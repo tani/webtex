@@ -1,5 +1,5 @@
 // Test shared counter functionality directly using the API like the node.js test
-import { HtmlGenerator, parse } from "../dist/webtex.node.js";
+import { HtmlGenerator, parse } from "../dist/node/index.js";
 
 const input = `\\documentclass{article}
 \\usepackage{amsthm}

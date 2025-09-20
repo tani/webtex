@@ -19,15 +19,15 @@
     "webtex": "./bin/webtex.js"
   },
   "type": "module",
-  "main": "./dist/webtex.node.js",
+  "main": "./dist/node/index.js",
   "exports": {
     ".": {
-      "browser": "./dist/webtex.browser.js",
-      "node": "./dist/webtex.node.js",
-      "default": "./dist/webtex.browser.js"
+      "browser": "./dist/browser/index.js",
+      "node": "./dist/node/index.js",
+      "default": "./dist/browser/index.js"
     }
   },
-  "browser": "./dist/webtex.browser.js",
+  "browser": "./dist/browser/index.js",
   "files": [
     "bin/",
     "dist/"

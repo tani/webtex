@@ -285,7 +285,8 @@ class WebTeXPreviewPanel {
     const webtexBrowserPath = vscode.Uri.joinPath(
       this._extensionUri,
       "webtex",
-      "webtex.browser.js",
+      "browser",
+      "index.js",
     );
     const webtexBrowserUri = webview.asWebviewUri(webtexBrowserPath);
 

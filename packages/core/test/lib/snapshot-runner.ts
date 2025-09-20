@@ -5,7 +5,7 @@ import {
   HtmlGenerator,
   parse,
   window,
-} from "../../dist/webtex.node.js";
+} from "../../dist/node/index.js";
 
 function resetSvgIds() {
   const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
