@@ -23,16 +23,18 @@ const processedHtml = htmlContent
 
 await fs.writeFile(path.join(distDir, "index.html"), processedHtml);
 
-// Bundle JavaScript
-console.log("📦 Bundling JavaScript...");
+// Bundle JavaScript with code splitting
+console.log("📦 Bundling JavaScript with code splitting...");
 await build({
   entryPoints: [path.join(srcDir, "main.js")],
   bundle: true,
-  outfile: path.join(distDir, "assets", "main.js"),
+  outdir: path.join(distDir, "assets"),
   format: "esm",
   target: "es2020",
   minify: true,
   sourcemap: true,
+  splitting: true,
+  chunkNames: "chunks/[name]-[hash]",
   external: [],
   define: {
     "process.env.NODE_ENV": '"production"',
