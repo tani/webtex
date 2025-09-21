@@ -34,7 +34,8 @@ declare global {
 //  The default options
 //
 const importMap = {
-  "mathjax/adaptors/liteDOM.js": () => import("mathjax/adaptors/liteDOM.js"),
+  "mathjax/adaptors/liteDOM.js": () =>
+    import("mathjax/es5/adaptors/liteDOM.js"),
   "xyjax/build/xypic.js": () => import("xyjax/build/xypic.js"),
 } as Record<string, () => Promise<unknown>>;
 
@@ -45,7 +46,7 @@ globalThis.MathJax = {
     require: (path: string) => importMap[path](),
     load: ["adaptors/liteDOM", "[custom]/xypic.js"],
     paths: {
-      mathjax: "mathjax/es5",
+      mathjax: "mathjax/es5/es5",
       custom: "xyjax/build",
     },
   },
@@ -97,12 +98,10 @@ globalThis.MathJax = {
 };
 
 //  Load the MathJax startup module
-await import("mathjax/tex-svg-full.js");
+await import("mathjax/es5/tex-svg-full.js");
 
 //  Wait for MathJax to start up
-if (MathJax.startup.promise) {
-  await MathJax.startup.promise;
-}
+await MathJax.startup.promise;
 
 export function tex2svg(math = "", argv = { display: true }) {
   if (!MathJax.tex2svg || !MathJax.startup.adaptor || !MathJax.svgStylesheet) {

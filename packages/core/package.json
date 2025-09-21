@@ -60,7 +60,7 @@
     "hypher": "^0.2.5",
     "juice": "^11.0.1",
     "katex": "^0.16.22",
-    "mathjax": "^4.0.0",
+    "mathjax": "^3.2.2",
     "parsimmon": "^1.18.1",
     "prettier": "^3.6.2",
     "slugify": "^1.6.6",
