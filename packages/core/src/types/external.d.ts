@@ -15,3 +15,7 @@ declare module "hypher" {
 declare module "svgdom" {
   export function createHTMLWindow(title?: string): Window & typeof globalThis;
 }
+
+declare module "mathjax/adaptors/liteDOM.js";
+declare module "xyjax/build/xypic.js";
+declare module "mathjax/tex-svg-full.js";

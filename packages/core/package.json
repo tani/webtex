@@ -58,17 +58,20 @@
     "hyphenation.de": "*",
     "hyphenation.en-us": "*",
     "hypher": "^0.2.5",
+    "juice": "^11.0.1",
     "katex": "^0.16.22",
+    "mathjax": "^4.0.0",
     "parsimmon": "^1.18.1",
     "prettier": "^3.6.2",
     "slugify": "^1.6.6",
-    "svgdom": "^0.1.8"
+    "svgdom": "^0.1.8",
+    "xyjax": "github:sonoisa/XyJax-v3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.3",
+    "@rollup/wasm-node": "^4.50.1",
     "@types/he": "^1.2.3",
     "@types/node": "^24.3.1",
-    "@rollup/wasm-node": "^4.50.1",
     "esbuild": "^0.25.9",
     "latex.js": "^0.12.6",
     "peggy": "^5.0.6",
