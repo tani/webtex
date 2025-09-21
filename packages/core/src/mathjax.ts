@@ -34,7 +34,7 @@ declare global {
 //  The default options
 //
 const importMap = {
-  "mathjax/adaptors/liteDOM.js": () =>
+  "mathjax/es5/adaptors/liteDOM.js": () =>
     import("mathjax/es5/adaptors/liteDOM.js"),
   "xyjax/build/xypic.js": () => import("xyjax/build/xypic.js"),
 } as Record<string, () => Promise<unknown>>;
@@ -44,14 +44,15 @@ globalThis.MathJax = {
   loader: {
     source: {},
     require: (path: string) => importMap[path](),
-    load: ["adaptors/liteDOM", "[custom]/xypic.js"],
+    load: ["adaptors/liteDOM", "[custom]/xypic"],
     paths: {
-      mathjax: "mathjax/es5/es5",
+      mathjax: "mathjax/es5",
       custom: "xyjax/build",
     },
   },
   tex: {
     packages: [
+      "base",
       "verb",
       "upgreek",
       "unicode",
@@ -113,3 +114,5 @@ export function tex2svg(math = "", argv = { display: true }) {
   const html = adaptor.outerHTML(node);
   return juice(`${html}<style>${stylesheet}</style>`);
 }
+
+// console.log(tex2svg("\\frac{a}{b}"));
