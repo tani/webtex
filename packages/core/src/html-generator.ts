@@ -2,7 +2,7 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import { tex2svg } from "webtex-mathjax";
+import { createTex2svg } from "webtex-mathjax";
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -625,6 +625,7 @@ export class HtmlGenerator extends Generator {
 
   public parseMath(math: string, display?: boolean): DocumentFragment {
     try {
+      using tex2svg = createTex2svg();
       const html = tex2svg(math, { display: !!display });
 
       // Create a temporary div to parse the HTML
@@ -633,7 +634,8 @@ export class HtmlGenerator extends Generator {
       const fragment = document.createDocumentFragment();
       fragment.appendChild(div.firstChild as Node);
       return fragment;
-    } catch (_error) {
+    } catch (error) {
+      console.log(error);
       // Fallback: return the original math as text
       const textNode = document.createTextNode(math);
       const fragment = document.createDocumentFragment();
