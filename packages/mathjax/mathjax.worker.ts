@@ -114,11 +114,12 @@ export function tex2svg(math = "", argv: { display?: boolean } = { display: true
   return juice(`${html}<style>${stylesheet}</style>`);
 }
 
-
-const worker = runAsWorker(async (math: string, argv: { display?: boolean } = { display: true }) => {
+async function tex2svg_wrapper(math: string, argv: { display?: boolean } = { display: true }) {
     await import("mathjax/es5/tex-svg-full.js");
     await MathJax.startup.promise;
     return tex2svg(math, argv);
-});
+}
+
+const worker = runAsWorker(tex2svg_wrapper);
 
 export default worker;
