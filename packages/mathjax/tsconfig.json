@@ -3,16 +3,13 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "rootDir": ".",
     "strict": true,
     "declaration": true,
     "outDir": "dist",
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "noEmit": true
+    "lib": ["ES2022", "DOM", "WebWorker"],
+    "types": ["node"]
   },
-  "include": ["src", "build.ts"],
+  "include": ["*.ts", "**/*.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }

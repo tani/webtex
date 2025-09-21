@@ -1,4 +1,5 @@
 import juice from "juice";
+import { runAsWorker } from "unasync";
 
 // MathJax type definitions
 interface MathJaxConfig {
@@ -98,21 +99,26 @@ globalThis.MathJax = {
   },
 };
 
-//  Load the MathJax startup module
-await import("mathjax/es5/tex-svg-full.js");
 
-//  Wait for MathJax to start up
-await MathJax.startup.promise;
 
-export function tex2svg(math = "", argv = { display: true }) {
+export function tex2svg(math = "", argv: { display?: boolean } = { display: true }) {
   if (!MathJax.tex2svg || !MathJax.startup.adaptor || !MathJax.svgStylesheet) {
     throw new Error("MathJax not properly initialized");
   }
-  const node = MathJax.tex2svg(math, argv);
+  // Ensure display property is always defined
+  const options = { display: argv.display ?? true };
+  const node = MathJax.tex2svg(math, options);
   const adaptor = MathJax.startup.adaptor;
   const stylesheet = adaptor.textContent(MathJax.svgStylesheet());
   const html = adaptor.outerHTML(node);
   return juice(`${html}<style>${stylesheet}</style>`);
 }
 
-// console.log(tex2svg("\\frac{a}{b}"));
+
+const worker = runAsWorker(async (math: string, argv: { display?: boolean } = { display: true }) => {
+    await import("mathjax/es5/tex-svg-full.js");
+    await MathJax.startup.promise;
+    return tex2svg(math, argv);
+});
+
+export default worker;

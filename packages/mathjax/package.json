@@ -1,0 +1,51 @@
+{
+  "name": "webtex-mathjax",
+  "version": "0.16.0",
+  "description": "WebTeX MathJax renderer with inline worker support",
+  "type": "module",
+  "main": "./dist/node/index.js",
+  "browser": "./dist/browser/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "browser": "./dist/browser/index.js",
+      "node": "./dist/node/index.js",
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/browser/index.js"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "npx tsx build.ts",
+    "clean": "rm -rf dist",
+    "dev": "npm run build -- --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'Linting not configured yet'",
+    "pretest": "npm run build"
+  },
+  "author": "tani <ta2gch@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "juice": "^11.0.1",
+    "mathjax": "^3.2.2",
+    "unasync": "^1.1.0",
+    "xyjax": "github:sonoisa/XyJax-v3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "esbuild": "^0.25.10",
+    "esbuild-plugin-inline-worker": "^0.1.1",
+    "happy-dom": "^15.11.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
+    "zx": "^8.0.0"
+  },
+  "engines": {
+    "node": ">= 18.0"
+  }
+}

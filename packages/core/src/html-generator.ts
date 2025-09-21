@@ -2,6 +2,7 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
+import { tex2svg } from "webtex-mathjax";
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -15,7 +16,6 @@ const flattenDeep = (arr: unknown[]): unknown[] =>
 
 import { document, window } from "#window";
 import { Generator } from "./generator";
-import { tex2svg } from "./mathjax";
 import { diacritics, ligatures } from "./symbols";
 
 interface HtmlGeneratorOptions {
@@ -88,20 +88,6 @@ const debugNode = (n: unknown): void => {
     console.log(`${node.nodeName}:`, node.textContent);
   } else {
     console.log("not a node:", n);
-  }
-};
-
-const _debugNodes = (l: unknown[]): void => {
-  for (const n of l) {
-    debugNode(n);
-  }
-};
-
-const _debugNodeContent = function (this: {
-  nodeValue?: string | null;
-}): void {
-  if (this.nodeValue) {
-    console.log(this.nodeValue);
   }
 };
 

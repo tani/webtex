@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { build as esbuild } from "esbuild";
 import peggy from "peggy";
 import { $ } from "zx";
+// @ts-ignore - No type declarations available for this module
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 
 const CONFIG = {

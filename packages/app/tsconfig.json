@@ -1,18 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowJs": true,
-    "checkJs": false,
     "noEmit": true,
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "noImplicitAny": false,
-    "strictNullChecks": false
+    "lib": ["ES2022", "DOM"]
   },
-  "include": ["src/**/*.js", "src/**/*.ts", "build.ts"],
-  "exclude": ["node_modules", "dist", "../core/dist"]
+  "include": ["src", "build.ts"],
+  "exclude": ["node_modules", "dist"]
 }
