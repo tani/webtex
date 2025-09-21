@@ -1,36 +1,6 @@
 import juice from "juice";
 import { runAsWorker } from "unasync";
 
-// MathJax type definitions
-interface MathJaxConfig {
-  loader: {
-    source: Record<string, unknown>;
-    require: (path: string) => Promise<unknown>;
-    load: string[];
-    paths: Record<string, string>;
-  };
-  tex: {
-    packages: string[];
-  };
-  svg: {
-    fontCache: string;
-  };
-  startup: {
-    typeset: boolean;
-    promise?: Promise<void>;
-    adaptor?: {
-      textContent: (node: unknown) => string;
-      outerHTML: (node: unknown) => string;
-    };
-  };
-  tex2svg?: (math: string, argv: { display: boolean }) => unknown;
-  svgStylesheet?: () => unknown;
-}
-
-declare global {
-  var MathJax: MathJaxConfig;
-}
-
 //
 //  The default options
 //
@@ -38,13 +8,13 @@ const importMap = {
   "mathjax/es5/adaptors/liteDOM.js": () =>
     import("mathjax/es5/adaptors/liteDOM.js"),
   "xyjax/build/xypic.js": () => import("xyjax/build/xypic.js"),
-} as Record<string, () => Promise<unknown>>;
+};
 
 // Configure MathJax
 globalThis.MathJax = {
   loader: {
     source: {},
-    require: (path: string) => importMap[path](),
+    require: (path) => importMap[path](),
     load: ["adaptors/liteDOM", "[custom]/xypic"],
     paths: {
       mathjax: "mathjax/es5",
@@ -99,9 +69,7 @@ globalThis.MathJax = {
   },
 };
 
-
-
-export function tex2svg(math = "", argv: { display?: boolean } = { display: true }) {
+export function tex2svg(math = "", argv = { display: true }) {
   if (!MathJax.tex2svg || !MathJax.startup.adaptor || !MathJax.svgStylesheet) {
     throw new Error("MathJax not properly initialized");
   }
@@ -114,10 +82,10 @@ export function tex2svg(math = "", argv: { display?: boolean } = { display: true
   return juice(`${html}<style>${stylesheet}</style>`);
 }
 
-async function tex2svg_wrapper(math: string, argv: { display?: boolean } = { display: true }) {
-    await import("mathjax/es5/tex-svg-full.js");
-    await MathJax.startup.promise;
-    return tex2svg(math, argv);
+async function tex2svg_wrapper(math, argv = { display: true }) {
+  await import("mathjax/es5/tex-svg-full.js");
+  await MathJax.startup.promise;
+  return tex2svg(math, argv);
 }
 
-export default runAsWorker(tex2svg_wrapper);
+runAsWorker(tex2svg_wrapper);
