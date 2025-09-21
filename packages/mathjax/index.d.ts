@@ -7,4 +7,4 @@ export interface Tex2SvgFunction {
   [Symbol.dispose](): void;
 }
 
-export declare const tex2svg: Tex2SvgFunction;
+export declare const createTex2svg: () => Tex2SvgFunction;

@@ -1,6 +1,8 @@
 import assert from "node:assert";
 import { test } from "node:test";
-import { tex2svg } from "./index.js";
+import { createTex2svg } from "./index.js";
+
+const tex2svg = createTex2svg();
 
 test("tex2svg should convert simple LaTeX to SVG", async () => {
   const result = await tex2svg("x = y");
