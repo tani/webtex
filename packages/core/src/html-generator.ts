@@ -66,31 +66,6 @@ const appendChildren = (
   return parent;
 };
 
-const _debugDOM = (
-  oParent: Element,
-  oCallback: (...args: unknown[]) => unknown,
-): void => {
-  if (oParent.hasChildNodes()) {
-    let oNode = oParent.firstChild;
-    for (; oNode; oNode = oNode.nextSibling) {
-      _debugDOM(oNode as Element, oCallback);
-    }
-  }
-  oCallback.call(oParent);
-};
-
-const debugNode = (n: unknown): void => {
-  if (!n) {
-    return;
-  }
-  const node = n as { nodeName?: string; textContent?: string };
-  if (typeof node.nodeName !== "undefined") {
-    console.log(`${node.nodeName}:`, node.textContent);
-  } else {
-    console.log("not a node:", n);
-  }
-};
-
 export class HtmlGenerator extends Generator {
   public sp = " ";
   public brsp = "\u200B ";
