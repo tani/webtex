@@ -120,6 +120,4 @@ async function tex2svg_wrapper(math: string, argv: { display?: boolean } = { dis
     return tex2svg(math, argv);
 }
 
-const worker = runAsWorker(tex2svg_wrapper);
-
-export default worker;
+export default runAsWorker(tex2svg_wrapper);

@@ -32,7 +32,7 @@
   "dependencies": {
     "juice": "^11.0.1",
     "mathjax": "^3.2.2",
-    "unasync": "^1.1.0",
+    "unasync": "^1.2.0",
     "xyjax": "github:sonoisa/XyJax-v3"
   },
   "devDependencies": {
