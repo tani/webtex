@@ -180,7 +180,7 @@ class LaTeXError extends Error {
 
 ### Visual Regression Testing with Playwright
 
-The project includes comprehensive visual regression testing to ensure UI consistency across changes.
+The project includes comprehensive visual regression testing, driven by Playwright, to ensure UI consistency across changes.
 
 #### Setup Requirements
 ```bash
@@ -193,14 +193,14 @@ npx playwright install
 
 #### Test Organization
 - **`test/visual/`** - Visual regression test suites
-- **`test/screenshots/`** - Generated screenshot comparisons  
+- **`test/visual/latex-code/`** - Generated screenshot baselines  
 - **Automated comparison** - Tests fail if visual differences detected
-- **CI integration** - Playwright dependencies cached for faster builds
+- **CI integration** - Browser binaries are managed by Playwright during install
 
 #### Running Visual Tests
 ```bash
 npm test test/visual/              # Run all visual tests
-npm test test/visual/screenshots.spec.ts   # Run screenshot comparison tests
+npm test test/visual/latex-code-regression.spec.ts   # Run LATEX snapshot comparisons
 ```
 
 ### Test Structure
@@ -247,7 +247,7 @@ The CI pipeline ensures code quality and prevents regressions:
 
 #### Caching Strategy
 - **npm cache** - Speeds up dependency installation
-- **Playwright binaries** - Cached browser installations
+- **Playwright browser downloads** - Cached between runs
 - **Build artifacts** - Optimized build caching between runs
 
 #### Quality Gates

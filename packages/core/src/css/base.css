@@ -1,5 +1,7 @@
 /* System font stacks; remove CMU/Latin Modern import */
 
+@import url("mathjax.css");
+
 /*******************/
 /* default lengths */
 /*******************/

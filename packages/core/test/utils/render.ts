@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const repoRoot = path.resolve(__dirname, "../../../..");
-const cssPath = path.resolve(repoRoot, "packages/core/dist/css/article.css");
+const cssDirectory = path.resolve(repoRoot, "packages/core/dist/css");
 
 const defaultPackages = `\\usepackage{amsmath}
 \\usepackage{amsthm}
@@ -103,18 +103,32 @@ const resetSvgIds = (): void => {
   registerWindow(window, document);
 };
 
-const loadArticleCss = (): string | undefined => {
+const loadCssBundle = (): string | undefined => {
   try {
-    return readFileSync(cssPath, "utf8");
+    const entries = readdirSync(cssDirectory, { withFileTypes: true });
+    const cssFiles = entries
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".css"))
+      .map((entry) => entry.name)
+      .sort();
+
+    if (cssFiles.length === 0) {
+      return undefined;
+    }
+
+    return cssFiles
+      .map((fileName) => readFileSync(path.join(cssDirectory, fileName), "utf8"))
+      .join("\n");
   } catch (error) {
     if (error instanceof Error) {
-      console.warn(`Unable to read article.css for screenshot tests: ${error.message}`);
+      console.warn(
+        `Unable to read CSS bundle for screenshot tests: ${error.message}`,
+      );
     }
     return undefined;
   }
 };
 
-const cachedCss = loadArticleCss();
+export const inlineCss = loadCssBundle();
 
 export const renderLatexToHtml = (latex: string): string => {
   resetSvgIds();
@@ -171,10 +185,10 @@ export const renderLatexToHtml = (latex: string): string => {
 
 export const renderLatexToStandaloneHtml = (latex: string): string => {
   const raw = renderLatexToHtml(latex).replace(/<link[^>]*>/g, "");
-  if (!cachedCss) {
+  if (!inlineCss) {
     return raw;
   }
-  const stylesheetTag = `<style>${cachedCss}</style>`;
+  const stylesheetTag = `<style>${inlineCss}</style>`;
   if (raw.includes("</head>")) {
     return raw.replace("</head>", `${stylesheetTag}</head>`);
   }

@@ -2,7 +2,12 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { chromium, type Browser, type Page } from "playwright";
+import {
+  chromium,
+  type Browser,
+  type BrowserContext,
+  type Page,
+} from "playwright";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToStandaloneHtml } from "../utils/render";
 
@@ -10,6 +15,7 @@ const allCases = loadLatexCodeCases();
 const visualCases = allCases.filter((testCase) => !testCase.allowFailure);
 
 let browser: Browser | undefined;
+let context: BrowserContext | undefined;
 let page: Page | undefined;
 
 const viewport = {
@@ -41,20 +47,17 @@ const shouldUpdateSnapshots = (): boolean => {
 
 beforeAll(async () => {
   browser = await chromium.launch();
-  page = await browser.newPage();
-  await page.setViewportSize(viewport);
+  context = await browser.newContext({ viewport });
+  page = await context.newPage();
   if (shouldUpdateSnapshots()) {
     await fs.mkdir(baselineDirectory, { recursive: true });
   }
 });
 
 afterAll(async () => {
-  if (page) {
-    await page.close();
-  }
-  if (browser) {
-    await browser.close();
-  }
+  await page?.close();
+  await context?.close();
+  await browser?.close();
 });
 
 const groupByCategory = new Map<string, typeof visualCases>();

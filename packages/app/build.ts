@@ -30,7 +30,7 @@ await build({
   bundle: true,
   outdir: path.join(distDir, "assets"),
   format: "esm",
-  target: "es2020",
+  target: "es2024",
   minify: true,
   sourcemap: true,
   splitting: true,

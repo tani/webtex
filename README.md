@@ -106,7 +106,7 @@ The project includes comprehensive testing infrastructure:
 # Unit and integration tests
 npm test
 
-# Visual regression tests (requires Playwright)
+# Visual regression tests (Playwright-powered)
 npx playwright install
 npm test test/visual/
 
@@ -178,4 +178,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - [LaTeX.js](https://github.com/michael-brade/LaTeX.js) - Original LaTeX.js project
 - [KaTeX](https://katex.org/) - Mathematical notation rendering
-- [Playwright](https://playwright.dev/) - End-to-end testing framework
+- [Playwright](https://playwright.dev/) - Headless browser automation

@@ -2,7 +2,7 @@ import { SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import hEn from "hyphenation.en-us";
 import Hypher from "hypher";
-import katex from "katex";
+import * as mathjax from "mathxyjax3";
 
 // Native JavaScript replacements for lodash functions
 const compact = <T>(array: T[]): NonNullable<T>[] =>
@@ -664,37 +664,14 @@ export class HtmlGenerator extends Generator {
 
   public parseMath(math: string, display?: boolean): DocumentFragment {
     try {
-      const html = katex.renderToString(math, {
-        displayMode: !!display,
-        throwOnError: false,
-        output: "htmlAndMathml",
-      });
-
-      // Create a temporary div to parse the HTML
+      const html = mathjax.tex2svgHtml(math, { display: !!display });
       const div = document.createElement("div");
-      div.innerHTML = html;
-
-      // Extract MathML elements - KaTeX generates both HTML and MathML
-      const mathmlElements = div.querySelectorAll("math");
-
-      // Create fragment and add MathML elements
+      div.innerHTML = html.replace(/<style[^>]*>[\s\S]*?<\/style>/i, "");;
       const fragment = document.createDocumentFragment();
-
-      if (mathmlElements.length > 0) {
-        // Use MathML if available
-        Array.from(mathmlElements).forEach((mathml) => {
-          fragment.appendChild(mathml.cloneNode(true));
-        });
-      } else {
-        // Fallback to HTML if no MathML found
-        while (div.firstChild) {
-          fragment.appendChild(div.firstChild);
-        }
-      }
-
+      fragment.appendChild(div.firstElementChild!);
       return fragment;
-    } catch (_error) {
-      // Fallback: return the original math as text
+    } catch (error) {
+      console.warn("MathJax failed to parse math:", math, error);
       const textNode = document.createTextNode(math);
       const fragment = document.createDocumentFragment();
       fragment.appendChild(textNode);

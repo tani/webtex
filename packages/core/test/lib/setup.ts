@@ -2,8 +2,14 @@
 
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { type Browser, chromium, type Page } from "playwright";
+import {
+  chromium,
+  type Browser,
+  type BrowserContext,
+  type Page,
+} from "playwright";
 import { afterAll } from "vitest";
+import { inlineCss } from "../utils/render";
 
 interface ScreenshotGlobal {
   takeScreenshot?: (html: string, filename: string) => Promise<void>;
@@ -11,6 +17,7 @@ interface ScreenshotGlobal {
 
 const screenshotGlobal = globalThis as ScreenshotGlobal;
 let browser: Browser | undefined;
+let context: BrowserContext | undefined;
 let page: Page | undefined;
 
 screenshotGlobal.takeScreenshot = async (
@@ -23,20 +30,33 @@ screenshotGlobal.takeScreenshot = async (
     : `${filename}.png`;
   console.log(`Taking screenshot for: ${screenshotPath}`);
 
-  if (!browser || !page) {
+  if (!browser) {
     browser = await chromium.launch();
-    page = await browser.newPage();
+  }
+  if (!context) {
+    context = await browser.newContext();
+  }
+  if (!page) {
+    page = await context.newPage();
   }
 
   // Set up the page with CSS and HTML
+  const stylesheet = inlineCss ? `<style>${inlineCss}</style>` : "";
+  const baseStyles = `
+    <style>
+      body {
+        margin: 20px;
+        font-family: 'Computer Modern', serif;
+      }
+    </style>
+  `;
   const fullHtml = `
     <!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
-      <style>
-        body { margin: 20px; font-family: 'Computer Modern', serif; }
-      </style>
+      ${stylesheet}
+      ${baseStyles}
     </head>
     <body>
       ${html}
@@ -44,7 +64,7 @@ screenshotGlobal.takeScreenshot = async (
     </html>
   `;
 
-  await page.setContent(fullHtml);
+  await page.setContent(fullHtml, { waitUntil: "networkidle" });
 
   // Ensure directory exists
   mkdirSync(dirname(screenshotPath), { recursive: true });
@@ -54,5 +74,7 @@ screenshotGlobal.takeScreenshot = async (
 };
 
 afterAll(async () => {
+  await page?.close();
+  await context?.close();
   await browser?.close();
 });
