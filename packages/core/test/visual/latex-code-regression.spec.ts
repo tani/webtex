@@ -23,11 +23,14 @@ const baselineDirectory = path.resolve(__dirname, "latex-code");
 
 const shouldUpdateSnapshots = (): boolean => {
   const state = expect.getState();
-  const snapshotState = state.snapshotState as
-    | { _updateSnapshot?: string }
-    | undefined;
-  if (snapshotState && typeof snapshotState._updateSnapshot === "string") {
-    return snapshotState._updateSnapshot !== "none";
+  const snapshotState = state.snapshotState as unknown;
+  if (
+    snapshotState &&
+    typeof snapshotState === "object" &&
+    "_updateSnapshot" in snapshotState &&
+    typeof (snapshotState as { _updateSnapshot: unknown })._updateSnapshot === "string"
+  ) {
+    return (snapshotState as { _updateSnapshot: string })._updateSnapshot !== "none";
   }
   const mode = process.env.VITEST_UPDATE_SNAPSHOT;
   if (!mode) {
