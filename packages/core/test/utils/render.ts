@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
@@ -70,7 +70,8 @@ const wrapLatex = (latex: string): string => {
     const mergedBodySource = `${bodyPrelude.join("\n")}
 ${bodyContent}`;
     const mergedBody = mergedBodySource.trim();
-    const extraPackages = packageLines.length > 0 ? `${packageLines.join("\n")}\n` : "";
+    const extraPackages =
+      packageLines.length > 0 ? `${packageLines.join("\n")}\n` : "";
     const prefix = `${docclassLine}\n${defaultPackages}${extraPackages}`;
 
     return `${prefix}\\begin{document}
@@ -95,9 +96,10 @@ ${latex}
 };
 
 const resetSvgIds = (): void => {
-  const prototype = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
-    SVG?: typeof SVG;
-  };
+  const prototype =
+    HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
+      SVG?: typeof SVG;
+    };
   delete prototype.SVG;
   prototype.SVG = SVG;
   registerWindow(window, document);
@@ -116,7 +118,9 @@ const loadCssBundle = (): string | undefined => {
     }
 
     return cssFiles
-      .map((fileName) => readFileSync(path.join(cssDirectory, fileName), "utf8"))
+      .map((fileName) =>
+        readFileSync(path.join(cssDirectory, fileName), "utf8"),
+      )
       .join("\n");
   } catch (error) {
     if (error instanceof Error) {
@@ -141,10 +145,7 @@ export const renderLatexToHtml = (latex: string): string => {
   const fragment = doc.domFragment();
   const htmlDoc = generator.htmlDocument();
   if (process.env.DEBUG_LATEX_RENDER === "1") {
-    console.warn(
-      "[latex-code] fragment children:",
-      fragment.childNodes.length,
-    );
+    console.warn("[latex-code] fragment children:", fragment.childNodes.length);
     fragment.childNodes.forEach((node) => {
       const serialized =
         "outerHTML" in node && typeof node.outerHTML === "string"

@@ -1,13 +1,13 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import {
-  chromium,
   type Browser,
   type BrowserContext,
+  chromium,
   type Page,
 } from "playwright";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToStandaloneHtml } from "../utils/render";
 
@@ -34,9 +34,12 @@ const shouldUpdateSnapshots = (): boolean => {
     snapshotState &&
     typeof snapshotState === "object" &&
     "_updateSnapshot" in snapshotState &&
-    typeof (snapshotState as { _updateSnapshot: unknown })._updateSnapshot === "string"
+    typeof (snapshotState as { _updateSnapshot: unknown })._updateSnapshot ===
+      "string"
   ) {
-    return (snapshotState as { _updateSnapshot: string })._updateSnapshot !== "none";
+    return (
+      (snapshotState as { _updateSnapshot: string })._updateSnapshot !== "none"
+    );
   }
   const mode = process.env.VITEST_UPDATE_SNAPSHOT;
   if (!mode) {
@@ -66,50 +69,43 @@ for (const testCase of visualCases) {
   if (!groupByCategory.has(category)) {
     groupByCategory.set(category, []);
   }
-  groupByCategory.get(category)!.push(testCase);
+  groupByCategory.get(category)?.push(testCase);
 }
 
 for (const [category, cases] of groupByCategory) {
   describe(`latex_code.yml visual regression (${category})`, () => {
     cases.forEach((testCase) => {
-      test(
-        `[${testCase.id}] ${testCase.name}`,
-        async () => {
-          if (!page) {
-            throw new Error("Playwright page not initialized");
+      test(`[${testCase.id}] ${testCase.name}`, async () => {
+        if (!page) {
+          throw new Error("Playwright page not initialized");
+        }
+        const html = renderLatexToStandaloneHtml(testCase.latex);
+        await page.setContent(html, { waitUntil: "networkidle" });
+        await page.waitForTimeout(50);
+        const screenshot = await page.screenshot({
+          type: "png",
+          fullPage: true,
+        });
+        const baselinePath = path.join(baselineDirectory, `${testCase.id}.png`);
+        const updateSnapshots = shouldUpdateSnapshots();
+        let baseline: Buffer | undefined;
+        try {
+          baseline = await fs.readFile(baselinePath);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
           }
-          const html = renderLatexToStandaloneHtml(testCase.latex);
-          await page.setContent(html, { waitUntil: "networkidle" });
-          await page.waitForTimeout(50);
-          const screenshot = await page.screenshot({
-            type: "png",
-            fullPage: true,
-          });
-          const baselinePath = path.join(
-            baselineDirectory,
-            `${testCase.id}.png`,
-          );
-          const updateSnapshots = shouldUpdateSnapshots();
-          let baseline: Buffer | undefined;
-          try {
-            baseline = await fs.readFile(baselinePath);
-          } catch (error) {
-            if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-              throw error;
-            }
-          }
+        }
 
-          if (updateSnapshots || !baseline) {
-            await fs.mkdir(baselineDirectory, { recursive: true });
-            await fs.writeFile(baselinePath, screenshot);
-            expect(screenshot.length).toBeGreaterThan(0);
-            return;
-          }
+        if (updateSnapshots || !baseline) {
+          await fs.mkdir(baselineDirectory, { recursive: true });
+          await fs.writeFile(baselinePath, screenshot);
+          expect(screenshot.length).toBeGreaterThan(0);
+          return;
+        }
 
-          expect(screenshot.equals(baseline)).toBe(true);
-        },
-        30_000,
-      );
+        expect(screenshot.equals(baseline)).toBe(true);
+      }, 30_000);
     });
   });
 }

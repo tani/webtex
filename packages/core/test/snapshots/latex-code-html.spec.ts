@@ -12,7 +12,7 @@ for (const testCase of renderableCases) {
   if (!groupByCategory.has(category)) {
     groupByCategory.set(category, []);
   }
-  groupByCategory.get(category)!.push(testCase);
+  groupByCategory.get(category)?.push(testCase);
 }
 
 for (const [category, cases] of groupByCategory) {

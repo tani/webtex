@@ -5,9 +5,6 @@
     "clientKind": "git",
     "useIgnoreFile": true
   },
-  "files": {
-    "ignoreUnknown": true
-  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
@@ -31,5 +28,8 @@
         "organizeImports": "on"
       }
     }
+  },
+  "files": {
+    "includes": ["**/*.ts", "**/*.js", "**/*.css", "**/*.json", "**/*.md", "!**/node_modules/**", "!**/dist/**", "!**/mathjax.css"]
   }
 }

@@ -3,9 +3,9 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import {
-  chromium,
   type Browser,
   type BrowserContext,
+  chromium,
   type Page,
 } from "playwright";
 import { afterAll } from "vitest";

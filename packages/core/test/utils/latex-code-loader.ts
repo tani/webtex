@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
@@ -151,9 +151,14 @@ export const loadLatexCodeCases = (): LatexCodeCase[] => {
     const name = normalizeName(rawNode.name, defaultName);
     const groups = context.length > 0 ? context : [DEFAULT_GROUP];
 
-    const hasNestedTests = Array.isArray(rawNode.tests) && rawNode.tests.length > 0;
+    const hasNestedTests =
+      Array.isArray(rawNode.tests) && rawNode.tests.length > 0;
 
-    if (!hasNestedTests && typeof latex === "string" && latex.trim().length > 0) {
+    if (
+      !hasNestedTests &&
+      typeof latex === "string" &&
+      latex.trim().length > 0
+    ) {
       const slugParts = [...groups, name].map((segment) => slugify(segment));
       const baseSlug = slugParts.filter(Boolean).join("-") || DEFAULT_GROUP;
       let slug = baseSlug;
