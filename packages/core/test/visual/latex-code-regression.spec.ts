@@ -8,6 +8,8 @@ import {
   type Page,
 } from "playwright";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import pixelmatch from "pixelmatch";
+import { PNG } from "pngjs";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToStandaloneHtml } from "../utils/render";
 
@@ -26,6 +28,9 @@ const viewport = {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const baselineDirectory = path.resolve(__dirname, "latex-code");
+// Small tolerance keeps visual regressions stable across Linux and macOS renders.
+const pixelmatchThreshold = 0.1;
+const maxPixelDifferenceRatio = 0.001;
 
 const shouldUpdateSnapshots = (): boolean => {
   const state = expect.getState();
@@ -104,7 +109,28 @@ for (const [category, cases] of groupByCategory) {
           return;
         }
 
-        expect(screenshot.equals(baseline)).toBe(true);
+        const baselinePng = PNG.sync.read(baseline);
+        const screenshotPng = PNG.sync.read(screenshot);
+
+        expect(baselinePng.width).toBe(screenshotPng.width);
+        expect(baselinePng.height).toBe(screenshotPng.height);
+
+        const diffPixelCount = pixelmatch(
+          baselinePng.data,
+          screenshotPng.data,
+          undefined,
+          baselinePng.width,
+          baselinePng.height,
+          {
+            threshold: pixelmatchThreshold,
+            includeAA: true,
+          },
+        );
+        const pixelCount = baselinePng.width * baselinePng.height;
+        expect(pixelCount).toBeGreaterThan(0);
+        const diffRatio = diffPixelCount / pixelCount;
+
+        expect(diffRatio).toBeLessThanOrEqual(maxPixelDifferenceRatio);
       }, 30_000);
     });
   });

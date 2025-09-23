@@ -765,7 +765,7 @@ test_cases:
         \usepackage{bussproofs}
         \title{WebTeX Preview Test Document}
         \author{VS Code Extension}
-        \date{\today}
+        \date{2025-09-24}
         \begin{document}
         \maketitle
         hello world! $x$ is a 
