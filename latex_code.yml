@@ -1660,10 +1660,11 @@ test_cases:
             \usepackage{xcolor}
             
             \begin{document}
-            \color[cmyk]{1,0,0,0}
-            \color[wave]{485}
-            \color{red}
-            This is \textcolor{magenta}{kind of red} text.
+            Regular text before the color switch.
+            \color[cmyk]{1,0,0,0}This sentence should appear in cyan thanks to the CMYK color definition.\par
+            {\color[wave]{485}This span uses a wavelength based color specification.}\par
+            {\color{red}This sentence is rendered in pure red.}\par
+            {\color{magenta}Kind of red text using a named color.}
             \end{document}
 
         - name: "color expressions"
@@ -1672,19 +1673,18 @@ test_cases:
             \usepackage{xcolor}
             
             \begin{document}
-            \color{-red}
-            \color{red!50}
-            \color{-green!40!yellow}
-            \color{--red!50!green!12.345}
-            \color{red!50!green!20!blue}
-            \color{foo!!+}
-            \color{foo!![7]}
-            \color{foo!25!red!!+++}
-            \color{foo!25!red!70!green!![7]}
-            
-            \color{rgb:-green!40!yellow,3;green!40!yellow,2;red,1}
-            \color{rgb:red,1}
-            \color{cmyk:red,1;-green!25!blue!60,11.25;blue,-2}
+            {\color{-red}Text using a negative red color expression.}\par
+            {\color{red!50}Half red text using the ! syntax.}\par
+            {\color{-green!40!yellow}A blend between green and yellow rendered here.}\par
+            {\color{--red!50!green!12.345}Complex weighted color applied to this sentence.}\par
+            {\color{red!50!green!20!blue}Three color mix applied to this sentence.}\par
+            {\color{foo!!+}Custom color mix with key syntax.}\par
+            {\color{foo!![7]}Same custom color with palette index.}\par
+            {\color{foo!25!red!!+++}Nested mix producing vibrant output.}\par
+            {\color{foo!25!red!70!green!![7]}Another nested color expression for comparison.}\par
+            {\color{rgb:-green!40!yellow,3;green!40!yellow,2;red,1}RGB style expression applied to text.}\par
+            {\color{rgb:red,1}Simple RGB specification in action.}\par
+            {\color{cmyk:red,1;-green!25!blue!60,11.25;blue,-2}CMYK mix with arithmetic values on display.}
             \end{document}
 
         - name: "defining colors"
@@ -1697,9 +1697,7 @@ test_cases:
             \definecolor{red}{rgb/cmyk}{1,0,0/0,1,1,0}
             \definecolor{red}{hsb:rgb/cmyk}{1,0,0/0,1,1,0}
             \definecolor[named]{Black}{cmyk}{0,0,0,1}
-            
             \definecolor{myblack}{named}{Black}
-            
             \definecolorset{cmyk/rgb/hsb/gray}{}{}%
              {cyan,1,0,0,0/0,1,1/.5,1,1/.7;%
               magenta,0,1,0,0/1,0,1/.83333,1,1/.41;%
@@ -1707,6 +1705,10 @@ test_cases:
               olive,0,0,1,.5/.5,.5,0/.16667,1,.5/.39}
             
             \begin{document}
+            {\color{myblack}Text rendered using a named color definition.}\par
+            {\color{cyan}Preview of a color from the defined color set.}\par
+            {\color{magenta}Another sentence demonstrating the palette entry.}\par
+            {\color{olive}Final line rendered with a custom olive color.}
             \end{document}
 
     amsthm:

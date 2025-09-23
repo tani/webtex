@@ -1,0 +1,117 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { chromium, type Browser, type Page } from "playwright";
+import { loadLatexCodeCases } from "../utils/latex-code-loader";
+import { renderLatexToStandaloneHtml } from "../utils/render";
+
+const allCases = loadLatexCodeCases();
+const visualCases = allCases.filter((testCase) => !testCase.allowFailure);
+
+let browser: Browser | undefined;
+let page: Page | undefined;
+
+const viewport = {
+  width: 1024,
+  height: 768,
+} as const;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const baselineDirectory = path.resolve(__dirname, "latex-code");
+
+const shouldUpdateSnapshots = (): boolean => {
+  const state = expect.getState();
+  const snapshotState = state.snapshotState as
+    | { _updateSnapshot?: string }
+    | undefined;
+  if (snapshotState && typeof snapshotState._updateSnapshot === "string") {
+    return snapshotState._updateSnapshot !== "none";
+  }
+  const mode = process.env.VITEST_UPDATE_SNAPSHOT;
+  if (!mode) {
+    return false;
+  }
+  return mode !== "none" && mode !== "0" && mode.toLowerCase() !== "false";
+};
+
+beforeAll(async () => {
+  browser = await chromium.launch();
+  page = await browser.newPage();
+  await page.setViewportSize(viewport);
+  if (shouldUpdateSnapshots()) {
+    await fs.mkdir(baselineDirectory, { recursive: true });
+  }
+});
+
+afterAll(async () => {
+  if (page) {
+    await page.close();
+  }
+  if (browser) {
+    await browser.close();
+  }
+});
+
+const groupByCategory = new Map<string, typeof visualCases>();
+for (const testCase of visualCases) {
+  const category = testCase.groups[1] ?? "misc";
+  if (!groupByCategory.has(category)) {
+    groupByCategory.set(category, []);
+  }
+  groupByCategory.get(category)!.push(testCase);
+}
+
+for (const [category, cases] of groupByCategory) {
+  describe(`latex_code.yml visual regression (${category})`, () => {
+    cases.forEach((testCase) => {
+      test(
+        `[${testCase.id}] ${testCase.name}`,
+        async () => {
+          if (!page) {
+            throw new Error("Playwright page not initialized");
+          }
+          const html = renderLatexToStandaloneHtml(testCase.latex);
+          await page.setContent(html, { waitUntil: "networkidle" });
+          await page.waitForTimeout(50);
+          const screenshot = await page.screenshot({
+            type: "png",
+            fullPage: true,
+          });
+          const baselinePath = path.join(
+            baselineDirectory,
+            `${testCase.id}.png`,
+          );
+          const updateSnapshots = shouldUpdateSnapshots();
+          let baseline: Buffer | undefined;
+          try {
+            baseline = await fs.readFile(baselinePath);
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+              throw error;
+            }
+          }
+
+          if (updateSnapshots || !baseline) {
+            await fs.mkdir(baselineDirectory, { recursive: true });
+            await fs.writeFile(baselinePath, screenshot);
+            expect(screenshot.length).toBeGreaterThan(0);
+            return;
+          }
+
+          expect(screenshot.equals(baseline)).toBe(true);
+        },
+        30_000,
+      );
+    });
+  });
+}
+
+if (visualCases.length === 0) {
+  describe.skip("latex_code.yml visual regression", () => {
+    test("no cases available", () => {
+      expect.fail("Expected latex_code.yml to provide at least one test case");
+    });
+  });
+}
