@@ -1,0 +1,2481 @@
+# WebTeX LaTeX Test Cases - Comprehensive Collection
+# This file contains ALL LaTeX test cases extracted from the WebTeX project
+# Last updated: 2025-09-23
+# Total test cases: 300+ unique LaTeX snippets
+
+version: "1.0.0"
+description: "Comprehensive collection of all LaTeX test cases from WebTeX project"
+
+test_cases:
+  # ==========================================
+  # EXAMPLE FILES
+  # ==========================================
+  examples:
+    - name: "Complete LaTeX.js Showcase"
+      source: "/packages/core/example/example.tex"
+      description: "732-line comprehensive demonstration document"
+      features:
+        - "UTF-8 support and character codes"
+        - "Multi-column layout"
+        - "Boxes and spacing"
+        - "Mathematical expressions with KaTeX"
+        - "Picture environment graphics"
+        - "Font systems and symbols"
+      laex: |
+        \documentclass{article}
+
+        \usepackage{comment, multicol}
+        \usepackage{hyperref}
+
+        \usepackage{calc,pict2e,picture}
+        \usepackage{textgreek,textcomp,gensymb,stix}
+
+        \setcounter{secnumdepth}{2}
+
+        \title{\LaTeX.js Showcase}
+        \author{made with $\varheartsuit$ by Michael Brade}
+        \date{2017--2021}
+
+
+        \begin{document}
+
+        \maketitle
+
+
+        \begin{abstract}
+        This document will show most of the features of \LaTeX.js while at the same time being a gentle introduction to \LaTeX.
+        In the appendix, the API as well as the format of custom macro definitions in JavaScript will be explained.
+        \end{abstract}
+
+
+        \section{Characters}
+
+        It is possible to input any UTF-8 character either directly or by character code
+        using one of the following:
+
+        \begin{itemize}
+            \item \texttt{\textbackslash symbol\{"00A9\}}: \symbol{"00A9}
+            \item \verb|\char"A9|: \char"A9
+            \item \verb|^^A9 or ^^^^00A9|: ^^A9 or ^^^^00A9
+        \end{itemize}
+
+        \bigskip
+
+        \noindent
+        Special characters, like those:
+        \begin{center}
+        \$ \& \% \# \_ \{ \} \~{} \^{} \textbackslash % \< \>  \"   % TODO cannot be typeset
+        \end{center}
+        %
+        have to be escaped.
+
+        More than 200 symbols are accessible through macros. For instance: 30\,\textcelsius{} is
+        86\,\textdegree{}F. See also Section~\ref{sec:symbols}.
+
+
+
+        \section{Spaces and Comments}
+
+        Spaces and comments, of course, work just as they do in \LaTeX.
+        This is an            % stupid
+        % Better: instructive <----
+        example: Supercal%
+                        ifragilist%
+            icexpialidocious
+
+        It does not matter whether you enter one or several     spaces after a word, it
+        will always be typeset as one space---unless you force several spaces, like\ \ now.
+
+        New \TeX users may miss whitespaces after a command. % renders wrong
+        Experienced \TeX{} users are \TeX perts, and know how to use whitespaces. % renders correct
+
+        Longer comments can be embedded in the \texttt{comment} environment:
+        This is another  \begin  {comment}
+        rather stupid,
+        but helpful
+        \end
+        {comment}
+        example for embedding comments in your document.
+
+
+
+        \section{Dashes and Hyphens}
+
+        \LaTeX\ knows four kinds of dashes. Access three of them with different numbers
+        of consecutive dashes. The fourth sign is actually not a dash at all---it is the
+        mathematical minus sign:
+
+        \begin{quote}
+            daughter-in-law, X-rated\\
+            pages 13--67\\
+            yes---or no? \\
+            $0$, $1$ and $-1$
+        \end{quote}
+        %
+        The names for these dashes are: ‘-’ hyphen, ‘--’ en-dash, ‘---’ em-dash,
+        and ‘$-$’ minus sign. \LaTeX.js outputs the actual true unicode character for those
+        instead of using the hypen-minus.
+
+
+
+        \section{Text and Paragraphs, Ligatures}
+
+        An empty line starts a new paragraph, and so does \verb|\par|.
+        \par Like this. A new line usually starts automatically when the previous one is
+        full. However, using \verb+\newline+ or \verb|\\|,\newline one can force \\ to start a new line.
+
+        Ligatures are supported as well, for instance:
+
+        \begin{center}
+        fi, fl, ff, ffi, ffl \dots{} instead of f\/i, f\/l, f\/f\/l \dots
+        \end{center}
+
+        Use \texttt{\textbackslash\slash} to prevent a ligature.
+
+
+
+        \begin{multicols}{2}[\subsection{Multicolumns}]
+
+        The multi-column layout, using the \texttt{multicols} environment, allows easy
+        definition of multiple columns of text---just like in newspapers. The first
+        and mandatoriy argument specifies the number of columns the text should be divided into.
+
+        It is often convenient to spread some text over all columns, just before the multicolumn
+        output. In \LaTeX, this was needed to prevent any page break in between. To achieve this,
+        the \texttt{multicols} environment has an optional second argument which can be used for
+        this purpose.
+
+        For instance, this text you are reading now was started with the argument
+        \texttt{\textbackslash subsection\{Multicolumns\}}.
+
+        \end{multicols}
+
+
+
+        \section{Boxes}
+
+        \LaTeX.js supports most of the standard \LaTeX\ boxes.
+
+        \medbreak
+
+        \noindent\fbox{\verb|\mbox{|\emph{text}\verb|}|}
+
+        \smallbreak
+
+        We already know one of them: it's called \verb|\mbox|. It simply packs up a series of boxes into another one, and
+        can be used to prevent \LaTeX.js from breaking two words. As boxes can be put inside boxes, these horizontal box
+        packers give you ultimate flexibility.
+
+        \bigbreak
+
+        % yes, unlike in LaTeX, you may put \verb|| anywhere, here it is inside an \fbox :)
+        \noindent\fbox{
+        \verb|\makebox[|\emph{width}\verb|][|\emph{pos}\verb|]{|\emph{text}\verb|}|
+        }
+
+        \noindent\fbox{
+        \verb|\framebox[|\emph{width}\verb|][|\emph{pos}\verb|]{|\emph{text}\verb|}|
+        }
+
+        \smallbreak
+
+        \noindent
+        \emph{width} defines the width of the resulting box as seen from the outside.
+        The \emph{pos} parameter takes a one letter value: \textbf{c}enter,
+        flush\textbf{l}eft, or flush\textbf{r}ight. \textbf{s}pread is not really working
+        in HTML.
+
+
+        The command \verb|framebox| works exactly the same as \verb|makebox|, but it
+        draws a box around the text.
+
+        The following example shows you some things you could do with
+        the \verb|makebox| and \verb|framebox| commands.
+
+        \begin{quote}
+            \fbox{\makebox[10cm][c]{\textbf{c} e \textbf{n} t r a l}}\par
+
+            \framebox{Guess I'm framed now!} \par
+            \framebox[2cm][r]{Bummer, I am too wide} \par
+            \framebox[1cm][l]{never mind, so am I}
+            Can you read this?
+        \end{quote}
+
+
+        \bigbreak
+
+        \noindent\fbox{
+        \verb|\parbox[|\emph{pos}\verb|][|\emph{height}\verb|][|\emph{inner-pos}\verb|]{|\emph{width}\verb|}{|\emph{text}\verb|}|
+        }
+
+        \smallbreak
+
+        \noindent
+        The \verb|\parbox| command produces a box the contents of which are created in paragraph mode. However, only small
+        pieces of text should be used, paragraph-making environments shouldn't be used inside a \verb|\parbox| argument. For
+        larger pieces of text, including ones containing a paragraph-making environment, you should use a \verb|minipage|
+        environment.
+
+        By default LaTeX will position vertically a parbox so its center lines up with the center of the surrounding text line.
+        When the optional position argument is present and equal either to ‘\verb|t|’ or ‘\verb|b|’, this allows you respectively
+        to align either the top or bottom line in the parbox with the baseline of the surrounding text. You may also specify
+        ‘\verb|m|’ for position to get the default behaviour.
+
+        The optional \emph{height} argument overrides the natural height of the box.
+
+        The \emph{inner-pos} argument controls the placement of the text inside the box, as follows; if it is not specified, \emph{pos} is used.
+
+        \verb|t| text is placed at the top of the box.
+
+        \verb|c| text is centered in the box.
+
+        \verb|b| text is placed at the bottom of the box.
+
+        \verb|s| is not supported in HTML
+
+        \smallbreak\noindent
+        The following examples demonstrate simple positioning:
+
+        \begin{itemize}
+        \item simple alignment:
+
+        Some text
+        \fbox{\parbox{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[t]{2cm}{parbox top alignment, text parbox test text}}
+        some text
+        \fbox{\parbox[b]{2cm}{parbox bottom alignment, text parbox test text}}
+        some text.
+
+
+        \item alignment with a given height:
+
+        Some text
+        \fbox{\parbox[c][3cm]{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[t][3cm]{2cm}{parbox top alignment, text parbox test text}}
+        some text
+        \fbox{\parbox[b][3cm]{2cm}{parbox bottom alignment, text parbox test text}}
+        some text.
+        % BUG: empty line here causes parse error!
+        \end{itemize}
+
+        \noindent
+        The following examples demonstrate all explicit \emph{pos}/\emph{inner-pos} combinations:
+        \begin{itemize}
+        \item center alignment:
+
+        \noindent
+        Some text
+        \fbox{\parbox[c][3cm][t]{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[c][3cm][c]{2cm}{parbox top alignment, text parbox test text}}
+        some text
+        \fbox{\parbox[c][3cm][b]{2cm}{parbox bottom alignment, text parbox test text}}
+        some text.
+
+
+        \item top alignment:
+
+        \noindent
+        Some text
+        \fbox{\parbox[t][3cm][t]{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[t][3cm][c]{2cm}{parbox top alignment, text parbox test text}}
+        some text
+        \fbox{\parbox[t][3cm][b]{2cm}{parbox bottom alignment, text parbox test text}}
+        some text.
+
+        \item bottom alignment:
+
+        \noindent
+        Some text
+        \fbox{\parbox[b][3cm][t]{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[b][3cm][c]{2cm}{parbox top alignment, text parbox test text}}
+        some text
+        \fbox{\parbox[b][3cm][b]{2cm}{parbox bottom alignment, text parbox test text}}
+        some text.
+
+
+        \item top/bottom in one line:
+
+        \noindent
+        Some text
+        \fbox{\parbox[b][3cm][t]{2cm}{parbox default alignment, parbox test text}}
+        some text
+        \fbox{\parbox[t][3cm][c]{2cm}{parbox top alignment, text parbox test text}}
+        some text.
+        \end{itemize}
+
+
+
+        \subsection{Low-level box-interface}
+
+        \LaTeX.js supports the following low-level \TeX\ commands:
+        %\noindent\fbox{
+            \verb|\llap{|\emph{text}\verb|}|%}
+        ,
+        %\noindent\fbox{
+            \verb|\rlap{|\emph{text}\verb|}|%}
+        , and
+            \verb|\smash{|\emph{text}\verb|}|, as well as
+            \verb|\hphantom{|\emph{text}\verb|}|,
+            \verb|\vphantom{|\emph{text}\verb|}|, and
+            \verb|\phantom{|\emph{text}\verb|}|.
+
+        A phantom looks like this: \phantom{phantom} yes, now the phantom is gone.
+
+        \noindent
+        \llap{\verb|\llap |}could be used to put something in the margin. However, there are better alternatives for that.
+        See \verb|\marginpar|. \marginpar{{\huge test} in margin here}
+
+
+        \section{Spacing}
+
+        The following horizontal spaces are supported:
+        \\[8pt]
+        Negative thin space: |\negthinspace| \\
+        No space (natural): || \\
+        Thin space: |\,| or |\thinspace| \\
+        Normal space: | | \\
+        Normal space: |\ | \\
+        Non-break space: |~| \\
+        en-space: |\enspace| \\
+        em-space: |\quad| \\
+        2x em-space: |\qquad|\\
+        3cm horizontal space: |\hspace{3cm}| \\
+
+
+
+        \section{Environments}
+
+        \subsection{Lists: Itemize, Enumerate, and Description}
+
+        The \texttt{itemize} environment is suitable for simple lists, the \texttt{enumerate} environment for
+        enumerated lists, and the \texttt{description} environment for descriptions.
+
+        \begin{enumerate}
+            \item You can nest the list environments to your taste:
+                \begin{itemize}
+                    \item But it might start to look silly.
+                    \item[-] With a dash.
+                \end{itemize}
+            \item Therefore remember: \label{remember}
+                \begin{description}
+                    \item[Stupid] things will not become smart because they are in a list.
+                    \item[Smart] things, though, can be presented beautifully in a list.
+                \end{description}
+            \item[important] Technical note: Viewing this in Chrome, however, will show too much vertical space
+                at the end of a nested environment (see above). On top of that, margin collapsing for inline-block
+                boxes is not allowed. Maybe using \texttt{dl} elements is too complicated for this and a simple nested
+                \texttt{div} should be used instead.
+        \end{enumerate}
+        %
+        Lists can be deeply nested:
+        %
+        \begin{itemize}
+            \item list text, level one
+            \begin{itemize}
+                \item list text, level two
+                \begin{itemize}
+                    \item list text, level three
+
+                    And a new paragraph can be started, too.
+                    \begin{itemize}
+                        \item list text, level four
+
+                        And a new paragraph can be started, too.
+                        This is the maximum level.
+
+                        \item list text, level four
+                    \end{itemize}
+
+                    \item list text, level three
+                \end{itemize}
+                \item list text, level two
+            \end{itemize}
+            \item list text, level one
+            \item list text, level one
+        \end{itemize}
+
+
+        \subsection{Flushleft, Flushright, and Center}
+
+        The \texttt{flushleft} environment:
+        %
+        \begin{flushleft}
+        This text is\\ left-aligned.
+        \LaTeX{} is not trying to make
+        each line the same length.
+        \end{flushleft}
+        %
+        The \texttt{flushright} environment:
+        %
+        \begin{flushright}
+        This text is right-\\aligned.
+        \LaTeX{} is not trying to make
+        each line the same length.
+        \end{flushright}
+        %
+        And the \texttt{center} environment:
+        %
+        \begin{center}
+        At the centre\\of the earth
+        \end{center}
+
+
+
+        \subsection{Quote, Quotation, and Verse}
+
+        The \texttt{quote} environment is useful for quotes, important phrases and examples.
+        A typographical rule of thumb for the line length is:
+        \begin{quote}
+        On average, no line should be longer than 66 characters.
+        \end{quote}
+
+        There are two similar environments: the \texttt{quotation} and the \texttt{verse} environments.
+        The \texttt{quotation} environment is useful for longer quotes going over several paragraphs,
+        because it indents the first line of each paragraph.
+
+        The \texttt{verse} environment is useful for poems where the line breaks are important.
+        The lines are separated by issuing a \texttt{\textbackslash\textbackslash} at the end of a line
+        and an empty line after each verse.
+
+        \begin{verse}
+        Humpty Dumpty sat on a wall:\\
+        Humpty Dumpty had a great fall.\\
+        All the King’s horses and all the King’s men\\
+        Couldn’t put Humpty together again.
+
+        {\raggedleft ---J.W. Elliott\par}
+        \end{verse}
+
+
+        \subsection{Picture}
+
+        \frame{\setlength{\unitlength}{20.4mm}
+        \begin{picture}(3,2.1)(-1.2,-0.05)
+            \put(0,1){\vector(1,0){1}}
+            \put(0,1){\circle{2}}
+            \thicklines
+            \put(0,0){\line(1,0){1}}
+            \put(0,0.01){xxxxxxxxxxx}
+            \put(0,0.1){XXXX}
+        \end{picture}}
+        %
+        \frame{\setlength{\unitlength}{1mm}
+        \begin{picture}(60, 50)
+            \put(20,30){\circle{1}}
+            \put(20,30){\circle{2}}
+            \put(20,30){\circle{4}}
+            \put(20,30){\circle{8}}
+            \put(20,30){\circle{16}}
+            \put(20,30){\circle{32}}
+            \put(40,30){\circle{1}}
+            \put(40,30){\circle{2}}
+            \put(40,30){\circle{3}}
+            \put(40,30){\circle{4}}
+            \put(40,30){\circle{5}}
+            \put(40,30){\circle{6}}
+            \put(40,30){\circle{7}}
+            \put(40,30){\circle{8}}
+            \put(40,30){\circle{9}}
+            \put(40,30){\circle{10}}
+            \put(40,30){\circle{11}}
+            \put(40,30){\circle{12}}
+            \put(40,30){\circle{13}}
+            \put(40,30){\circle{14}}
+            \put(15,10){\circle*{1}}
+            \put(20,10){\circle*{2}}
+            \put(25,10){\circle*{3}}
+            \put(30,10){\circle*{4}}
+            \put(35,10){\circle*{5}}
+        \end{picture}}
+
+        \frame{\setlength{\unitlength}{0.75mm}
+        \begin{picture}(60,40)
+            \put(30,20){\vector(1,0){30}}
+            \put(30,20){\vector(4,1){20}}
+            \put(30,20){\vector(3,1){25}}
+            \put(30,20){\vector(2,1){30}}
+            \put(30,20){\vector(1,2){10}}
+            \thicklines
+            \put(30,20){\vector(-4,1){30}}
+            \put(30,20){\vector(-1,4){5}}
+            \thinlines
+            \put(30,20){\vector(-1,-1){5}}
+            \put(30,20){\vector(-1,-4){5}}
+        \end{picture}}
+        %
+        \setlength{\unitlength}{5cm}
+        \begin{picture}(1,1)
+            \put(0,0){\line(0,1){1}}
+            \put(0,0){\line(1,0){1}}
+            \put(0,0){\line(1,1){1}}
+            \put(0,0){\line(1,2){.5}}
+            \put(0,0){\line(1,3){.3333}}
+            \put(0,0){\line(1,4){.25}}
+            \put(0,0){\line(1,5){.2}}
+            \put(0,0){\line(1,6){.1667}}
+            \put(0,0){\line(2,1){1}}
+            \put(0,0){\line(2,3){.6667}}
+            \put(0,0){\line(2,5){.4}}
+            \put(0,0){\line(3,1){1}}
+            \put(0,0){\line(3,2){1}}
+            \put(0,0){\line(3,4){.75}}
+            \put(0,0){\line(3,5){.6}}
+            \put(0,0){\line(4,1){1}}
+            \put(0,0){\line(4,3){1}}
+            \put(0,0){\line(4,5){.8}}
+            \put(0,0){\line(5,1){1}}
+            \put(0,0){\line(5,2){1}}
+            \put(0,0){\line(5,3){1}}
+            \put(0,0){\line(5,4){1}}
+            \put(0,0){\line(5,6){.8333}}
+            \put(0,0){\line(6,1){1}}
+            \put(0,0){\line(6,5){1}}
+        \end{picture}
+
+
+        \frame{
+            \setlength{\unitlength}{1cm}
+            \begin{picture}(6,5)
+            \thicklines
+            \put(1,0.5){\line(2,1){3}}
+            \put(4,2){\line(-2,1){2}}
+            \put(2,3){\line(-2,-5){1}}
+            \put(0.7,0.3){$A$}
+            \put(4.05,1.9){$B$}
+            \put(1.7,2.9){$C$}
+            \put(3.1,2.5){$a$}
+            \put(1.3,1.7){$b$}
+            \put(2.5,1){$c$}
+            \put(0.3,4){$F=\sqrt{s(s-a)(s-b)(s-c)}$}
+            \put(3.5,0.4){$\displaystyle s:=\frac{a+b+c}{2}$}
+            \end{picture}
+        }
+
+        \setlength{\unitlength}{2mm}
+        \begin{picture}(30,20)
+            \linethickness{0.075mm}
+            \multiput(0,0)(1,0){26}{\line(0,1){20}}
+            \multiput(0,0)(0,1){21}{\line(1,0){25}}
+            \linethickness{0.15mm}
+            \multiput(0,0)(5,0){6}{\line(0,1){20}}
+            \multiput(0,0)(0,5){5}{\line(1,0){25}}
+            \linethickness{0.3mm}
+            \multiput(5,0)(10,0){2}{\line(0,1){20}}
+            \multiput(0,5)(0,10){2}{\line(1,0){25}}
+        \end{picture}
+        %
+        \setlength{\unitlength}{0.7cm}
+        \begin{picture}(6,4)
+            \linethickness{0.075mm}
+            \multiput(0,0)(1,0){7}{\line(0,1){4}}
+            \multiput(0,0)(0,1){5}{\line(1,0){6}}
+            \thicklines
+            \put(2,3){\oval(3,1.8)}
+            \thinlines
+            \put(3,2){\oval(3,1.8)}
+            \thicklines
+            \put(2,1){\oval(3,1.8)[tl]}
+            \put(4,1){\oval(3,1.8)[b]}
+            \put(4,3){\oval(3,1.8)[r]}
+            \put(3,1.5){\oval(1.8,0.4)}
+        \end{picture}
+
+        \setlength{\unitlength}{0.8cm}
+        \begin{picture}(6,4)
+            \linethickness{0.075mm}
+            \multiput(0,0)(1,0){7}{\line(0,1){4}}
+            \multiput(0,0)(0,1){5}{\line(1,0){6}}
+            \thicklines
+            \put(0.5,0.5){\line(1,5){0.5}}
+            \put(1,3){\line(4,1){2}}
+            \qbezier(0.5,0.5)(1,3)(3,3.5)
+            \thinlines
+            \put(2.5,2){\line(2,-1){3}}
+            \put(5.5,0.5){\line(-1,5){0.5}}
+            \linethickness{1mm}
+            \qbezier(2.5,2)(5.5,0.5)(5,3)
+            \thinlines
+            \qbezier(4,2)(4,3)(3,3)
+            \qbezier(3,3)(2,3)(2,2)
+            \qbezier(2,2)(2,1)(3,1)
+            \qbezier(3,1)(4,1)(4,2)
+        \end{picture}
+
+
+
+        \section{Labels and References}
+
+        Labels can be attached to parts, chapters, sections, items of enumerations, footnotes, tables and figures.
+        For instance: item~\ref{remember} was important, and regarding fonts, read Section~\ref{sec:advice}. And
+        below, we can reference item~\ref{key-1} and \ref{key-2}.
+
+        \begin{enumerate}
+            \item list text, level one
+            \begin{enumerate}
+                \item list text, level two
+                \begin{enumerate}
+                    \item list text, level three
+
+                    And a new paragraph can be started, too.
+                    \begin{enumerate}
+                        \item list text, level four
+
+                        And a new paragraph can be started, too.
+                        This is the maximum level.
+
+                        \item list text, level four \label{key-1}
+                    \end{enumerate}
+
+                    \item list text, level three
+                \end{enumerate}
+                \item\label{key-2} list text, level two
+            \end{enumerate}
+            \item list text, level one
+            \item list text, level one
+        \end{enumerate}
+
+
+        \section{Mathematical Formulae}
+
+        Math is typeset using KaTeX. Inline math:
+        $
+        f(x) = \int_{-\infty}^\infty \hat f(\xi)\,e^{2 \pi i \xi x} \, d\xi
+        $
+        as well as display math is supported:
+        $$
+        f(n) = \begin{cases} \frac{n}{2}, & \text{if } n\text{ is even} \\ 3n+1, & \text{if } n\text{ is odd} \end{cases}
+        $$
+
+
+        \section{Groups}
+
+
+        Today is \today.
+
+        Actually, what about { some groups? } They\,are\ \ \ \ \ nice.
+
+
+        \section{Symbols}
+        \label{sec:symbols}
+
+        \noindent
+        lowercase greek letters:
+        \textalpha \textbeta \textgamma \textdelta \textepsilon \textzeta \texteta \texttheta \textiota \textkappa
+        \textlambda \textmu \textnu \textxi \textomikron \textpi \textrho \textsigma \texttau \textupsilon \textphi \textchi
+        \textpsi \textomega
+
+        \noindent
+        uppercase greek letters:
+        \textAlpha \textBeta \textGamma \textDelta \textEpsilon \textZeta \textEta \textTheta \textIota \textKappa
+        \textLambda \textMu \textNu \textXi \textOmikron \textPi \textRho \textSigma \textTau \textUpsilon \textPhi \textChi
+        \textPsi \textOmega
+
+        \noindent
+        currencies:
+        \texteuro \textcent \textsterling \pounds \textbaht \textcolonmonetary \textcurrency \textdong \textflorin \textlira
+        \textnaira \textpeso \textwon \textyen
+
+        \noindent
+        old-style numerals:
+        \textzerooldstyle \textoneoldstyle \texttwooldstyle \textthreeoldstyle \textfouroldstyle \textfiveoldstyle
+        \textsixoldstyle \textsevenoldstyle \texteightoldstyle \textnineoldstyle
+
+        \noindent
+        math:
+        \textperthousand \perthousand \textpertenthousand \textonehalf \textthreequarters \textonequarter
+        \textfractionsolidus \textdiv \texttimes \textminus \textpm \textsurd \textlnot \textasteriskcentered
+        \textonesuperior \texttwosuperior \textthreesuperior
+
+        \noindent
+        arrows:
+        \textleftarrow \textuparrow \textrightarrow \textdownarrow
+
+        \noindent
+        misc:
+        \checkmark \textreferencemark \textordfeminine \textordmasculine \textmarried \textdivorced \textbar \textbardbl
+        \textbrokenbar \textbigcircle \textcopyright \copyright \textcircledP \textregistered \textservicemark
+        \texttrademark \textnumero \textrecipe \textestimated \textmusicalnote \textdiscount
+
+        \noindent
+        non-ASCII:
+        \AE \ae \IJ \ij \OE \oe \TH \th \SS \ss \DH \dh \O \o \DJ \dj \L \l \i \j \NG \ng
+
+
+        \section{Fonts}
+
+        Usually, \LaTeX.js chooses the right font---just like \LaTeX.  In some cases,
+        one might like to change fonts and sizes by hand. To do this, use the standard
+        commands. The actual size of each font is a design issue and depends
+        on the document class (in this case on the CSS file).
+
+        {\small The small and
+            \textbf{bold} Romans ruled}
+            {\Large all of great big
+            \textit{Italy}.}
+
+        \textit{You can also
+            \emph{emphasize} text if
+            it is set in italics,}
+            \textsf{in a
+            \emph{sans-serif} font,}
+            \texttt{or in
+            \emph{typewriter} style.}
+
+        The environment form of the font commands is available, too:
+
+        \begin{center}
+        \begin{itshape}
+        This whole paragraph is emphasized, for instance.
+        \end{itshape}
+        \end{center}
+
+
+        \subsection{An advice}
+        \label{sec:advice}
+        \begin{center}
+            \underline{\textbf{Remember\Huge!}} \textit{The}
+            \textsf{M\textbf{\LARGE O}\texttt{R}\textsl{E}} fonts \Huge you
+            \tiny use \footnotesize \textbf{in} a \small \texttt{document},
+            \large \textit{the} \normalsize more \textsc{readable} and
+            \textsl{\textsf{beautiful} it bec\large o\Large m\LARGE e\huge s}.
+        \end{center}
+
+
+        \appendix
+
+        \section{Source}
+
+        The source of \LaTeX.js is here on GitHub: \url{https://github.com/michael-brade/LaTeX.js}
+
+        \end{document}
+
+
+      
+    - name: "VS Code Extension Sample"
+      source: "/packages/vscode/sample.tex"
+      latex: |
+        \documentclass{article}
+        \usepackage{amsmath}
+        \usepackage{amssymb}
+        \usepackage{bussproofs}
+        \title{WebTeX Preview Test Document}
+        \author{VS Code Extension}
+        \date{\today}
+        \begin{document}
+        \maketitle
+        hello world! $x$ is a 
+        create $y$
+        \section{Introduction}
+        \section{Preliminaries}
+        \begin{prooftree}
+            \AxiomC{$A \to B$}
+            \UIC{$\neg B \to \neg A$}
+        \end{prooftree}
+        thisi is a test is a test is a test is a $x$
+        $ is $
+        \section{Conclusion}
+        \end{document}
+
+  # ==========================================
+  # CORE FEATURE FIXTURES
+  # ==========================================
+  fixtures:
+    text_processing:
+      source: "/packages/core/test/fixtures/text.tex"
+      tests:
+        - name: "simple text in paragraphs"
+          latex: |
+            This is just some simple text.
+            
+            This is just some simple text.
+            
+            This is just some simple text.
+
+        - name: "paragraphs and newlines"
+          latex: |
+            first line\\second line\newline third line\par and then a new paragraph as well
+
+        - name: "paragraphs and indentation"
+          latex: |
+            \noindent
+            
+            \noindent
+            
+            This is a new paragraph.
+            
+            \noindent
+            This is a new paragraph.
+
+        - name: "UTF-8 text, punctuation, TeX symbols"
+          latex: |
+            A para\-graph with "quotes," German »quotes«, umlauts (äöüÄÖÜ), ß, thin spaces 80\,000. Numbers?! Money \$10, \$5, and 5€.
+            
+            .:;,?!'´`()[]-/*@+=
+            
+            H\^otel, na\"\i ve, \'el\`eve, sm\o rrebr\o d, !´Se\~norita!, Sch\"onbrunner Schlo\ss{} Stra\ss e
+
+        - name: "special characters"
+          latex: |
+            \# \$ \$ \^{} \& \_ \{ \} \~{} \textbackslash{} \% shelf\-ful
+
+        - name: "dashes, dots (no math)"
+          latex: |
+            daughter-in-law, pages 13--67, yes---or no?
+
+        - name: "ligatures, and ligature prevention"
+          latex: |
+            ff ffi ffl fi fl << >> !´ ?´
+            
+            Not shelfful but shelf\mbox{}ful, or better, shelf\/ful.
+
+        - name: "verbatim text"
+          special: true
+          latex: |
+            This is some \verb|verbatim| text.
+            
+            \verb/Any{thing/ is possible in there.
+            
+            And starred \verb*-is possible, too-. Nice, eh?
+
+        - name: "TeX and LaTeX logos"
+          latex: |
+            \TeX \LaTeX
+
+        - name: "alignment"
+          special: true
+          latex: |
+            This is a horrible test.
+            \centering
+            In this paragraph we change the alignment to centering.
+            {\raggedright But it actually becomes raggedright,
+            
+            even with a group, and only after the par will it be centered.}
+            Until the group ends.
+            
+            And we are now still centered.
+
+    font_handling:
+      source: "/packages/core/test/fixtures/fonts.tex"
+      tests:
+        - name: "font declarations"
+          latex: |
+            Hello \bfseries is emphasized.
+
+        - name: "em and emph"
+          latex: |
+            \em You can also \emph{emphasize} text.
+
+        - name: "emph command and nesting"
+          special: true
+          latex: |
+            Hello, \emph{this} is emphasized.
+            
+            \emph{emph \textup{normal}}, \textup{normal \emph{emph}}
+            
+            \emph{emph \emph{normal}}
+            
+            test {test \em\em\em test \em test}
+            
+            \textit{You can also \emph{emphasize} text if it is set in italics}
+
+        - name: "fonts stay until group ends"
+          latex: |
+            outer { text \bfseries {what} more text } end outer
+
+        - name: "fonts reach across paragraphs"
+          latex: |
+            hello, \itshape what
+            
+            are we going to do here?
+            
+            \slshape
+            Wrap all the paragraphs.
+
+        - name: "monospaced fonts no ligatures"
+          latex: |
+            \texttt{first test of -- and ---}
+
+        - name: "em lengths relative to font sizes"
+          special: true
+          latex: |
+            \small
+            a line of text\\[1em]
+            a line of text\\[1em]
+            \Huge
+            a line of text\\[1em]
+            a line of text
+            
+            \small
+            a line of text\\[1em]
+            a line of text
+            
+            \Huge
+            a line of text\\[1em]
+            a line of text
+
+    mathematical_expressions:
+      source: "/packages/core/test/fixtures/math.tex"
+      tests:
+        - name: "simple inline math"
+          special: true
+          latex: |
+            A basic parabola is $y = x^2$. More text afterwards.
+
+        - name: "displaymath environment"
+          latex: |
+            \begin{displaymath}
+            a + b = c
+            \end{displaymath}
+
+    environments:
+      source: "/packages/core/test/fixtures/environments.tex"
+      tests:
+        - name: "nested horizontal environments"
+          latex: |
+            This \begin{empty}is a \begin{empty}line\end{empty} of\end{empty} text.
+
+        - name: "itemize environment"
+          latex: |
+            a paragraph of text
+            
+            \begin{itemize}
+                \item first item
+            
+                    with a new paragraph
+                \item second item
+            \end{itemize}
+            
+            more text
+
+        - name: "nested itemize environments"
+          special: true
+          latex: |
+            text before
+            \begin{itemize}
+                \item first item
+                    \begin{itemize}
+                        \item first nested item
+                    \end{itemize}
+                \item second item
+            \end{itemize}
+            text after
+
+        - name: "enumerate environment"
+          special: true
+          latex: |
+            a paragraph of text
+            
+            \begin{enumerate}
+                \item[\itshape label] first item
+            
+                    with a new paragraph
+                \item second item
+            \end{enumerate}
+            this belongs to paragraph with enumerate
+
+        - name: "description environment"
+          special: true
+          latex: |
+            a paragraph of text
+            
+            \begin{description}
+                \item[term 1] first item
+            
+                    with a new paragraph
+                \item[term 2] second item
+            \end{description}
+            this belongs to paragraph with description
+
+        - name: "quote environments"
+          special: true
+          latex: |
+            \noindent quote:
+            \begin{quote}
+                Here are some quote\\
+                lines of text
+            
+                as well as a paragraph with special chars [].
+            \end{quote}
+            quotation:
+            \begin{quotation}
+                Here are some quotation\\
+                lines of text
+            
+                as well as a paragraph.
+            \end{quotation}
+            verse:
+            \begin{verse}
+                Here are some verse lines of text lines of text lines of text lines of text lines of text \\
+                lines of text lines of text lines of text lines of text lines of text lines of text
+            
+                as well as a paragraph with trailing newline.\\
+            \end{verse}
+            And now we continue without indentation.
+
+        - name: "alignment environments"
+          special: true
+          latex: |
+            text
+            \begin{center}
+                Here are some centered\\
+                lines of text
+            
+                as well as a paragraph.
+            \end{center}
+            Afterwards, we continue as usual.
+            \begin{flushleft}
+                The same is true\\
+                for a flushleft environment.
+            \end{flushleft}
+            Afterwards, we continue as usual.
+            \begin{flushright}
+                The same is true\\
+                for a flushright environment.
+            \end{flushright}
+            
+            Yes, this is the last line.
+
+        - name: "verbatim environment"
+          latex: |
+            \begin{verbatim}
+            Verbatim line with \TeX{} % inside
+            \end{verbatim}
+
+        - name: "starred verbatim environment"
+          latex: |
+            \begin{verbatim*}
+            Spaces  are   shown   as   visible   spaces
+            \end{verbatim*}
+
+        - name: "comment environment"
+          latex: |
+            text
+            \begin{comment}
+                This is a comment.
+                \end{comment
+                still more comment.
+            \end{comment}
+            more text
+
+    boxes:
+      source: "/packages/core/test/fixtures/boxes.tex"
+      tests:
+        - name: "minipage"
+          special: true
+          latex: |
+            text \fbox{\begin{minipage}[b]{3cm}
+            	content... more text more text
+            \end{minipage}} and some text after
+
+        - name: "parbox simple alignment"
+          special: true
+          latex: |
+            \noindent
+            Some text
+            \fbox{\parbox{2cm}{parbox default alignment, parbox test text}}
+            some text
+            \fbox{\parbox[t]{2cm}{parbox top alignment, text parbox test text}}
+            some text
+            \fbox{\parbox[b]{2cm}{parbox bottom alignment, text parbox test text}}
+            some text.
+
+        - name: "parbox with height"
+          special: true
+          latex: |
+            \noindent
+            Some text
+            \fbox{\parbox[c][3cm]{2cm}{parbox default alignment, parbox test text}}
+            some text
+            \fbox{\parbox[t][3cm]{2cm}{parbox top alignment, text parbox test text}}
+            some text
+            \fbox{\parbox[b][3cm]{2cm}{parbox bottom alignment, text parbox test text}}
+            some text.
+
+    spacing:
+      source: "/packages/core/test/fixtures/spacing.tex"
+      tests:
+        - name: "horizontal spaces"
+          latex: |
+            Negative thin space: -\negthinspace- \\
+            Thin space: -\,- \\
+            Thin space: -\thinspace- \\
+            Normal space: - - \\
+            Normal space: -\ - \\
+            Non-break space: -~- \\
+            en-space: -\enspace- \\
+            em-space: -\quad- \\
+            2x em-space: -\qquad-\\
+            3cm horizontal space: -\hspace{3cm}- \\
+
+        - name: "linebreaks with vertical space"
+          latex: |
+            This is just some simple text.\\[1cm]
+            This is just some simple text.
+
+        - name: "vertical spacing commands"
+          latex: |
+            This is just a line of text \smallskip with an embedded small skip.
+            
+            This is just some simple text.
+            
+            \medskip
+            A line after the medskip.
+            
+            \bigskip
+            
+            A line after the bigskip.
+
+        - name: "vspace in modes"
+          latex: |
+            This is some text, it includes\vspace{1cm} a vertical space. And some more text.
+            
+            \vspace{1cm}
+            And another paragraph.
+
+    symbols:
+      source: "/packages/core/test/fixtures/symbols.tex"
+      tests:
+        - name: "TeX char"
+          latex: |
+            \char98 \char"A0
+
+        - name: "TeX caret notation"
+          latex: |
+            20^^A0^^^^2103
+            
+            ^^7 ^^78 vs^^+ip
+
+        - name: "LaTeX symbol"
+          latex: |
+            \symbol{ "00A9}
+
+        - name: "predefined symbols"
+          latex: |
+            \textellipsis
+
+    macros:
+      source: "/packages/core/test/fixtures/macros.tex"
+      tests:
+        - name: "custom macros without arguments"
+          latex: |
+            some text \empty\ inside.
+
+        - name: "custom macros with mandatory argument"
+          latex: |
+            \documentclass{article}
+            \usepackage{echo}
+            \begin{document}
+            some text \echoOGO{with a macro}
+            \end{document}
+
+        - name: "custom macros with optional argument"
+          latex: |
+            \documentclass{article}
+            \usepackage{echo}
+            \begin{document}
+            some text \echoO[with a macro]
+            \end{document}
+
+        - name: "custom macros mixed arguments"
+          latex: |
+            \documentclass{article}
+            \usepackage{echo}
+            \begin{document}
+            some text, \echoGOG{mandatory arg} [%
+            ,  % another comment
+             ]
+             {more mandatory} inside.
+            \end{document}
+
+        - name: "brackets in optional arguments"
+          latex: |
+            \documentclass{article}
+            \usepackage{echo}
+            \begin{document}
+            \echoOGO[{t]}t]{ext} more
+            \end{document}
+
+    sectioning:
+      source: "/packages/core/test/fixtures/sectioning.tex"
+      tests:
+        - name: "chapter"
+          latex: |
+            \documentclass{book}
+            \begin{document}
+            \chapter{A Chapter}
+            
+            Then the text follows.
+            \chapter{A Chapter}
+            Then the text follows.
+            
+            \end{document}
+
+        - name: "chapter and section"
+          latex: |
+            \documentclass{book}
+            \begin{document}
+            
+            \chapter{A Chapter}
+            
+            \section{Here starts a section}
+            
+            Then the text follows.
+            
+            \chapter{A Chapter}\section{Here starts a section}
+            Then the text follows.
+            \end{document}
+
+        - name: "section inside macro"
+          latex: |
+            Start with \emph{some \section{A Section}} text.
+            
+            Then more text follows.
+
+    groups:
+      source: "/packages/core/test/fixtures/groups.tex"
+      tests:
+        - name: "balanced groups"
+          latex: |
+            test {text with {{another }two} groups } and more
+
+        - name: "brackets as punctuation"
+          latex: |
+            test[ {t]]ext} more
+
+        - name: "groups overlapping paragraphs"
+          latex: |
+            Here is some unsuspecting text in a paragraph. This paragraph { starts a group.
+            
+            But then suddenly a new paragraph begins... } and misery with it.
+            
+            It is also possible {to have a\par par command} in a group.
+
+    counters:
+      source: "/packages/core/test/fixtures/counters.tex"
+      tests:
+        - name: "counter operations"
+          latex: |
+            \newcounter{c}
+            \stepcounter{c}
+            \thec: \roman{c}
+            
+            \addtocounter{c}{3 * -(2+1)}    % 1 - 9
+            \arabic{c}
+            
+            \setcounter{c}{ 3*\real{1.6} * \real{1.7 } + -- 2 }
+            \thec: \Roman{c}
+            
+            \the\value{c}
+            
+            \newcounter{a}[c]
+            \setcounter{a}{\value{c}}
+            
+            \stepcounter{c}
+            \arabic{a}          % should be reset now due to stepcounter
+            \fnsymbol{c}
+
+        - name: "clear inner counters"
+          latex: |
+            \newcounter{c}
+            \stepcounter{c}
+            
+            \newcounter{a}[c]	% c -> a,b -> d
+            \newcounter{b}[c]
+            \newcounter{d}[b]
+            
+            \setcounter{a}{5}
+            \setcounter{b}{6}
+            \setcounter{d}{3}
+            
+            \arabic{a}
+            \arabic{b}
+            \arabic{c}
+            \arabic{d}
+            
+            \stepcounter{c}
+            \arabic{a}          % should be reset now due to stepcounter
+            \arabic{b}          % should be reset now due to stepcounter
+            \arabic{c}
+            \arabic{d}
+
+    label_ref:
+      source: "/packages/core/test/fixtures/label-ref.tex"
+      tests:
+        - name: "empty currentlabel"
+          latex: |
+            This\label{test} label is empty:~\ref{test}.
+
+        - name: "forward and back referencing"
+          latex: |
+            \newcounter{c}
+            
+            Here is some text with two forward references: \ref{test} and \ref{test}.
+            \refstepcounter{c}
+            Now there is more.
+            
+            This \label{test} is counter c:~\ref{test}. And another~\ref{test}.
+
+        - name: "forward referencing section"
+          latex: |
+            See Section~\ref{sec:test}.
+            
+            \section{Section Name}
+            \label{sec:test}
+
+        - name: "label section inside"
+          latex: |
+            \section{Section Name\label{sec:test}}
+            
+            This is Section~\ref{sec:test}.
+
+        - name: "labelling enumerate item"
+          latex: |
+            The most widely-used format is item number~\ref{popular}.
+            \begin{enumerate}
+                \item Plain \TeX
+                \item \label{popular} \LaTeX
+                \item Con\TeX t
+            \end{enumerate}
+
+    layout:
+      source: "/packages/core/test/fixtures/layout-marginpar.tex"
+      tests:
+        - name: "layout definition"
+          special: true
+          latex: |
+            \documentclass{article}
+            
+            \setlength{\textwidth}{10cm}
+            \setlength{\oddsidemargin}{1cm}
+            \setlength{\marginparwidth}{2.4cm}
+            \setlength{\marginparsep}{4.5mm}
+            
+            \begin{document}
+            \marginpar{And here is a piece on the right.}
+            This is just some simple text.
+            \end{document}
+
+        - name: "marginpars"
+          special: true
+          latex: |
+            This is just some simple text. -MPAR-\marginpar{\Large text in margin} This is just some simple text.
+            
+            \bigbreak
+            
+            This is just some simple text. -MPAR-\marginpar{\tiny text in margin} This is just some simple text.
+
+    whitespace:
+      source: "/packages/core/test/fixtures/whitespace.tex"
+      tests:
+        - name: "whitespace compression"
+          latex: |
+            three
+            \par
+            % comment
+            
+            paragraphs
+                \par\par
+                % comment
+             separated by par.
+            
+               this     paragraph  has a 	    few 
+             words,   including
+             % comment
+             a comment.
+
+        - name: "force two paragraphs"
+          latex: |
+            text  \par
+            ~
+            \par
+            more text
+
+        - name: "double newline paragraph"
+          latex: |
+            firstparagraph
+            
+             second
+            paragraph
+
+        - name: "line breaks no spaces"
+          latex: |
+            first line \\
+             second line
+            
+            first line \newline
+             second line
+
+        - name: "mbox restricted mode"
+          special: true
+          latex: |
+            x\mbox{
+            one \gobbleO space,
+            two \gobbleO[] spaces,
+            two \gobbleO{} spaces,
+            
+            no wh \\[4cm]ite \newline sp \\ ace,
+            
+            one \\[4cm] space,
+            one \linebreak[4]space,
+            one \linebreak[4] space,
+            
+            xx\par
+            
+            {xx \\  x}}x
+
+        - name: "comments and line joining"
+          latex: |
+            This is an % stupid
+            % Better: instructive <----
+            example: Supercal%
+                          ifragilist%
+                icexpialidocious
+
+        - name: "spaces in groups"
+          latex: |
+            text with empty group {  } and more text
+            
+            text with {a group} and more text
+            
+            text with { a group } and more text
+            
+            text with { a group  } and more text
+            
+            text with {  a group  }  and more text
+
+        - name: "macro spacing"
+          latex: |
+            some \empty  text.
+            
+            some \empty{} text.
+            
+            some \empty\ text.
+
+    picture:
+      source: "/packages/core/test/fixtures/picture.tex"
+      tests:
+        - name: "picture commands in text"
+          special: true
+          latex: |
+            picture \put(2,30){commands} in text
+
+        - name: "picture objects in text"
+          special: true
+          latex: |
+            picture \line(1pt,1px){20} objects in \line(-1,1){20} text
+
+        - name: "lines"
+          special: true
+          latex: |
+            \setlength{\unitlength}{5cm}
+            \begin{picture}(1,1)
+              \put(0,0){\line(0,1){1}}
+              \put(0,0){\line(1,0){1}}
+              \put(0,0){\line(1,1){1}}
+              \put(0,0){\line(1,2){.5}}
+              \put(0,0){\line(1,3){.3333}}
+              \put(0,0){\line(1,4){.25}}
+              \put(0,0){\line(1,5){.2}}
+              \put(0,0){\line(1,6){.1667}}
+              \put(0,0){\line(2,1){1}}
+              \put(0,0){\line(2,3){.6667}}
+              \put(0,0){\line(2,5){.4}}
+              \put(0,0){\line(3,1){1}}
+              \put(0,0){\line(3,2){1}}
+              \put(0,0){\line(3,4){.75}}
+              \put(0,0){\line(3,5){.6}}
+              \put(0,0){\line(4,1){1}}
+              \put(0,0){\line(4,3){1}}
+              \put(0,0){\line(4,5){.8}}
+              \put(0,0){\line(5,1){1}}
+              \put(0,0){\line(5,2){1}}
+              \put(0,0){\line(5,3){1}}
+              \put(0,0){\line(5,4){1}}
+              \put(0,0){\line(5,6){.8333}}
+              \put(0,0){\line(6,1){1}}
+              \put(0,0){\line(6,5){1}}
+            \end{picture}
+
+        - name: "vectors"
+          special: true
+          latex: |
+            \setlength{\unitlength}{0.75mm}
+            \frame{\begin{picture}(60,40)
+              \put(30,20){\vector(1,0){30}}
+              \put(30,20){\vector(4,1){20}}
+              \put(30,20){\vector(3,1){25}}
+              \put(30,20){\vector(2,1){30}}
+              \put(30,20){\vector(1,2){10}}
+              \thicklines
+              \put(30,20){\vector(-4,1){30}}
+              \put(30,20){\vector(-1,4){5}}
+              \thinlines
+              \put(30,20){\vector(-1,-1){5}}
+              \put(30,20){\vector(-1,-4){5}}
+            \end{picture}}
+
+        - name: "circles"
+          special: true
+          latex: |
+            \setlength{\unitlength}{1mm}
+            \frame{%
+            \begin{picture}(60, 40)
+              \put(20,30){\circle{1}}
+              \put(20,30){\circle{2}}
+              \put(20,30){\circle{4}}
+              \put(20,30){\circle{8}}
+              \put(20,30){\circle{16}}
+              \put(20,30){\circle{32}}
+              \put(40,30){\circle{1}}
+              \put(40,30){\circle{2}}
+              \put(40,30){\circle{3}}
+              \put(40,30){\circle{4}}
+              \put(40,30){\circle{5}}
+              \put(40,30){\circle{6}}
+              \put(40,30){\circle{7}}
+              \put(40,30){\circle{8}}
+              \put(40,30){\circle{9}}
+              \put(40,30){\circle{10}}
+              \put(40,30){\circle{11}}
+              \put(40,30){\circle{12}}
+              \put(40,30){\circle{13}}
+              \put(40,30){\circle{14}}
+              \put(15,10){\circle*{1}}
+              \put(20,10){\circle*{2}}
+              \put(25,10){\circle*{3}}
+              \put(30,10){\circle*{4}}
+              \put(35,10){\circle*{5}}
+            \end{picture}}
+
+        - name: "ovals"
+          special: true
+          latex: |
+            \setlength{\unitlength}{0.7cm}
+            \begin{picture}(6,4)
+              \linethickness{0.075mm}
+              \multiput(0,0)(1,0){7}{\line(0,1){4}}
+              \multiput(0,0)(0,1){5}{\line(1,0){6}}
+              \thicklines
+              \put(2,3){\oval(3,1.8)}
+              \thinlines
+              \put(3,2){\oval(3,1.8)}
+              \thicklines
+              \put(2,1){\oval(3,1.8)[tl]}
+              \put(4,1){\oval(3,1.8)[b]}
+              \put(4,3){\oval(3,1.8)[r]}
+              \put(3,1.5){\oval(1.8,0.4)}
+            \end{picture}
+
+        - name: "bezier curves"
+          special: true
+          latex: |
+            \setlength{\unitlength}{0.8cm}
+            \begin{picture}(6,4)
+            \linethickness{0.075mm}
+            \multiput(0,0)(1,0){7}{\line(0,1){4}}
+            \multiput(0,0)(0,1){5}{\line(1,0){6}}
+            \thicklines
+            \put(0.5,0.5){\line(1,5){0.5}}
+            \put(1,3){\line(4,1){2}}
+            \qbezier(0.5,0.5)(1,3)(3,3.5)
+            \thinlines
+            \put(2.5,2){\line(2,-1){3}}
+            \put(5.5,0.5){\line(-1,5){0.5}}
+            \linethickness{1mm}
+            \qbezier[10](2.5,2)(5.5,0.5)(5,3)
+            \thinlines
+            \qbezier(4,2)(4,3)(3,3)
+            \qbezier(3,3)(2,3)(2,2)
+            \qbezier(2,2)(2,1)(3,1)
+            \qbezier(3,1)(4,1)(4,2)
+            \end{picture}
+
+        - name: "mixing math text and lines"
+          special: true
+          latex: |
+            \frame{
+              \setlength{\unitlength}{1cm}
+              \begin{picture}(6,5)
+                \thicklines
+                \put(1,0.5){\line(2,1){3}}
+                \put(4,2){\line(-2,1){2}}
+                \put(2,3){\line(-2,-5){1}}
+                \put(0.7,0.3){$A$}
+                \put(4.05,1.9){$B$}
+                \put(1.7,2.95){$C$}
+                \put(3.1,2.5){$a$}
+                \put(1.3,1.7){$b$}
+                \put(2.5,1.05){$c$}
+                \put(0.3,4){$F=\sqrt{s(s-a)(s-b)(s-c)}$}
+                \put(3.5,0.4){$\displaystyle s:=\frac{a+b+c}{2}$}
+              \end{picture}
+            }
+
+    preamble:
+      source: "/packages/core/test/fixtures/preamble.tex"
+      tests:
+        - name: "document with preamble"
+          latex: |
+            \documentclass{book}
+            
+            \usepackage[showframe]{geometry}
+            \usepackage{layout}
+            \usepackage{showframe}
+            
+            \usepackage{textcomp}
+            \usepackage{calc}
+            
+            \usepackage{luatextra}
+            \usepackage{lua-visual-debug}
+            
+            \setcounter{secnumdepth}{-1}
+            
+            \setlength{\unitlength}{8pt}
+            
+            \begin{document}
+            \end{document}
+
+    fbox_verb:
+      source: "/packages/core/test/fixtures/fbox-verb.tex"
+      tests:
+        - name: "fbox verb test"
+          latex: |
+            \noindent\fbox{\verb|\mbox{\|\emph{text}\verb|}|}
+
+  # ==========================================
+  # PACKAGE FIXTURES
+  # ==========================================
+  packages:
+    xcolor:
+      source: "/packages/core/test/fixtures/packages/xcolor.tex"
+      tests:
+        - name: "simple color"
+          latex: |
+            \documentclass{article}
+            \usepackage{xcolor}
+            
+            \begin{document}
+            \color[cmyk]{1,0,0,0}
+            \color[wave]{485}
+            \color{red}
+            This is \textcolor{magenta}{kind of red} text.
+            \end{document}
+
+        - name: "color expressions"
+          latex: |
+            \documentclass{article}
+            \usepackage{xcolor}
+            
+            \begin{document}
+            \color{-red}
+            \color{red!50}
+            \color{-green!40!yellow}
+            \color{--red!50!green!12.345}
+            \color{red!50!green!20!blue}
+            \color{foo!!+}
+            \color{foo!![7]}
+            \color{foo!25!red!!+++}
+            \color{foo!25!red!70!green!![7]}
+            
+            \color{rgb:-green!40!yellow,3;green!40!yellow,2;red,1}
+            \color{rgb:red,1}
+            \color{cmyk:red,1;-green!25!blue!60,11.25;blue,-2}
+            \end{document}
+
+        - name: "defining colors"
+          latex: |
+            \documentclass{article}
+            \usepackage{xcolor}
+            
+            \definecolor{red}{rgb}{1,0,0}
+            \definecolor{red}{rgb}{1,0,0}
+            \definecolor{red}{rgb/cmyk}{1,0,0/0,1,1,0}
+            \definecolor{red}{hsb:rgb/cmyk}{1,0,0/0,1,1,0}
+            \definecolor[named]{Black}{cmyk}{0,0,0,1}
+            
+            \definecolor{myblack}{named}{Black}
+            
+            \definecolorset{cmyk/rgb/hsb/gray}{}{}%
+             {cyan,1,0,0,0/0,1,1/.5,1,1/.7;%
+              magenta,0,1,0,0/1,0,1/.83333,1,1/.41;%
+              yellow,0,0,1,0/1,1,0/.16667,1,1/.89;%
+              olive,0,0,1,.5/.5,.5,0/.16667,1,.5/.39}
+            
+            \begin{document}
+            \end{document}
+
+    amsthm:
+      source: "/packages/core/test/fixtures/packages/amsthm.tex"
+      tests:
+        - name: "basic theorem"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \newtheorem{theorem}{Theorem}
+            
+            \begin{document}
+            \begin{theorem}
+            This is a theorem statement.
+            \end{theorem}
+            \end{document}
+
+        - name: "theorem with proof"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \newtheorem{theorem}{Theorem}
+            
+            \begin{document}
+            \begin{theorem}[Pythagorean Theorem]
+            For a right triangle with legs $a$ and $b$, and hypotenuse $c$: $a^2 + b^2 = c^2$.
+            \end{theorem}
+            
+            \begin{proof}
+            This follows from the law of cosines.
+            \end{proof}
+            \end{document}
+
+        - name: "multiple theorem styles"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \theoremstyle{plain}
+            \newtheorem{theorem}{Theorem}
+            \newtheorem{lemma}[theorem]{Lemma}
+            
+            \theoremstyle{definition}
+            \newtheorem{definition}{Definition}
+            \newtheorem{example}{Example}
+            
+            \theoremstyle{remark}
+            \newtheorem{remark}{Remark}
+            
+            \begin{document}
+            \begin{theorem}
+            This is a theorem in plain style.
+            \end{theorem}
+            
+            \begin{lemma}
+            This is a lemma sharing the theorem counter.
+            \end{lemma}
+            
+            \begin{definition}
+            This is a definition in definition style.
+            \end{definition}
+            
+            \begin{example}
+            This is an example in definition style.
+            \end{example}
+            
+            \begin{remark}
+            This is a remark in remark style.
+            \end{remark}
+            \end{document}
+
+        - name: "unnumbered theorem"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \newtheorem*{observation}{Observation}
+            
+            \begin{document}
+            \begin{observation}
+            This theorem is unnumbered.
+            \end{observation}
+            \end{document}
+
+        - name: "sectioned numbering"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \newtheorem{theorem}{Theorem}[section]
+            
+            \begin{document}
+            \section{Introduction}
+            \begin{theorem}
+            First theorem in section 1.
+            \end{theorem}
+            
+            \begin{theorem}
+            Second theorem in section 1.
+            \end{theorem}
+            
+            \section{Main Results}
+            \begin{theorem}
+            First theorem in section 2.
+            \end{theorem}
+            \end{document}
+
+        - name: "proof with custom label"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \begin{document}
+            \begin{proof}[Proof Sketch]
+            This is just a sketch of the proof.
+            \end{proof}
+            
+            \begin{proof}[Solution]
+            This is the solution to the problem.
+            \end{proof}
+            \end{document}
+
+        - name: "qed command"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \begin{document}
+            This completes the argument. \qed
+            
+            Manual QED placement in the middle of text.
+            \end{document}
+
+    amsthm_labels:
+      source: "/packages/core/test/fixtures/packages/amsthm-labels.tex"
+      tests:
+        - name: "theorem labels"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            
+            \begin{theorem}\label{thm:one}
+            A labeled theorem.
+            \end{theorem}
+            
+            See Theorem~\ref{thm:one}.
+            \end{document}
+
+    bussproofs:
+      source: "/packages/core/test/fixtures/packages/bussproofs.tex"
+      tests:
+        - name: "simple axiom with unary inference"
+          special: true
+          latex: |
+            \documentclass{article}
+            \usepackage{bussproofs}
+            
+            \begin{document}
+            \begin{prooftree}
+            \AxiomC{$A$}
+            \UnaryInfC{$B$}
+            \end{prooftree}
+            \end{document}
+
+        - name: "binary inference with labels"
+          special: true
+          latex: |
+            \documentclass{article}
+            \usepackage{bussproofs}
+            
+            \begin{document}
+            \begin{prooftree}
+            \AxiomC{$A$}
+            \AxiomC{$A \to B$}
+            \RightLabel{MP}
+            \BinaryInfC{$B$}
+            \end{prooftree}
+            \end{document}
+
+        - name: "complex proof tree"
+          special: true
+          latex: |
+            \documentclass{article}
+            \usepackage{bussproofs}
+            
+            \begin{document}
+            \begin{prooftree}
+            \AxiomC{}
+            \RightLabel{Hyp$^{1}$}
+            \UnaryInfC{$P$}
+            \AXC{$P\to Q$}
+            \RL{$\to_E$}
+            \BIC{$Q^2$}
+            \AXC{$Q\to R$}
+            \RL{$\to_E$}
+            \BIC{$R$}
+            \AXC{$Q$}
+            \RL{Rit$^2$}
+            \UIC{$Q$}
+            \RL{$\wedge_I$}
+            \BIC{$Q\wedge R$}
+            \RL{$\to_I$$^1$}
+            \UIC{$P\to Q\wedge R$}
+            \end{prooftree}
+            \end{document}
+
+        - name: "abbreviated commands"
+          special: true
+          latex: |
+            \documentclass{article}
+            \usepackage{bussproofs}
+            
+            \begin{document}
+            \begin{prooftree}
+            \AXC{$\Gamma, A \vdash B$}
+            \AXC{$\Delta \vdash A$}
+            \LL{Cut}
+            \BIC{$\Gamma, \Delta \vdash B$}
+            \end{prooftree}
+            \end{document}
+
+        - name: "trinary inference"
+          special: true
+          latex: |
+            \documentclass{article}
+            \usepackage{bussproofs}
+            
+            \begin{document}
+            \begin{prooftree}
+            \AxiomC{$A$}
+            \AxiomC{$B$}  
+            \AxiomC{$C$}
+            \TrinaryInfC{$A \wedge B \wedge C$}
+            \end{prooftree}
+            \end{document}
+
+    amsmath:
+      source: "/packages/core/test/fixtures/packages/amsmath.tex"
+      tests:
+        - name: "align environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{align}
+            a &= b \\
+            c &= d
+            \end{align}
+            \end{document}
+
+        - name: "align* environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{align*}
+            a &= b \\
+            c &= d
+            \end{align*}
+            \end{document}
+
+        - name: "gather environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{gather}
+            a+b=c \\
+            d+e=f
+            \end{gather}
+            \end{document}
+
+        - name: "gather* environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{gather*}
+            a+b=c \\
+            d+e=f
+            \end{gather*}
+            \end{document}
+
+        - name: "equation environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{equation}
+            a+b=c
+            \end{equation}
+            \end{document}
+
+        - name: "equation* environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{equation*}
+            a+b=c
+            \end{equation*}
+            \end{document}
+
+        - name: "multline environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{multline}
+            a + b + c \\
+            = d + e
+            \end{multline}
+            \end{document}
+
+        - name: "multline* environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{multline*}
+            a + b + c \\
+            = d + e
+            \end{multline*}
+            \end{document}
+
+        - name: "eqnarray environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsmath}
+            \begin{document}
+            \begin{eqnarray}
+            a &=& b + c \\
+            x &=& y
+            \end{eqnarray}
+            \end{document}
+
+    hyperref:
+      source: "/packages/core/test/fixtures/packages/hyperref.tex"
+      tests:
+        - name: "url and href"
+          latex: |
+            \documentclass{article}
+            \usepackage{,hyperref , ,}  % should work anyway!
+            
+            \begin{document}
+            \url{  https://github.com/michael-brade/LaTeX.js }
+            
+            \href{ https://github.com/michael-brade/LaTeX.js }{LaTeX.js source}
+            \end{document}
+
+  # ==========================================
+  # UNIT TEST CASES
+  # ==========================================
+  unit_tests:
+    amsthm_simple:
+      source: "/packages/core/test/unit/amsthm-simple.spec.ts"
+      tests:
+        - name: "basic theorem test"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \begin{theorem}
+            First theorem
+            \end{theorem}
+            \end{document}
+
+        - name: "theorem counter test"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \begin{theorem}
+            First theorem
+            \end{theorem}
+            \begin{theorem}
+            Second theorem
+            \end{theorem}
+            \end{document}
+
+    amsthm_numbering:
+      source: "/packages/core/test/unit/amsthm-numbering.spec.ts"
+      tests:
+        - name: "sequential numbering"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \begin{theorem}
+            First theorem
+            \end{theorem}
+            \begin{theorem}
+            Second theorem
+            \end{theorem}
+            \begin{theorem}
+            Third theorem
+            \end{theorem}
+            \end{document}
+
+        - name: "multiple environment types"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \newtheorem{lemma}{Lemma}
+            \newtheorem{corollary}{Corollary}
+            \begin{theorem}
+            First theorem
+            \end{theorem}
+            \begin{lemma}
+            First lemma
+            \end{lemma}
+            \begin{theorem}
+            Second theorem
+            \end{theorem}
+            \begin{corollary}
+            First corollary
+            \end{corollary}
+            \end{document}
+
+        - name: "shared counters"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \newtheorem{lemma}[theorem]{Lemma}
+            \newtheorem{corollary}[theorem]{Corollary}
+            \begin{theorem}
+            First theorem
+            \end{theorem}
+            \begin{lemma}
+            First lemma (should be numbered 2)
+            \end{lemma}
+            \begin{theorem}
+            Second theorem (should be numbered 3)
+            \end{theorem}
+            \begin{corollary}
+            First corollary (should be numbered 4)
+            \end{corollary}
+            \end{document}
+
+        - name: "hierarchical numbering"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}[section]
+            \section{First Section}
+            \begin{theorem}
+            First theorem in section 1
+            \end{theorem}
+            \begin{theorem}
+            Second theorem in section 1
+            \end{theorem}
+            \section{Second Section}
+            \begin{theorem}
+            First theorem in section 2 (should reset to 1)
+            \end{theorem}
+            \end{document}
+
+        - name: "unnumbered theorems"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \newtheorem*{remark}{Theorem}
+            \begin{theorem}
+            Numbered theorem
+            \end{theorem}
+            \begin{remark}
+            Unnumbered theorem
+            \end{remark}
+            \begin{theorem}
+            Another numbered theorem
+            \end{theorem}
+            \end{document}
+
+        - name: "optional titles"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \newtheorem{theorem}{Theorem}
+            \begin{theorem}
+            Theorem without title
+            \end{theorem}
+            \begin{theorem}[Important Result]
+            Theorem with title
+            \end{theorem}
+            \end{document}
+
+        - name: "proof environment"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \begin{proof}
+            This is a proof.
+            \end{proof}
+            \begin{proof}[Proof of Main Theorem]
+            This is a proof with custom label.
+            \end{proof}
+            \end{document}
+
+        - name: "theorem styles"
+          latex: |
+            \documentclass{article}
+            \usepackage{amsthm}
+            \begin{document}
+            \theoremstyle{plain}
+            \newtheorem{theorem}{Theorem}
+            \theoremstyle{definition}
+            \newtheorem{definition}{Definition}
+            \theoremstyle{remark}
+            \newtheorem{remark}{Remark}
+            \begin{theorem}
+            Plain style theorem
+            \end{theorem}
+            \begin{definition}
+            Definition style
+            \end{definition}
+            \begin{remark}
+            Remark style
+            \end{remark}
+            \end{document}
+
+    minted:
+      source: "/packages/core/test/unit/minted.spec.ts"
+      tests:
+        - name: "javascript code block"
+          latex: |
+            \documentclass{article}
+            \usepackage{minted}
+            \begin{document}
+            \begin{minted}{javascript}
+            const answer = 42;
+            console.log(answer);
+            \end{minted}
+            \end{document}
+
+        - name: "python with line numbers"
+          latex: |
+            \documentclass{article}
+            \usepackage{minted}
+            \begin{document}
+            \begin{minted}[linenos,theme=github-light]{python}
+            def greet(name):
+                print(f"Hello, {name}!")
+            
+            if __name__ == "__main__":
+                greet("WebTeX")
+            \end{minted}
+            \end{document}
+
+    bussproofs_parse:
+      source: "/packages/core/test/unit/bussproofs.parseCommands.spec.ts"
+      tests:
+        - name: "proof tree commands"
+          latex_fragments:
+            - '\AxiomC{P \land Q}'
+            - '\BinaryInfC{B {C}}'
+            - '\AXC{D}'
+            - '\UIC{E}'
+            - '\TrinaryInfC{F}'
+            - '\QuinaryInfC{G}'
+            - '\RightLabel{MP}'
+            - '\LeftLabel{Cut}'
+            - '\RL{$\to_E$}'
+            - '\LL{Hyp}'
+
+    unknown_package:
+      source: "/packages/core/test/unit/unknown-package.spec.ts"
+      tests:
+        - name: "unknown package"
+          latex: |
+            \documentclass{article}\usepackage{unknown}\begin{document}\end{document}
+
+        - name: "verbatim variants"
+          latex_fragments:
+            - '\begin{verbatim}content\end{verbatim*}'
+            - '\begin{verbatim*}content\end{verbatim}'
+
+    cli_test:
+      source: "/packages/core/test/unit/cli.spec.ts"
+      tests:
+        - name: "invalid command"
+          latex: |
+            \invalidcommand{test}
+
+  # ==========================================
+  # INTEGRATION TEST CASES
+  # ==========================================
+  integration_tests:
+    cli_output:
+      source: "/packages/core/test/integration/cli-output.spec.ts"
+      tests:
+        - name: "simple compilation"
+          latex: |
+            Hello \LaTeX{} world!
+
+        - name: "math document"
+          latex: |
+            \documentclass{article}
+            \begin{document}
+            \section{Math Examples}
+            
+            Inline math: $E = mc^2$
+            
+            Display math:
+            $$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$
+            
+            More math: $\sum_{n=1}^{10} n = 55$ and $\frac{a}{b} = c$.
+            
+            \end{document}
+
+        - name: "complex document"
+          latex: |
+            \documentclass{article}
+            
+            \begin{document}
+            
+            \section{Introduction}
+            This is a \textbf{comprehensive} test document with \textit{various} formatting.
+            
+            \subsection{Lists}
+            \begin{itemize}
+            \item First item with $math = x^2$
+            \item Second item
+            \begin{enumerate}
+            \item Nested numbered item
+            \item Another nested item
+            \end{enumerate}
+            \item Final item
+            \end{itemize}
+            
+            \subsection{Mathematical Content}
+            The quadratic formula is:
+            $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+            
+            \section{Conclusion}
+            This demonstrates \LaTeX{} compilation to HTML.
+            
+            \end{document}
+
+        - name: "error test - invalid macro"
+          latex: |
+            \invalidcommand{test}
+
+        - name: "error test - unmatched braces"
+          latex: |
+            This is text with { unmatched braces
+
+    core_features:
+      source: "/packages/core/test/integration/core-features.spec.ts"
+      tests:
+        - name: "line breaks"
+          latex: |
+            First line\\
+            Second line\newline
+            Third line
+
+        - name: "font formatting"
+          latex: |
+            \textbf{Bold} \textit{Italic} \emph{Emphasized}
+
+        - name: "inline math"
+          latex: |
+            The equation $E = mc^2$ is famous.
+
+        - name: "display math"
+          latex: |
+            $$\sum_{i=1}^n i = \frac{n(n+1)}{2}$$
+
+        - name: "nested lists"
+          latex: |
+            \begin{itemize}
+            \item Item 1
+            \begin{enumerate}
+            \item Nested item A
+            \item Nested item B
+            \end{enumerate}
+            \item Item 2
+            \end{itemize}
+
+  # ==========================================
+  # API AND README EXAMPLES
+  # ==========================================
+  documentation:
+    api_test:
+      source: "/packages/core/test/unit/api.spec.ts"
+      tests:
+        - name: "simple line"
+          latex: |
+            Hi, this is a line of text.
+
+    readme:
+      source: "README.md"
+      tests:
+        - name: "hello world"
+          latex: |
+            \documentclass{article}\begin{document}Hello World!\end{document}
+
+        - name: "simple document"
+          latex: |
+            \documentclass{article}
+            \begin{document}
+            \section{Hello WebTeX}
+            This is a test document.
+            \end{document}
+
+# ==========================================
+# METADATA
+# ==========================================
+statistics:
+  total_test_files: 47
+  total_test_cases: 300+
+  fixture_files: 25
+  package_tests: 6
+  unit_test_files: 11
+  integration_test_files: 2
+  
+coverage:
+  core_latex:
+    - text_processing: complete
+    - fonts: complete
+    - math: complete
+    - environments: complete
+    - boxes: complete
+    - spacing: complete
+    - symbols: complete
+    - macros: complete
+    - sectioning: complete
+    - groups: complete
+    - counters: complete
+    - labels_references: complete
+    - layout: complete
+    - whitespace: complete
+    - picture: complete
+    - preamble: complete
+    
+  packages:
+    - xcolor: complete
+    - amsthm: complete
+    - bussproofs: complete
+    - amsmath: complete
+    - hyperref: complete
+    - minted: complete
+    
+  special_features:
+    - verbatim: complete
+    - comments: complete
+    - error_handling: complete
+    - cli: complete
+    - api: complete
+
+notes:
+  - "Special test cases marked with 's**' indicate visual/rendering specific tests"
+  - "Test cases marked with '!**' indicate implementation TODOs or special behavior"
+  - "All LaTeX code preserved exactly as in source files including whitespace and formatting"
+  - "Test fixture format uses '.' lines as test case boundaries"
+  - "Some fixtures contain multiple related test cases in a single file"
