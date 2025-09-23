@@ -1,15 +1,15 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import pixelmatch from "pixelmatch";
 import {
   type Browser,
   type BrowserContext,
   chromium,
   type Page,
 } from "playwright";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToStandaloneHtml } from "../utils/render";
 
