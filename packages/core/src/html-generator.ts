@@ -666,9 +666,13 @@ export class HtmlGenerator extends Generator {
     try {
       const html = mathjax.tex2svgHtml(math, { display: !!display });
       const div = document.createElement("div");
-      div.innerHTML = html.replace(/<style[^>]*>[\s\S]*?<\/style>/i, "");;
+      div.innerHTML = html.replace(/<style[^>]*>[\s\S]*?<\/style>/i, "");
       const fragment = document.createDocumentFragment();
-      fragment.appendChild(div.firstElementChild!);
+      const wrapper = div.firstElementChild;
+      if (wrapper) {
+        const mathNode = wrapper.firstElementChild;
+        fragment.appendChild(mathNode ?? wrapper);
+      }
       return fragment;
     } catch (error) {
       console.warn("MathJax failed to parse math:", math, error);

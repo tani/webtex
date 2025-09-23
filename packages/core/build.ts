@@ -130,8 +130,6 @@ async function bundleApplication(): Promise<void> {
       platform: "browser",
       minify: true,
       sourcemap: true,
-      splitting: true,
-      chunkNames: "chunks/[name]-[hash]",
     });
 
     // Node bundle with code splitting
@@ -143,8 +141,6 @@ async function bundleApplication(): Promise<void> {
       platform: "node",
       minify: true,
       sourcemap: true,
-      splitting: true,
-      chunkNames: "chunks/[name]-[hash]",
       banner: {
         js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
       },

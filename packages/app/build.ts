@@ -33,8 +33,6 @@ await build({
   target: "es2024",
   minify: true,
   sourcemap: true,
-  splitting: true,
-  chunkNames: "chunks/[name]-[hash]",
   external: [],
   define: {
     "process.env.NODE_ENV": '"production"',

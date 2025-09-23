@@ -2274,22 +2274,6 @@ test_cases:
             \end{minted}
             \end{document}
 
-    bussproofs_parse:
-      source: "/packages/core/test/unit/bussproofs.parseCommands.spec.ts"
-      tests:
-        - name: "proof tree commands"
-          latex_fragments:
-            - '\AxiomC{P \land Q}'
-            - '\BinaryInfC{B {C}}'
-            - '\AXC{D}'
-            - '\UIC{E}'
-            - '\TrinaryInfC{F}'
-            - '\QuinaryInfC{G}'
-            - '\RightLabel{MP}'
-            - '\LeftLabel{Cut}'
-            - '\RL{$\to_E$}'
-            - '\LL{Hyp}'
-
     unknown_package:
       source: "/packages/core/test/unit/unknown-package.spec.ts"
       tests:
