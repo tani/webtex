@@ -32,11 +32,6 @@ jobs:
         run: npx playwright install
         working-directory: ./packages/core
 
-      - name: Install VS Code test dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb
-
       - name: Lint all packages
         run: npm run lint
 
