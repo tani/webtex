@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename);
 const baselineDirectory = path.resolve(__dirname, "latex-code");
 // Small tolerance keeps visual regressions stable across Linux and macOS renders.
 const pixelmatchThreshold = 0.1;
-const maxPixelDifferenceRatio = 0.01;
+const maxPixelDifferenceRatio = 0.001;
 
 const shouldUpdateSnapshots = (): boolean => {
   const state = expect.getState();
