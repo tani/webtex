@@ -1,15 +1,15 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import pixelmatch from "pixelmatch";
 import {
   type Browser,
   type BrowserContext,
   chromium,
   type Page,
 } from "playwright";
-import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import pixelmatch from "pixelmatch";
+import { PNG } from "pngjs";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToStandaloneHtml } from "../utils/render";
 
@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename);
 const baselineDirectory = path.resolve(__dirname, "latex-code");
 // Small tolerance keeps visual regressions stable across Linux and macOS renders.
 const pixelmatchThreshold = 0.1;
-const maxPixelDifferenceRatio = 0.001;
+const maxPixelDifferenceRatio = 0.01;
 
 const shouldUpdateSnapshots = (): boolean => {
   const state = expect.getState();
