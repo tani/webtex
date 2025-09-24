@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Also watch for document saves
   const saveWatcher = vscode.workspace.onDidSaveTextDocument((document) => {
     if (isTexDocument(document)) {
-      WebTeXPreviewPanel.updatePreview(document.uri);
+      WebTeXPreviewPanel.updatePreview(document.uri, { immediate: true });
     }
   });
 
@@ -76,15 +76,21 @@ export async function getLatexContent(
   }
 }
 
+interface PreviewUpdateOptions {
+  immediate?: boolean;
+}
+
 class WebTeXPreviewPanel {
   public static currentPanel: WebTeXPreviewPanel | undefined;
   public static readonly viewType = "webtexPreview";
+  private static readonly DEFAULT_UPDATE_DEBOUNCE_DELAY_MS = 200;
 
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _currentUri: vscode.Uri | undefined;
   private _disposables: vscode.Disposable[] = [];
   private _htmlInitialized = false;
+  private _updateTimer: ReturnType<typeof setTimeout> | undefined;
 
   public static createOrShow(
     extensionUri: vscode.Uri,
@@ -98,7 +104,7 @@ class WebTeXPreviewPanel {
       WebTeXPreviewPanel.currentPanel._panel.reveal(targetColumn);
       if (uri) {
         WebTeXPreviewPanel.currentPanel._currentUri = uri;
-        WebTeXPreviewPanel.currentPanel._update();
+        WebTeXPreviewPanel.currentPanel._triggerUpdate({ immediate: true });
       }
       return;
     }
@@ -124,13 +130,18 @@ class WebTeXPreviewPanel {
     );
   }
 
-  public static updatePreview(uri: vscode.Uri) {
-    if (
-      WebTeXPreviewPanel.currentPanel &&
-      WebTeXPreviewPanel.currentPanel._currentUri?.toString() === uri.toString()
-    ) {
-      WebTeXPreviewPanel.currentPanel._update();
+  public static updatePreview(
+    uri: vscode.Uri,
+    options?: PreviewUpdateOptions,
+  ): void {
+    const panel = WebTeXPreviewPanel.currentPanel;
+    if (!panel) {
+      return;
     }
+    if (panel._currentUri?.toString() !== uri.toString()) {
+      return;
+    }
+    panel._triggerUpdate(options);
   }
 
   private constructor(
@@ -143,7 +154,7 @@ class WebTeXPreviewPanel {
     this._currentUri = uri || this._getActiveTexFile();
 
     // Set the webview's initial html content
-    this._update();
+    this._triggerUpdate({ immediate: true });
 
     // Listen for when the panel is disposed
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -227,6 +238,11 @@ class WebTeXPreviewPanel {
     // Clean up our resources
     this._panel.dispose();
 
+    if (this._updateTimer) {
+      clearTimeout(this._updateTimer);
+      this._updateTimer = undefined;
+    }
+
     while (this._disposables.length) {
       const x = this._disposables.pop();
       if (x) {
@@ -235,7 +251,34 @@ class WebTeXPreviewPanel {
     }
   }
 
-  private async _update() {
+  private _triggerUpdate(options?: PreviewUpdateOptions): void {
+    if (options?.immediate) {
+      if (this._updateTimer) {
+        clearTimeout(this._updateTimer);
+        this._updateTimer = undefined;
+      }
+      void this._update();
+      return;
+    }
+
+    if (this._updateTimer) {
+      clearTimeout(this._updateTimer);
+    }
+
+    const delay = WebTeXPreviewPanel.getUpdateDebounceDelay();
+    if (delay <= 0) {
+      this._updateTimer = undefined;
+      void this._update();
+      return;
+    }
+
+    this._updateTimer = setTimeout(() => {
+      this._updateTimer = undefined;
+      void this._update();
+    }, delay);
+  }
+
+  private async _update(): Promise<void> {
     const webview = this._panel.webview;
     this._panel.title = this._currentUri
       ? `WebTeX Preview - ${this._currentUri.fsPath}`
@@ -344,6 +387,19 @@ class WebTeXPreviewPanel {
                 <p>Open a .tex file to see the preview here.</p>
             </div>
         `;
+  }
+
+  private static getUpdateDebounceDelay(): number {
+    const config = vscode.workspace.getConfiguration("webtex-preview");
+    const configuredValue = config.get<number>("previewUpdateDebounce");
+    if (
+      typeof configuredValue === "number" &&
+      Number.isFinite(configuredValue) &&
+      configuredValue >= 0
+    ) {
+      return configuredValue;
+    }
+    return WebTeXPreviewPanel.DEFAULT_UPDATE_DEBOUNCE_DELAY_MS;
   }
 }
 

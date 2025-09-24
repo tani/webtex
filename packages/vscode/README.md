@@ -52,7 +52,7 @@ The preview automatically updates when you:
 
 ## Extension Settings
 
-This extension doesn't currently contribute any VS Code settings.
+- `webtex-preview.previewUpdateDebounce`: Delay in milliseconds before the preview refreshes after edits (set to 0 for immediate updates).
 
 ## Known Issues
 

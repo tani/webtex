@@ -49,6 +49,17 @@
         }
       ]
     },
+    "configuration": {
+      "title": "WebTeX Preview",
+      "properties": {
+        "webtex-preview.previewUpdateDebounce": {
+          "type": "number",
+          "default": 200,
+          "minimum": 0,
+          "description": "Delay in milliseconds before the preview refreshes after text changes. Set to 0 to update immediately."
+        }
+      }
+    },
     "keybindings": [
       {
         "command": "webtex-preview.openPreviewToSide",
