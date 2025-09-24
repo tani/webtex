@@ -1,10 +1,8 @@
-/* 
 mjx-assistive-mml {
 user-select: text !important;
 clip: auto !important;
 color: rgba(0,0,0,0);
 }
-*/
 
 mjx-container[jax="SVG"] {
 direction: ltr;
