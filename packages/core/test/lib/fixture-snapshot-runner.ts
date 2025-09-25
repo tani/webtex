@@ -3,7 +3,7 @@ import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import slugify from "slugify";
-import { expect, test } from "vitest";
+import { expect, test, type TestAPI } from "vitest";
 import {
   document,
   HtmlGenerator,
@@ -16,9 +16,11 @@ function resetSvgIds() {
   const proto = HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
     SVG?: typeof SVG;
   };
-  delete proto.SVG;
+  Reflect.deleteProperty(proto, "SVG");
   proto.SVG = SVG;
-  return registerWindow(window, document);
+  const win = window as unknown as Window & typeof globalThis;
+  const doc = document as unknown as Document;
+  return registerWindow(win, doc);
 }
 
 export interface MigrationOptions {
@@ -72,14 +74,14 @@ export function runMigratedFixture(
     useFixtureAsSnapshot = false,
   } = options;
 
-  let _test: typeof test = test;
+  let _test: TestAPI = test;
 
   // Handle test modifiers
   if (fixture.header?.charAt(0) === "!") {
-    _test = test.skip;
+    _test = test.skip as typeof test;
     fixture.header = fixture.header.substr(1);
   } else if (fixture.header?.charAt(0) === "+") {
-    _test = test.only;
+    _test = test.only as typeof test;
     fixture.header = fixture.header.substr(1);
   }
   if (fixture.header?.charAt(0) === "s") {

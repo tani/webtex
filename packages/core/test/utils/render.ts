@@ -100,9 +100,11 @@ const resetSvgIds = (): void => {
     HtmlGenerator.prototype as typeof HtmlGenerator.prototype & {
       SVG?: typeof SVG;
     };
-  delete prototype.SVG;
+  Reflect.deleteProperty(prototype, "SVG");
   prototype.SVG = SVG;
-  registerWindow(window, document);
+  const win = window as unknown as Window & typeof globalThis;
+  const doc = document as unknown as Document;
+  registerWindow(win, doc);
 };
 
 const loadCssBundle = (): string | undefined => {
@@ -142,8 +144,8 @@ export const renderLatexToHtml = (latex: string): string => {
   }
   const generator = new HtmlGenerator({ hyphenate: false });
   const doc = parse(normalized, { generator });
-  const fragment = doc.domFragment();
-  const htmlDoc = generator.htmlDocument();
+  const fragment = doc.domFragment() as unknown as DocumentFragment;
+  const htmlDoc = generator.htmlDocument() as unknown as Document;
   if (process.env.DEBUG_LATEX_RENDER === "1") {
     console.warn("[latex-code] fragment children:", fragment.childNodes.length);
     fragment.childNodes.forEach((node) => {
@@ -156,12 +158,10 @@ export const renderLatexToHtml = (latex: string): string => {
   }
   const body = htmlDoc.querySelector(".body");
   if (body) {
-    const imported = Array.from(fragment.childNodes).map((node) =>
-      node.cloneNode(true),
-    );
+    const imported = Array.from(fragment.childNodes) as Node[];
 
     const replacement: Node[] = [];
-    imported.forEach((node) => {
+    imported.forEach((node: Node) => {
       if (node.nodeType === 1) {
         const element = node as Node & {
           getAttribute?: (name: string) => string | null;

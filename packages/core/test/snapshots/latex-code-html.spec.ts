@@ -1,9 +1,18 @@
-import { describe, expect, test } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
 import { loadLatexCodeCases } from "../utils/latex-code-loader";
 import { renderLatexToHtml } from "../utils/render";
 
 const allCases = loadLatexCodeCases();
 const renderableCases = allCases.filter((testCase) => !testCase.allowFailure);
+
+beforeAll(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(Date.UTC(2025, 8, 24, 12, 0, 0)));
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 const groupByCategory = new Map<string, typeof renderableCases>();
 

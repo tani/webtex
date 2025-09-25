@@ -21,11 +21,17 @@ const PATH = process.env.PATH;
  * @param {Array} args Arguments to the command
  * @param {Object} env (optional) Environment variables
  */
+function assertStreams(
+  child: ReturnType<typeof spawnCmd>,
+): child is ChildProcessWithoutNullStreams {
+  return Boolean(child.stdin && child.stdout && child.stderr);
+}
+
 function createProcess(
   processPath: string,
   args: string[] = [],
   env: NodeJS.ProcessEnv | null = null,
-) {
+): ChildProcessWithoutNullStreams {
   // ensure that path exists
   if (!processPath || !existsSync(processPath)) {
     throw new Error("Invalid process path");
@@ -34,7 +40,7 @@ function createProcess(
   args = [processPath].concat(args);
 
   // this works for node-based CLIs and has to be adjusted for other processes
-  return spawnCmd("node", args, {
+  const child = spawnCmd("node", args, {
     env: Object.assign(
       {
         NODE_ENV: "test",
@@ -44,6 +50,13 @@ function createProcess(
     ),
     stdio: ["pipe", "pipe", "pipe", "ipc"], // create an IPC channel, enable subprocess.send()
   });
+
+  if (!assertStreams(child)) {
+    child.kill(constants.signals.SIGTERM);
+    throw new Error("Expected child process streams to be available");
+  }
+
+  return child;
 }
 
 /**
@@ -78,9 +91,7 @@ function executeWithInput(
 ): Promise<ExecuteResult> {
   const { env = null, timeout = 100, maxTimeout = 10000 } = opts;
   const childProcess = createProcess(processPath, args, env);
-  if (typeof childProcess.stdin.setEncoding === "function") {
-    childProcess.stdin.setEncoding("utf-8");
-  }
+  childProcess.stdin.setDefaultEncoding("utf-8");
 
   //
   let currentInputTimeout: NodeJS.Timeout | undefined;

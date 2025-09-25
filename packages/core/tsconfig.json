@@ -20,9 +20,10 @@
     "types": ["node"],
     "resolveJsonModule": true,
     "downlevelIteration": true,
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
-  "include": ["src/**/*", "build.ts"],
+  "include": ["src/**/*", "test/**/*.ts", "build.ts"],
   "files": ["test/types/globals.d.ts", "src/types/external.d.ts"],
   "exclude": ["node_modules", "dist", "docs", "website", "**/*.d.ts"]
 }

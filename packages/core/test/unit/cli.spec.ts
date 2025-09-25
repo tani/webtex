@@ -6,7 +6,8 @@ import { describe, expect, test } from "vitest";
 import pkg from "../../package.json";
 import { create as cmd } from "../lib/cmd";
 
-const binFile = path.resolve(pkg.bin[pkg.name]);
+const binEntries = pkg.bin as Record<string, string>;
+const binFile = path.resolve(binEntries[pkg.name]);
 const latexjs = cmd(binFile);
 
 // Helper function to create temporary files
