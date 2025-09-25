@@ -97,6 +97,14 @@ The build system uses esbuild which is significantly faster than TypeScript comp
 
 Open a `.tex` file and use the preview commands to test functionality. Unit tests cover core editor-to-preview data flow.
 
+```bash
+# Run the Vitest unit suite once
+npm run test
+
+# Watch mode during development
+npm run test:watch
+```
+
 ## Release Notes
 
 ### 0.0.1

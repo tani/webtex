@@ -420,3 +420,7 @@ function getNonce() {
 }
 
 // (Compilation moved to webview via webtex.browser.js)
+
+export const __testing = {
+  WebTeXPreviewPanel,
+};

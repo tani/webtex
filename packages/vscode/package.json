@@ -78,6 +78,8 @@
     "build:watch": "npx tsx build.ts --watch",
     "watch": "npx tsx build.ts --watch",
     "pretest": "npm run build && npx tsc && npm run lint:skip",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "biome check",
     "lint:skip": "echo 'Skipping lint for test run'",
     "lint:fix": "biome check --write",
@@ -94,6 +96,7 @@
     "esbuild": "^0.25.9",
     "tsx": "^4.19.1",
     "typescript": "^5.9.2",
+    "vitest": "^3.2.4",
     "zx": "^8.0.0"
   },
   "dependencies": {
