@@ -96,9 +96,8 @@
     "esbuild": "^0.25.9",
     "tsx": "^4.19.1",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
-  },
-  "dependencies": {
+    "vitest": "^3.2.4",
     "morphdom": "^2.7.7"
-  }
+  },
+  "dependencies": {}
 }
