@@ -1,7 +1,9 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { cp, mkdir, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { spawn } from "node:child_process";
 import { build as esbuild } from "esbuild";
 import peggy from "peggy";
-import { $ } from "zx";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";
 
 const CONFIG = {
@@ -25,76 +27,46 @@ const CONFIG = {
   staticAssets: [{ src: "src/css", dest: "dist/css" }],
 } as const;
 
-// Logging utilities
-const log = {
-  info: (msg: string) => console.log(`ℹ️  ${msg}`),
-  success: (msg: string) => console.log(`✅ ${msg}`),
-  error: (msg: string) => console.error(`❌ ${msg}`),
-  step: (msg: string) => console.log(`🔨 ${msg}`),
-  timing: (msg: string, time: number) => console.log(`⏱️  ${msg} (${time}ms)`),
-};
-
-/**
- * Clean the distribution directory
- */
-async function cleanDist(): Promise<void> {
-  log.step("Cleaning distribution directory...");
-  const start = Date.now();
-
-  try {
-    await $`rm -rf ${CONFIG.paths.distDir}`;
-    log.timing("Cleaned distribution directory", Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to clean dist directory: ${error}`);
-  }
-}
-
-/**
- * Generate LaTeX parser from PegJS grammar
- */
-async function generateParser(): Promise<void> {
-  log.step("Generating LaTeX parser from PegJS grammar...");
-  const start = Date.now();
-
-  try {
-    // Read grammar file
-    const grammar = readFileSync(CONFIG.paths.grammarFile, "utf8");
-
-    // Generate parser
-    const generatedParser = peggy.generate(grammar, {
-      ...CONFIG.pegjs,
-      plugins: [ignoreInfiniteLoop],
+function runCommand(command: string, args: readonly string[]): Promise<void> {
+  const resolved = process.platform === "win32" ? `${command}.cmd` : command;
+  return new Promise((resolve, reject) => {
+    const child = spawn(resolved, args, { stdio: "inherit" });
+    child.on("exit", (code) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+      reject(new Error(`${command} exited with code ${code}`));
     });
-
-    // Apply transformations
-    const transformedParser = transformGeneratedParser(generatedParser);
-
-    // Write parser file
-    writeFileSync(CONFIG.paths.parserOutput, transformedParser);
-
-    log.timing("Generated LaTeX parser", Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to generate parser: ${error}`);
-  }
+    child.on("error", reject);
+  });
 }
 
-/**
- * Apply necessary transformations to the generated parser
- */
+async function cleanDist(): Promise<void> {
+  await rm(CONFIG.paths.distDir, { recursive: true, force: true });
+}
+
+async function generateParser(): Promise<void> {
+  const grammar = readFileSync(CONFIG.paths.grammarFile, "utf8");
+  const generatedParser = peggy.generate(grammar, {
+    ...CONFIG.pegjs,
+    plugins: [ignoreInfiniteLoop],
+  });
+  const transformedParser = transformGeneratedParser(generatedParser);
+  await writeParser(transformedParser);
+}
+
 function transformGeneratedParser(generatedParser: string): string {
   let fixedParser = generatedParser
-    // Fix SyntaxError inheritance for global context
     .replace(
       /class peg\$SyntaxError extends SyntaxError/g,
       "class peg$SyntaxError extends globalThis.SyntaxError",
     )
-    // Convert require to import for ES modules
     .replace(
       /const { Vector } = require\('\.\/types'\);/g,
       "import { Vector } from './types';",
     );
 
-  // Extract and reorganize imports
   const importMatch = fixedParser.match(/import[^;]+;\n?/);
   const importLine = importMatch ? importMatch[0] : "";
 
@@ -102,7 +74,6 @@ function transformGeneratedParser(generatedParser: string): string {
     fixedParser = fixedParser.replace(importMatch[0], "");
   }
 
-  // Generate final parser code with proper exports
   return [
     "// @ts-nocheck",
     importLine,
@@ -113,109 +84,70 @@ function transformGeneratedParser(generatedParser: string): string {
   ].join("\n");
 }
 
-/**
- * Bundle the application using esbuild
- */
+async function writeParser(content: string): Promise<void> {
+  await mkdir(path.dirname(CONFIG.paths.parserOutput), { recursive: true });
+  await writeFile(CONFIG.paths.parserOutput, content);
+}
+
 async function bundleApplication(): Promise<void> {
-  log.step("Bundling application...");
-  const start = Date.now();
+  await esbuild({
+    entryPoints: [CONFIG.paths.entrypoint],
+    outdir: `${CONFIG.paths.distDir}/browser`,
+    bundle: true,
+    format: CONFIG.bundler.format,
+    platform: "browser",
+    minify: true,
+    sourcemap: true,
+  });
 
-  try {
-    // Browser bundle with code splitting
-    await esbuild({
-      entryPoints: [CONFIG.paths.entrypoint],
-      outdir: `${CONFIG.paths.distDir}/browser`,
-      bundle: true,
-      format: CONFIG.bundler.format,
-      platform: "browser",
-      minify: true,
-      sourcemap: true,
-    });
-
-    // Node bundle with code splitting
-    await esbuild({
-      entryPoints: [CONFIG.paths.entrypoint],
-      outdir: `${CONFIG.paths.distDir}/node`,
-      bundle: true,
-      format: CONFIG.bundler.format,
-      platform: "node",
-      minify: true,
-      sourcemap: true,
-      banner: {
-        js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
-      },
-    });
-
-    log.timing("Bundled application", Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to bundle application: ${error}`);
-  }
+  await esbuild({
+    entryPoints: [CONFIG.paths.entrypoint],
+    outdir: `${CONFIG.paths.distDir}/node`,
+    bundle: true,
+    format: CONFIG.bundler.format,
+    platform: "node",
+    minify: true,
+    sourcemap: true,
+    banner: {
+      js: "import { createRequire as __createRequire } from 'module';\nconst require = __createRequire(import.meta.url);",
+    },
+  });
 }
 
-/**
- * Copy static assets to distribution directory
- */
 async function copyStaticAssets(): Promise<void> {
-  log.step("Copying static assets...");
-  const start = Date.now();
-  let copiedCount = 0;
-
-  try {
-    for (const asset of CONFIG.staticAssets) {
-      if (existsSync(asset.src)) {
-        await $`cp -r ${asset.src} ${asset.dest}`;
-        copiedCount++;
-      } else {
-        log.info(`Skipping missing asset: ${asset.src}`);
-      }
+  for (const asset of CONFIG.staticAssets) {
+    if (!existsSync(asset.src)) {
+      continue;
     }
-
-    log.timing(`Copied ${copiedCount} static asset(s)`, Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to copy static assets: ${error}`);
+    await mkdir(path.dirname(asset.dest), { recursive: true });
+    await cp(asset.src, asset.dest, { recursive: true, force: true });
   }
 }
 
-/**
- * Generate TypeScript declaration files
- */
 async function generateTypeDeclarations(): Promise<void> {
-  log.step("Generating TypeScript declarations...");
-  const start = Date.now();
-
-  try {
-    await $`npx tsc --emitDeclarationOnly --outDir ${CONFIG.paths.typesDir} --noEmit false`;
-    log.timing("Generated TypeScript declarations", Date.now() - start);
-  } catch (error) {
-    throw new Error(`Failed to generate type declarations: ${error}`);
-  }
+  await runCommand("npx", [
+    "tsc",
+    "--emitDeclarationOnly",
+    "--outDir",
+    CONFIG.paths.typesDir,
+    "--noEmit",
+    "false",
+  ]);
 }
 
-/**
- * Main build function
- */
 async function build(): Promise<void> {
-  const totalStart = Date.now();
-  log.info("Starting WebTeX build process...");
-
-  try {
-    await cleanDist();
-    await generateParser();
-    await bundleApplication();
-    await copyStaticAssets();
-    await generateTypeDeclarations();
-
-    const totalTime = Date.now() - totalStart;
-    log.success(`Build completed successfully!`);
-    log.timing("Total build time", totalTime);
-  } catch (error) {
-    log.error(
-      `Build failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    process.exit(1);
-  }
+  await cleanDist();
+  await generateParser();
+  await bundleApplication();
+  await copyStaticAssets();
+  await generateTypeDeclarations();
 }
 
-await build();
+try {
+  await build();
+} catch (error) {
+  console.error(error);
+  process.exit(1);
+}
 
 export { build };

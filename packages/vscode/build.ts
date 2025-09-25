@@ -1,23 +1,10 @@
-/**
- * Build script for VSCode extension using esbuild
- * Optimized for small VSCode packages with minimal dependencies
- */
-
 import { existsSync } from "node:fs";
+import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
-import { $ } from "zx";
 
-// Handle __dirname in ES modules
-interface ImportMeta {
-  dir?: string;
-}
-
-const __dirname =
-  typeof (import.meta as ImportMeta).dir !== "undefined"
-    ? ((import.meta as ImportMeta).dir as string)
-    : path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 interface BuildOptions {
   clean?: boolean;
@@ -25,140 +12,100 @@ interface BuildOptions {
   production?: boolean;
 }
 
-async function copyWebTexFiles() {
-  console.log("📦 Copying WebTeX core files...");
-
+async function copyWebTexFiles(): Promise<void> {
   const coreDistPath = path.join(__dirname, "..", "core", "dist");
   const localWebtexPath = path.join(__dirname, "webtex");
 
   if (!existsSync(coreDistPath)) {
-    throw new Error(
-      "Core package dist directory not found. Please build the core package first with 'npm run compile:core'",
-    );
+    throw new Error("Core package dist directory not found. Run the core build first.");
   }
 
-  // Create local webtex directory and copy files
-  await $`mkdir -p ${localWebtexPath}`;
-  await $`cp -r ${coreDistPath}/* ${localWebtexPath}/`;
-
-  console.log("✅ WebTeX core files copied successfully");
+  await mkdir(localWebtexPath, { recursive: true });
+  const entries = await readdir(coreDistPath);
+  for (const entry of entries) {
+    const source = path.join(coreDistPath, entry);
+    const target = path.join(localWebtexPath, entry);
+    await cp(source, target, { recursive: true, force: true });
+  }
 }
 
-async function buildExtension(options: BuildOptions = {}) {
+function getExtensionConfig(production: boolean): esbuild.BuildOptions {
+  return {
+    entryPoints: ["./src/extension.ts"],
+    outdir: "./out",
+    platform: "node",
+    format: "cjs",
+    bundle: true,
+    minify: production,
+    sourcemap: production ? false : "inline",
+    external: ["vscode", "mocha", "@vscode/test-electron", "@vscode/test-cli"],
+    define: {
+      "process.env.NODE_ENV": production ? '"production"' : '"development"',
+    },
+  };
+}
+
+function getPreviewConfig(production: boolean): esbuild.BuildOptions {
+  return {
+    entryPoints: ["./src/preview.ts"],
+    outfile: "./media/preview.js",
+    platform: "browser",
+    format: "iife",
+    bundle: true,
+    minify: production,
+    sourcemap: production ? false : "inline",
+    define: {
+      "process.env.NODE_ENV": production ? '"production"' : '"development"',
+    },
+  };
+}
+
+async function buildExtension(options: BuildOptions = {}): Promise<void> {
   const { clean = false, watch = false, production = false } = options;
 
-  console.log(
-    `🔨 Building VSCode extension${production ? " (production)" : ""}${watch ? " (watch mode)" : ""}...`,
-  );
-
-  // Clean output and WebTeX directories if requested
   if (clean) {
-    console.log("🧹 Cleaning directories...");
-    await $`rm -rf out webtex`;
-    console.log("✅ Clean completed successfully");
+    await Promise.all([
+      rm("out", { recursive: true, force: true }),
+      rm("webtex", { recursive: true, force: true }),
+    ]);
     return;
   }
 
-  // Copy WebTeX core files
   await copyWebTexFiles();
 
-  // Build configuration for the extension
-  const extensionConfig = {
-    entryPoints: ["./src/extension.ts"],
-    outdir: "./out",
-    platform: "node" as const,
-    format: "cjs" as const, // VSCode extensions need CommonJS
-    bundle: true,
-    minify: production,
-    sourcemap: production ? false : ("inline" as const),
-    external: [
-      "vscode", // Always external - provided by VSCode runtime
-      "mocha", // Test dependencies
-      "@vscode/test-electron",
-      "@vscode/test-cli",
-    ],
-    define: {
-      "process.env.NODE_ENV": production ? '"production"' : '"development"',
-    },
-    metafile: !production,
-  };
+  const extensionConfig = getExtensionConfig(production);
+  const previewConfig = getPreviewConfig(production);
 
-  // Build configuration for the preview script (runs in webview)
-  const previewConfig = {
-    entryPoints: ["./src/preview.ts"],
-    outfile: "./media/preview.js",
-    platform: "browser" as const,
-    format: "iife" as const, // IIFE for browser execution
-    bundle: true,
-    minify: production,
-    sourcemap: production ? false : ("inline" as const),
-    define: {
-      "process.env.NODE_ENV": production ? '"production"' : '"development"',
-    },
-    metafile: !production,
-  };
-
-  try {
-    if (watch) {
-      console.log("👀 Starting watch mode...");
-      const extensionCtx = await esbuild.context(extensionConfig);
-      const previewCtx = await esbuild.context(previewConfig);
-      await Promise.all([extensionCtx.watch(), previewCtx.watch()]);
-      console.log("✅ Watch mode started. Press Ctrl+C to stop.");
-      process.on("SIGINT", () => {
-        console.log("\n👋 Stopping watch mode...");
-        extensionCtx.dispose();
-        previewCtx.dispose();
-        process.exit(0);
-      });
-      await new Promise(() => {});
-    } else {
-      const startTime = performance.now();
-      const [extensionResult, previewResult] = await Promise.all([
-        esbuild.build(extensionConfig),
-        esbuild.build(previewConfig),
-      ]);
-      const duration = Math.round(performance.now() - startTime);
-      console.log(`✅ Build completed successfully in ${duration}ms`);
-      if (!production) {
-        console.log("📁 Output files:");
-        if (extensionResult.metafile) {
-          for (const output of Object.keys(extensionResult.metafile.outputs)) {
-            const relativePath = path.relative(__dirname, output);
-            console.log(`   ${relativePath}`);
-          }
-        }
-        if (previewResult.metafile) {
-          for (const output of Object.keys(previewResult.metafile.outputs)) {
-            const relativePath = path.relative(__dirname, output);
-            console.log(`   ${relativePath}`);
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error("❌ Build failed:", error);
-    process.exit(1);
+  if (watch) {
+    const extensionCtx = await esbuild.context(extensionConfig);
+    const previewCtx = await esbuild.context(previewConfig);
+    await Promise.all([extensionCtx.watch(), previewCtx.watch()]);
+    process.on("SIGINT", () => {
+      void extensionCtx.dispose();
+      void previewCtx.dispose();
+      process.exit(0);
+    });
+    await new Promise(() => {});
+    return;
   }
+
+  await Promise.all([esbuild.build(extensionConfig), esbuild.build(previewConfig)]);
 }
 
-// CLI argument parsing
 function parseArgs(): BuildOptions {
   const args = process.argv.slice(2);
   return {
     clean: args.includes("--clean") || args.includes("-c"),
     watch: args.includes("--watch") || args.includes("-w"),
     production:
-      args.includes("--production") ||
-      args.includes("--prod") ||
-      args.includes("-p"),
+      args.includes("--production") || args.includes("--prod") || args.includes("-p"),
   };
 }
 
-// Run if called directly
 const options = parseArgs();
-(async () => {
-  await buildExtension(options);
-})();
+void buildExtension(options).catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 
 export { buildExtension };

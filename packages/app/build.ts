@@ -1,58 +1,68 @@
 #!/usr/bin/env tsx
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import path from "node:path";
 import { build } from "esbuild";
-import { fs, path } from "zx";
 
-// Build configuration
 const srcDir = "src";
 const distDir = "dist";
 const publicDir = "public";
 
-console.log("🔨 Building WebTeX App...");
-
-// Clean dist directory
-console.log("🧹 Cleaning distribution directory...");
-await fs.remove(distDir);
-await fs.ensureDir(distDir);
-
-// Copy HTML file and process it
-console.log("📄 Processing HTML file...");
-const htmlContent = await fs.readFile(path.join(srcDir, "index.html"), "utf-8");
-const processedHtml = htmlContent
-  .replace(/src="\.\/main\.js"/g, 'src="./assets/main.js"')
-  .replace(/href="\.\/styles\.css"/g, 'href="./assets/styles.css"');
-
-await fs.writeFile(path.join(distDir, "index.html"), processedHtml);
-
-// Bundle JavaScript with code splitting
-console.log("📦 Bundling JavaScript with code splitting...");
-await build({
-  entryPoints: [path.join(srcDir, "main.js")],
-  bundle: true,
-  outdir: path.join(distDir, "assets"),
-  format: "esm",
-  target: "es2024",
-  minify: true,
-  sourcemap: true,
-  external: [],
-  define: {
-    "process.env.NODE_ENV": '"production"',
-  },
-});
-
-// Bundle CSS
-console.log("🎨 Processing CSS...");
-await build({
-  entryPoints: [path.join(srcDir, "styles.css")],
-  bundle: true,
-  outfile: path.join(distDir, "assets", "styles.css"),
-  minify: true,
-  sourcemap: true,
-});
-
-// Copy public assets
-console.log("📁 Copying public assets...");
-if (await fs.pathExists(publicDir)) {
-  await fs.copy(publicDir, distDir, { overwrite: true });
+async function cleanDist(): Promise<void> {
+  await rm(distDir, { recursive: true, force: true });
+  await mkdir(distDir, { recursive: true });
 }
 
-console.log("✅ Build completed successfully!");
+async function writeHtml(): Promise<void> {
+  const htmlPath = path.join(srcDir, "index.html");
+  const htmlContent = await readFile(htmlPath, "utf8");
+  const processedHtml = htmlContent
+    .replace(/src="\.\/main\.js"/g, 'src="./assets/main.js"')
+    .replace(/href="\.\/styles\.css"/g, 'href="./assets/styles.css"');
+  await writeFile(path.join(distDir, "index.html"), processedHtml);
+}
+
+async function bundleScripts(): Promise<void> {
+  await build({
+    entryPoints: [path.join(srcDir, "main.js")],
+    bundle: true,
+    outdir: path.join(distDir, "assets"),
+    format: "esm",
+    target: "es2024",
+    minify: true,
+    sourcemap: true,
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+  });
+}
+
+async function bundleStyles(): Promise<void> {
+  await build({
+    entryPoints: [path.join(srcDir, "styles.css")],
+    bundle: true,
+    outfile: path.join(distDir, "assets", "styles.css"),
+    minify: true,
+    sourcemap: true,
+  });
+}
+
+async function copyPublicAssets(): Promise<void> {
+  try {
+    await cp(publicDir, distDir, { recursive: true });
+  } catch (error) {
+    const err = error as NodeJS.ErrnoException;
+    if (err.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
+async function buildApp(): Promise<void> {
+  await cleanDist();
+  await writeHtml();
+  await bundleScripts();
+  await bundleStyles();
+  await copyPublicAssets();
+}
+
+await buildApp();
