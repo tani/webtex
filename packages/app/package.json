@@ -29,8 +29,7 @@
     "esbuild": "^0.25.9",
     "http-server": "^14.1.1",
     "tsx": "^4.19.1",
-    "typescript": "^5.9.2",
-    "zx": "^8.0.0"
+    "typescript": "^5.9.2"
   },
   "files": [
     "dist"
