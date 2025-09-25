@@ -1,9 +1,11 @@
-import { mkdir, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
+import { mkdir, writeFile } from "node:fs/promises";
 
 async function run(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, { stdio: ["ignore", "pipe", "inherit"] });
+    const child = spawn(command, args, {
+      stdio: ["ignore", "pipe", "inherit"],
+    });
     const chunks = [];
     child.stdout.on("data", (data) => {
       chunks.push(data);

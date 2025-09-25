@@ -1,7 +1,7 @@
+import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { cp, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { spawn } from "node:child_process";
 import { build as esbuild } from "esbuild";
 import peggy from "peggy";
 import ignoreInfiniteLoop from "./lib/pegjs-no-infinite-loop.mjs";

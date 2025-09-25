@@ -17,7 +17,9 @@ async function copyWebTexFiles(): Promise<void> {
   const localWebtexPath = path.join(__dirname, "webtex");
 
   if (!existsSync(coreDistPath)) {
-    throw new Error("Core package dist directory not found. Run the core build first.");
+    throw new Error(
+      "Core package dist directory not found. Run the core build first.",
+    );
   }
 
   await mkdir(localWebtexPath, { recursive: true });
@@ -89,7 +91,10 @@ async function buildExtension(options: BuildOptions = {}): Promise<void> {
     return;
   }
 
-  await Promise.all([esbuild.build(extensionConfig), esbuild.build(previewConfig)]);
+  await Promise.all([
+    esbuild.build(extensionConfig),
+    esbuild.build(previewConfig),
+  ]);
 }
 
 function parseArgs(): BuildOptions {
@@ -98,7 +103,9 @@ function parseArgs(): BuildOptions {
     clean: args.includes("--clean") || args.includes("-c"),
     watch: args.includes("--watch") || args.includes("-w"),
     production:
-      args.includes("--production") || args.includes("--prod") || args.includes("-p"),
+      args.includes("--production") ||
+      args.includes("--prod") ||
+      args.includes("-p"),
   };
 }
 

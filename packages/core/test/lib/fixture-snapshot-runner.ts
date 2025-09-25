@@ -3,7 +3,7 @@ import path from "node:path";
 import { registerWindow, SVG } from "@svgdotjs/svg.js";
 import he from "he";
 import slugify from "slugify";
-import { expect, test, type TestAPI } from "vitest";
+import { expect, type TestAPI, test } from "vitest";
 import {
   document,
   HtmlGenerator,
