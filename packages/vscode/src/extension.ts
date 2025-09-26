@@ -198,6 +198,13 @@ class WebTeXPreviewPanel {
           diagCollection?.set(this._currentUri, [diag]);
           return;
         }
+        if (msg?.type === "openSourceLocation") {
+          const line = Number(msg.line);
+          const column = Number(msg.column);
+          if (Number.isFinite(line) && Number.isFinite(column)) {
+            void this._revealEditorLocation(line, column);
+          }
+        }
       },
       null,
       this._disposables,
@@ -307,6 +314,39 @@ class WebTeXPreviewPanel {
         }, 50);
       }
     }
+  }
+
+  private async _revealEditorLocation(
+    line: number,
+    column: number,
+  ): Promise<void> {
+    if (!this._currentUri) {
+      return;
+    }
+
+    const editor = vscode.window.visibleTextEditors.find(
+      (e) => e.document.uri.toString() === this._currentUri?.toString(),
+    );
+
+    if (!editor) {
+      return;
+    }
+
+    const targetLine = Math.max(0, Math.floor(line) - 1);
+    const targetColumn = Math.max(0, Math.floor(column) - 1);
+    const position = new vscode.Position(targetLine, targetColumn);
+    const range = new vscode.Range(position, position);
+
+    editor.selection = new vscode.Selection(position, position);
+    editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+
+    const viewColumn = editor.viewColumn ?? vscode.ViewColumn.Active;
+    await vscode.window.showTextDocument(editor.document, {
+      viewColumn,
+      preserveFocus: false,
+      preview: false,
+      selection: range,
+    });
   }
 
   private async _getHtmlForWebview(webview: vscode.Webview) {

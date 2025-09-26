@@ -46,6 +46,12 @@ interface CompileErrorMessage {
   };
 }
 
+interface OpenSourceLocationMessage {
+  type: "openSourceLocation";
+  line: number;
+  column: number;
+}
+
 type IncomingMessage = SetLatexMessage | ScrollToLineMessage;
 
 const vscode =
@@ -176,6 +182,56 @@ function scrollToLine(line: number): void {
   }
 }
 
+function findSourceElement(target: EventTarget | null): Element | null {
+  if (!target) {
+    return null;
+  }
+
+  let element: Element | null = null;
+  if (target instanceof Element) {
+    element = target;
+  } else if (target instanceof Node && target.parentElement) {
+    element = target.parentElement;
+  }
+
+  while (element) {
+    if (
+      element.hasAttribute("data-source-line") &&
+      element.hasAttribute("data-source-column")
+    ) {
+      return element;
+    }
+    element = element.parentElement;
+  }
+
+  return null;
+}
+
+function handleClick(event: MouseEvent): void {
+  if (event.defaultPrevented || event.button !== 0 || !vscode) {
+    return;
+  }
+
+  const element = findSourceElement(event.target);
+  if (!element) {
+    return;
+  }
+
+  const line = Number(element.getAttribute("data-source-line"));
+  const column = Number(element.getAttribute("data-source-column"));
+
+  if (!Number.isFinite(line) || !Number.isFinite(column)) {
+    return;
+  }
+
+  const message: OpenSourceLocationMessage = {
+    type: "openSourceLocation",
+    line,
+    column,
+  };
+  vscode.postMessage(message);
+}
+
 window.addEventListener("message", (event: MessageEvent) => {
   const msg = event?.data as IncomingMessage | undefined;
   if (!msg) return;
@@ -189,3 +245,5 @@ window.addEventListener("message", (event: MessageEvent) => {
     scrollToLine(Number(msg.line));
   }
 });
+
+document.addEventListener("click", handleClick);
