@@ -13,13 +13,9 @@ First theorem
 \\end{theorem}
 \\end{document}`;
 
-  console.log("Testing input:", input);
-
   try {
     const doc = parse(input, { generator }).htmlDocument();
     const html = doc.documentElement.outerHTML;
-
-    console.log("Generated HTML:", html);
 
     // Should contain theorem text
     expect(html).toContain("First theorem");
@@ -47,8 +43,6 @@ Second theorem
   try {
     const doc = parse(input, { generator }).htmlDocument();
     const html = doc.documentElement.outerHTML;
-
-    console.log("Generated HTML with counters:", html);
 
     // Check for theorem numbering
     const hasFirstNumber = html.includes("Theorem 1") || html.includes("1.");

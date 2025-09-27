@@ -6,8 +6,6 @@ import * as vscode from "vscode";
 let diagCollection: vscode.DiagnosticCollection | undefined;
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("WebTeX Preview extension is now active!");
-
   // Create diagnostics collection for WebTeX errors
   diagCollection = vscode.languages.createDiagnosticCollection("webtex");
   context.subscriptions.push(diagCollection);

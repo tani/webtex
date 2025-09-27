@@ -27,17 +27,10 @@ Second theorem - should be number 3 (shared counter)
     const doc = parse(input, { generator: generator }).htmlDocument();
     const html = doc.documentElement.outerHTML;
 
-    console.log("Shared counter test result:");
-    console.log(html);
-
     // Check for correct numbering sequence
     const hasTheorem1 = html.includes("Theorem 1");
     const hasLemma2 = html.includes("Lemma 2");
     const hasTheorem3 = html.includes("Theorem 3");
-
-    console.log("Contains 'Theorem 1':", hasTheorem1);
-    console.log("Contains 'Lemma 2':", hasLemma2);
-    console.log("Contains 'Theorem 3':", hasTheorem3);
 
     expect(hasTheorem1).toBe(true);
     expect(hasLemma2).toBe(true);
@@ -68,14 +61,8 @@ Second theorem
     const doc = parse(input, { generator: generator }).htmlDocument();
     const html = doc.documentElement.outerHTML;
 
-    console.log("Basic numbering test result:");
-    console.log(html);
-
     const hasTheorem1 = html.includes("Theorem 1");
     const hasTheorem2 = html.includes("Theorem 2");
-
-    console.log("Contains 'Theorem 1':", hasTheorem1);
-    console.log("Contains 'Theorem 2':", hasTheorem2);
 
     expect(hasTheorem1).toBe(true);
     expect(hasTheorem2).toBe(true);
