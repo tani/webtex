@@ -6,8 +6,8 @@ test("Simple amsthm test - basic theorem", async () => {
 
   const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -30,8 +30,8 @@ test("Simple amsthm test - check number counter", async () => {
 
   const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}

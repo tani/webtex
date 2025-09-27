@@ -38,8 +38,6 @@ const wrapLatex = (latex: string): string => {
     const bodyPrelude: string[] = [];
 
     const moveToBodyPatterns: RegExp[] = [
-      /\\newtheorem\*?\{[^}]+\}[^\n]*\n?/g,
-      /\\theoremstyle\{[^}]+\}\n?/g,
       /\\numberwithin\{[^}]+\}\{[^}]+\}\n?/g,
     ];
 

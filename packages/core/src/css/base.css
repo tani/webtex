@@ -862,6 +862,20 @@ span.latex > .e {
   font-style: normal;
 }
 
+/* Custom theorem styles */
+.amsthm-custom-header {
+  font-weight: bold;
+  font-style: normal;
+}
+
+.amsthm-custom-body {
+  font-style: normal;
+}
+
+.amsthm-head-spacer {
+  display: inline-block;
+}
+
 /* Proof environment */
 .amsthm-proof {
   margin: 1rem 0;
@@ -876,17 +890,17 @@ span.latex > .e {
 
 /* QED symbol */
 .amsthm-qed {
-  float: right;
   font-size: 1rem;
   font-weight: bold;
   margin-left: 0.5em;
 }
+.amsthm-qed-block {
+  float: right;
+}
 
-/* Automatic QED symbol at end of proof */
-.amsthm-proof-with-qed::after {
-  content: "◻";
-  font-size: 1.2rem;
-  margin-left: 0.5em;
+.amsthm-qed-inline {
+  float: none;
+  display: inline;
 }
 
 /* Bussproofs package */

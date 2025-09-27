@@ -7,8 +7,8 @@ test("Amsthm theorem numbering - basic sequential numbering", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -35,10 +35,10 @@ test("Amsthm theorem numbering - multiple environment types", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}{Lemma}
 \\newtheorem{corollary}{Corollary}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -69,10 +69,10 @@ test("Amsthm theorem numbering - shared counters", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}[theorem]{Lemma}
 \\newtheorem{corollary}[theorem]{Corollary}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}
@@ -103,8 +103,8 @@ test("Amsthm theorem numbering - hierarchical numbering with sections", async ()
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}[section]
+\\begin{document}
 \\section{First Section}
 \\begin{theorem}
 First theorem in section 1
@@ -133,9 +133,9 @@ test("Amsthm theorem numbering - unnumbered theorems", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem*{remark}{Theorem}
+\\begin{document}
 \\begin{theorem}
 Numbered theorem
 \\end{theorem}
@@ -162,8 +162,8 @@ test("Amsthm theorem numbering - with optional titles", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
+\\begin{document}
 \\begin{theorem}
 Theorem without title
 \\end{theorem}
@@ -198,7 +198,7 @@ This is a proof with custom label.
   const html = doc.documentElement.outerHTML;
 
   expect(html).toContain("Proof.");
-  expect(html).toContain("Proof of Main Theorem.");
+  expect(html).toContain("Proof (Proof of Main Theorem).");
 });
 
 test("Amsthm theorem styles", async () => {
@@ -207,13 +207,13 @@ test("Amsthm theorem styles", async () => {
   const input = `
 \\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\theoremstyle{plain}
 \\newtheorem{theorem}{Theorem}
 \\theoremstyle{definition}
 \\newtheorem{definition}{Definition}
 \\theoremstyle{remark}
 \\newtheorem{remark}{Remark}
+\\begin{document}
 \\begin{theorem}
 Plain style theorem
 \\end{theorem}

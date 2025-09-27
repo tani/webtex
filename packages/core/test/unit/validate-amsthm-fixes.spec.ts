@@ -7,9 +7,9 @@ test("Validate amsthm fixes - shared counters working", async () => {
   // This tests the main issue: shared counter syntax \newtheorem{lemma}[theorem]{Lemma}
   const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}[theorem]{Lemma}
+\\begin{document}
 \\begin{theorem}
 First theorem - should be number 1
 \\end{theorem}
@@ -46,8 +46,8 @@ test("Validate amsthm fixes - basic numbering works", async () => {
 
   const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
 \\newtheorem{theorem}{Theorem}
+\\begin{document}
 \\begin{theorem}
 First theorem
 \\end{theorem}

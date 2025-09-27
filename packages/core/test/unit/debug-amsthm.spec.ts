@@ -7,8 +7,6 @@ test("Debug amsthm - multiple theorem styles from fixture", async () => {
   // This is copied from the amsthm.tex fixture
   const input = `\\documentclass{article}
 \\usepackage{amsthm}
-\\begin{document}
-
 \\theoremstyle{plain}
 \\newtheorem{theorem}{Theorem}
 \\newtheorem{lemma}[theorem]{Lemma}
@@ -20,6 +18,7 @@ test("Debug amsthm - multiple theorem styles from fixture", async () => {
 \\theoremstyle{remark}
 \\newtheorem{remark}{Remark}
 
+\\begin{document}
 \\begin{theorem}
 This is a theorem in plain style.
 \\end{theorem}
