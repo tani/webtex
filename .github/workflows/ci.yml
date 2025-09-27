@@ -32,14 +32,14 @@ jobs:
         run: npx playwright install
         working-directory: ./packages/core
 
+      - name: Build all packages
+        run: npm run build
+
       - name: Lint all packages
         run: npm run lint
 
       - name: Type check all packages
         run: npm run typecheck
-
-      - name: Build all packages
-        run: npm run build
 
       - name: Test core package
         run: npm run test:core
